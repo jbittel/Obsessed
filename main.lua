@@ -26,6 +26,8 @@ end
 
 function game_loop()
     local game_over = false
+    local card_num = nil
+
     while not game_over do
         for _,player in ipairs(players) do
             print('Discard pile: ')
@@ -33,29 +35,41 @@ function game_loop()
             print('Player '..player.num..' hand: ')
             display_cards(player.hand)
 
-            -- TODO use card indexes?
-            io.write('Enter card: ')
-            card = io.stdin:read'*l'
-            -- TODO validate card (actual card and in player's hand)
+            -- TODO repeat until turn done
+            repeat
+                io.write('Enter card: ')
+                card_num = io.stdin:read'*n'
+            until is_valid_card(player.hand, card_num)
             -- TODO validate against game rules
             -- TODO no valid moves, pick up discard
 
-            -- TODO move card from player's hand to discard
+            -- Discard selected card
+            local card = table.remove(player.hand, card_num)
+            table.insert(discard_pile, card)
 
-            -- Draw next card from pile
+            -- TODO kill discard pile if necessary
+
+            -- Draw next card from appropriate pile as necessary
             if #draw_pile > 0 and #player.hand < 3 then
                 local card = get_next_card(draw_pile)
                 if card ~= nil then
                     table.insert(player.hand, card)
                 end
-            end
-
-            -- TODO if hand and pile are empty, draw from visible
-            -- TODO if hand, pile and visible are empty, draw from hidden
-
-            -- End game when one player is out of cards
-            -- TODO this isn't the final end condition
-            if #draw_pile == 0 then
+            elseif #draw_pile == 0 and #player.hand == 0 then
+                -- TODO allow player to select card
+                local card = get_next_card(player.visible)
+                if card ~= nil then
+                    table.insert(player.hand, card)
+                end
+            elseif #draw_pile == 0 and #player.hand == 0 and
+                   #player.visible == 0 then
+                -- TODO allow player to select card
+                local card = get_next_card(player.hidden)
+                if card ~= nil then
+                    table.insert(player.hand, card)
+                end
+            elseif #draw_pile == 0 and #player.hand == 0 and
+                   #player.visible == 0 and #player.hidden == 0 then
                 game_over = true
             end
         end
@@ -67,7 +81,7 @@ function display_cards(cards, num)
         return
     end
 
-    if num == nil then
+    if num == nil or num > #cards then
         num = #cards
     end
 
@@ -77,6 +91,10 @@ function display_cards(cards, num)
         io.write('('..i..') '..face..suit..' ')
     end
     print('')
+end
+
+function is_valid_card(hand, card_num)
+    return hand[card_num]
 end
 
 function build_decks(num)
@@ -124,7 +142,6 @@ function get_num_cards(cards, num)
         local card = table.remove(cards)
         table.insert(t, card)
     end
-
     return t
 end
 
@@ -134,6 +151,15 @@ function get_next_card(cards)
     else
         return nil
     end
+end
+
+function table.find(f, l)
+    for _,v in ipairs(l) do
+        if f(v) then
+            return v
+        end
+    end
+    return nil
 end
 
 -- main
