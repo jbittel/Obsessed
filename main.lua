@@ -10,8 +10,6 @@ players = {}
 cards = {}
 
 function init_game()
-    local cards = {}
-    
     cards = build_decks(NUM_DECKS)
 
     math.randomseed(os.time())
@@ -22,16 +20,20 @@ end
 
 function game_loop()
     local game_over = false
-    local card_num = nil
     local draw_pile = cards
-    local discard_pile = {}
+    local discard = {}
 
     while not game_over do
         for _,player in ipairs(players) do
+            local turn_over = true
+            local card_num = nil
+
             print('Discard pile: ')
-            display_cards(discard_pile, 5)
+            display_cards(discard, 5)
             print('Player '..player.num..' hand: ')
             display_cards(player.hand)
+
+            -- TODO if no valid moves, pick up discard pile and lose turn
 
             repeat
                 repeat
@@ -39,7 +41,15 @@ function game_loop()
                     card_num = io.stdin:read'*n'
                 until is_valid_card(player.hand, card_num)
                 -- TODO allow multiple cards to be played
-            until is_turn_complete(discard_pile, player.hand, card_num)
+                -- TODO pass all cards to be played to this function
+            until is_valid_action(discard, player.hand, card_num)
+  
+            -- TODO apply appropriate game action
+            discard_card(discard, player.hand, card_num)
+
+            -- TODO kill discard pile if necessary
+            --  if 10 on top
+            --  if 4 or more of the same on top
 
             -- Draw next card from appropriate pile as necessary
             if #draw_pile > 0 and #player.hand < 3 then
@@ -69,6 +79,10 @@ function game_loop()
     end
 end
 
+-- TODO split out display_hand() that:
+--  * displays index numbers
+--  * displays cards in rank order
+--  * displays visible cards
 function display_cards(cards, num)
     if #cards == 0 then
         return
@@ -90,40 +104,50 @@ function is_valid_card(hand, card_num)
     return hand[card_num]
 end
 
-function is_turn_complete(discard_pile, hand, card_num)
-    -- TODO validate against game rules
-    -- TODO apply game action
-    local special_cards = {}
+function is_valid_action(discard, hand, card_num)
+    local active_face = hand[card_num].face
+    local invalid_moves = {}
  
-    if #discard_pile == 0 then
-        discard_card(discard_pile, hand, card_num)
+    if #discard == 0 then
+        return true
+    end
+ 
+    -- TODO multiple cards: ensure consistency and treat them as a stack
+    -- TODO in some cases, look deeper into discard pile
+
+    local base_face = discard[#discard].face
+
+    -- Cards can always be played onto themselves
+    if base_face == active_face then
         return true
     end
 
-    -- Any special card can play onto a non-special card
-    if not is_special_card(discard_pile[#discard_pile]) and is_special_card(hand[card_num]) then
-        discard_card(discard_pile, hand, card_num)
-        return true
+    invalid_moves['3'] = { '2', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A' }
+    invalid_moves['5'] = { '4' }
+    invalid_moves['6'] = { '4', '5' }
+    invalid_moves['7'] = { '8', '9', 'J', 'Q', 'K', 'A' }
+    invalid_moves['9'] = { '4', '5', '6' }
+    invalid_moves['J'] = { '4', '5', '6', '9' }
+    invalid_moves['Q'] = { '4', '5', '6', '9', 'J' }
+    invalid_moves['K'] = { '4', '5', '6', '9', 'J', 'Q' }
+    invalid_moves['A'] = { '4', '5', '6', '9', 'J', 'Q', 'K' }
+
+    for face,moves in pairs(invalid_moves) do
+        if face == base_face then
+            for _,move in ipairs(moves) do
+                if move == active_face then
+                    print('You cannot play a '..active_face..' onto a '..base_face)
+                    return false
+                end
+            end
+        end
     end
 
-    -- TODO if not special and not special
-    --  compare rank
-    -- TODO if special and not special
-    -- TODO if special and special
-  
-    -- TODO if no valid moves, pick up discard pile
-
-    -- TODO kill discard pile if necessary
-    --  if 10 on top
-    --  if 4 or more of the same on top
-    return true
-end
-
-function is_special_card()
     return true
 end
 
 function discard_card(discard, hand, card_num)
+    -- TODO push discarded cards onto top of stack
     local card = table.remove(hand, card_num)
     table.insert(discard, card)
 end
