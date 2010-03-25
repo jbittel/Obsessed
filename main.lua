@@ -28,53 +28,67 @@ function game_loop()
             local turn_over = true
             local card_num = nil
 
-            print('Discard pile: ')
-            display_cards(discard, 5)
-            print('Player '..player.num..' hand: ')
-            display_cards(player.hand)
-
-            -- TODO if no valid moves, pick up discard pile and lose turn
-
             repeat
+                print('Discard pile: ')
+                display_cards(discard, 5)
+                print('Player '..player.num..' hand: ')
+                display_cards(player.hand)
+
+                -- TODO if no valid moves, pick up discard pile and lose turn
+
                 repeat
-                    io.write('Enter card number(s): ')
-                    card_num = io.stdin:read'*n'
-                until is_valid_card(player.hand, card_num)
-                -- TODO allow multiple cards to be played
-                -- TODO pass all cards to be played to this function
-            until is_valid_action(discard, player.hand, card_num)
-  
-            -- TODO apply appropriate game action
-            discard_card(discard, player.hand, card_num)
+                    repeat
+                        io.write('Enter card number(s): ')
+                        card_num = io.stdin:read'*n'
+                    until is_valid_card(player.hand, card_num)
+                    -- TODO allow multiple cards to be played
+                    -- TODO pass all cards to be played to this function
+                until is_valid_action(discard, player.hand, card_num)
+      
+                -- Apply appropriate game actions
+                active_face = player.hand[card_num].face
+                if active_face == '8' then
+                    discard_card(discard, player.hand, card_num)
+                    turn_over = false
+                elseif active_face == '10' then
+                    discard_card(discard, player.hand, card_num)
+                    discard = {}
+                    turn_over = false
+                else
+                    discard_card(discard, player.hand, card_num)
+                    turn_over = true
+                end
 
-            -- TODO kill discard pile if necessary
-            --  if 10 on top
-            --  if 4 or more of the same on top
+                if #discard > 4 then
+                    --  TODO kill pile if top four are identical
+                    --turn_over = false
+                end
 
-            -- Draw next card from appropriate pile as necessary
-            if #draw_pile > 0 and #player.hand < 3 then
-                -- TODO draw multiple cards to fill hand
-                local card = get_next_card(draw_pile)
-                if card ~= nil then
-                    table.insert(player.hand, card)
+                -- Draw next card from appropriate pile as necessary
+                if #draw_pile > 0 and #player.hand < 3 then
+                    -- TODO draw multiple cards to fill hand
+                    local card = get_next_card(draw_pile)
+                    if card ~= nil then
+                        table.insert(player.hand, card)
+                    end
+                elseif #draw_pile == 0 and #player.hand == 0 then
+                    -- TODO allow player to select card
+                    local card = get_next_card(player.visible)
+                    if card ~= nil then
+                        table.insert(player.hand, card)
+                    end
+                elseif #draw_pile == 0 and #player.hand == 0 and
+                       #player.visible == 0 then
+                    -- TODO allow player to select card
+                    local card = get_next_card(player.hidden)
+                    if card ~= nil then
+                        table.insert(player.hand, card)
+                    end
+                elseif #draw_pile == 0 and #player.hand == 0 and
+                       #player.visible == 0 and #player.hidden == 0 then
+                    game_over = true
                 end
-            elseif #draw_pile == 0 and #player.hand == 0 then
-                -- TODO allow player to select card
-                local card = get_next_card(player.visible)
-                if card ~= nil then
-                    table.insert(player.hand, card)
-                end
-            elseif #draw_pile == 0 and #player.hand == 0 and
-                   #player.visible == 0 then
-                -- TODO allow player to select card
-                local card = get_next_card(player.hidden)
-                if card ~= nil then
-                    table.insert(player.hand, card)
-                end
-            elseif #draw_pile == 0 and #player.hand == 0 and
-                   #player.visible == 0 and #player.hidden == 0 then
-                game_over = true
-            end
+            until turn_over
         end
     end
 end
