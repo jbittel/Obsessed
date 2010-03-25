@@ -1,5 +1,5 @@
 
-
+-- TODO add Joker as a playable card
 FACES = { '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A' }
 SUITS = { 'C', 'D', 'H', 'S' }
 
@@ -8,8 +8,6 @@ NUM_PLAYERS = 2
 
 players = {}
 cards = {}
-draw_pile = {}
-discard_pile = {}
 
 function init_game()
     local cards = {}
@@ -20,13 +18,13 @@ function init_game()
     shuffle(cards)
 
     deal_cards(cards, NUM_PLAYERS)
-
-    draw_pile = cards
 end
 
 function game_loop()
     local game_over = false
     local card_num = nil
+    local draw_pile = cards
+    local discard_pile = {}
 
     while not game_over do
         for _,player in ipairs(players) do
@@ -35,22 +33,17 @@ function game_loop()
             print('Player '..player.num..' hand: ')
             display_cards(player.hand)
 
-            -- TODO repeat until turn done
             repeat
-                io.write('Enter card: ')
-                card_num = io.stdin:read'*n'
-            until is_valid_card(player.hand, card_num)
-            -- TODO validate against game rules
-            -- TODO no valid moves, pick up discard
-
-            -- Discard selected card
-            local card = table.remove(player.hand, card_num)
-            table.insert(discard_pile, card)
-
-            -- TODO kill discard pile if necessary
+                repeat
+                    io.write('Enter card number(s): ')
+                    card_num = io.stdin:read'*n'
+                until is_valid_card(player.hand, card_num)
+                -- TODO allow multiple cards to be played
+            until is_turn_complete(discard_pile, player.hand, card_num)
 
             -- Draw next card from appropriate pile as necessary
             if #draw_pile > 0 and #player.hand < 3 then
+                -- TODO draw multiple cards to fill hand
                 local card = get_next_card(draw_pile)
                 if card ~= nil then
                     table.insert(player.hand, card)
@@ -95,6 +88,44 @@ end
 
 function is_valid_card(hand, card_num)
     return hand[card_num]
+end
+
+function is_turn_complete(discard_pile, hand, card_num)
+    -- TODO validate against game rules
+    -- TODO apply game action
+    local special_cards = {}
+ 
+    if #discard_pile == 0 then
+        discard_card(discard_pile, hand, card_num)
+        return true
+    end
+
+    -- Any special card can play onto a non-special card
+    if not is_special_card(discard_pile[#discard_pile]) and is_special_card(hand[card_num]) then
+        discard_card(discard_pile, hand, card_num)
+        return true
+    end
+
+    -- TODO if not special and not special
+    --  compare rank
+    -- TODO if special and not special
+    -- TODO if special and special
+  
+    -- TODO if no valid moves, pick up discard pile
+
+    -- TODO kill discard pile if necessary
+    --  if 10 on top
+    --  if 4 or more of the same on top
+    return true
+end
+
+function is_special_card()
+    return true
+end
+
+function discard_card(discard, hand, card_num)
+    local card = table.remove(hand, card_num)
+    table.insert(discard, card)
 end
 
 function build_decks(num)
