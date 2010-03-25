@@ -3,8 +3,20 @@
 FACES = { '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A' }
 SUITS = { 'C', 'D', 'H', 'S' }
 
-NUM_DECKS = 2
-NUM_PLAYERS = 2
+INVALID_MOVES = {
+    ['3'] = { '2', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A' },
+    ['5'] = { '4' },
+    ['6'] = { '4', '5' },
+    ['7'] = { '8', '9', 'J', 'Q', 'K', 'A' },
+    ['9'] = { '4', '5', '6' },
+    ['J'] = { '4', '5', '6', '9' },
+    ['Q'] = { '4', '5', '6', '9', 'J' },
+    ['K'] = { '4', '5', '6', '9', 'J', 'Q' },
+    ['A'] = { '4', '5', '6', '9', 'J', 'Q', 'K' },
+}
+
+NUM_DECKS = 1
+NUM_PLAYERS = 5
 
 players = {}
 cards = {}
@@ -29,20 +41,27 @@ function game_loop()
             local card_num = nil
 
             repeat
-                print('Discard pile: ')
-                display_cards(discard, 5)
-                print('Player '..player.num..' hand: ')
-                display_cards(player.hand)
+                print('*** '..#draw_pile..' card(s) left in draw pile')
+                display_pile(discard)
+                display_hand(player.num, player.hand)
 
-                -- TODO if no valid moves, pick up discard pile and lose turn
+                -- If no valid moves, pick up pile and lose turn
+                if not has_valid_action(discard, player.hand) then
+                    print('*** No valid moves available')
+                    -- TODO this count is wrong because of 3 cards being removed
+                    print('*** Player '..player.num..' picked up '..#discard..' cards')
+                    pick_up_pile(discard, player.hand)
+                    break
+                end
 
+                -- TODO push these loops into function, use them for visible cards
+                -- TODO allow multiple cards to be played
                 repeat
                     repeat
                         io.write('Enter card number(s): ')
                         card_num = io.stdin:read'*n'
                     until is_valid_card(player.hand, card_num)
-                    -- TODO allow multiple cards to be played
-                    -- TODO pass all cards to be played to this function
+                    -- TODO tell the user what/if invalid action was encountered
                 until is_valid_action(discard, player.hand, card_num)
       
                 -- Apply appropriate game actions
@@ -59,20 +78,27 @@ function game_loop()
                     turn_over = true
                 end
 
+                -- Kill discard pile if 4+ top cards match
                 if #discard > 4 then
-                    --  TODO kill pile if top four are identical
-                    --turn_over = false
+                    if discard[1].face == discard[2].face and
+                       discard[1].face == discard[3].face and
+                       discard[1].face == discard[4].face then
+                        discard = {}
+                        turn_over = false
+                    end
                 end
 
                 -- Draw next card from appropriate pile as necessary
                 if #draw_pile > 0 and #player.hand < 3 then
-                    -- TODO draw multiple cards to fill hand
-                    local card = get_next_card(draw_pile)
-                    if card ~= nil then
-                        table.insert(player.hand, card)
+                    while #player.hand < 3 do
+                        local card = get_next_card(draw_pile)
+                        if card ~= nil then
+                            table.insert(player.hand, card)
+                        end
                     end
                 elseif #draw_pile == 0 and #player.hand == 0 then
                     -- TODO allow player to select card
+                    print('*** Draw pile empty, using visible cards')
                     local card = get_next_card(player.visible)
                     if card ~= nil then
                         table.insert(player.hand, card)
@@ -80,6 +106,7 @@ function game_loop()
                 elseif #draw_pile == 0 and #player.hand == 0 and
                        #player.visible == 0 then
                     -- TODO allow player to select card
+                    print('*** Draw pile and visible cards empty, using hidden cards')
                     local card = get_next_card(player.hidden)
                     if card ~= nil then
                         table.insert(player.hand, card)
@@ -93,64 +120,74 @@ function game_loop()
     end
 end
 
--- TODO split out display_hand() that:
---  * displays index numbers
---  * displays cards in rank order
---  * displays visible cards
-function display_cards(cards, num)
-    if #cards == 0 then
+function display_pile(pile)
+    if #pile == 0 then
+        print('*** The discard pile is empty')
         return
     end
 
-    if num == nil or num > #cards then
-        num = #cards
+    local num = 0
+    if #pile < 5 then
+        num = #pile
+    else
+        num = 5
+    end
+    local t = {}
+    for i = 1,num do
+        table.insert(t, pile[i].face..pile[i].suit)
+    end
+    print('*** Discard pile: '..table.concat(t, ' ')..'\t['..#pile..' card(s) total]')
+end
+
+function display_hand(num, hand)
+    if #hand == 0 then
+        return
     end
 
-    for i = 1,num do
-        local face = cards[i].face
-        local suit = cards[i].suit
-        io.write('('..i..') '..face..suit..' ')
+    -- TODO display visible cards also?
+    print('Player '..num..' hand:')
+    table.sort(hand, function(a, b) return a.rank < b.rank end)
+    for i,card in ipairs(hand) do
+        print('  '..i..': '..card.face..card.suit)
     end
-    print('')
 end
 
 function is_valid_card(hand, card_num)
     return hand[card_num]
 end
 
+function has_valid_action(discard, hand)
+    for i,card in ipairs(hand) do
+        if is_valid_action(discard, hand, i) then
+            return true
+        end
+    end
+
+    return false
+end
+
 function is_valid_action(discard, hand, card_num)
     local active_face = hand[card_num].face
-    local invalid_moves = {}
- 
+
+    -- TODO if multiple cards: ensure same face and treat as one
+
     if #discard == 0 then
         return true
     end
  
-    -- TODO multiple cards: ensure consistency and treat them as a stack
     -- TODO in some cases, look deeper into discard pile
-
-    local base_face = discard[#discard].face
+    --  what cases? Joker
+    local base_face = discard[1].face
 
     -- Cards can always be played onto themselves
     if base_face == active_face then
         return true
     end
 
-    invalid_moves['3'] = { '2', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A' }
-    invalid_moves['5'] = { '4' }
-    invalid_moves['6'] = { '4', '5' }
-    invalid_moves['7'] = { '8', '9', 'J', 'Q', 'K', 'A' }
-    invalid_moves['9'] = { '4', '5', '6' }
-    invalid_moves['J'] = { '4', '5', '6', '9' }
-    invalid_moves['Q'] = { '4', '5', '6', '9', 'J' }
-    invalid_moves['K'] = { '4', '5', '6', '9', 'J', 'Q' }
-    invalid_moves['A'] = { '4', '5', '6', '9', 'J', 'Q', 'K' }
-
-    for face,moves in pairs(invalid_moves) do
+    for face,moves in pairs(INVALID_MOVES) do
         if face == base_face then
             for _,move in ipairs(moves) do
                 if move == active_face then
-                    print('You cannot play a '..active_face..' onto a '..base_face)
                     return false
                 end
             end
@@ -160,10 +197,18 @@ function is_valid_action(discard, hand, card_num)
     return true
 end
 
+function pick_up_pile(discard, hand)
+    for i,card in ipairs(discard) do
+        if card.face ~= '3' then
+            table.insert(hand, card)
+        end
+        discard[i] = nil
+    end
+end
+
 function discard_card(discard, hand, card_num)
-    -- TODO push discarded cards onto top of stack
     local card = table.remove(hand, card_num)
-    table.insert(discard, card)
+    table.insert(discard, 1, card)
 end
 
 function build_decks(num)
@@ -220,15 +265,6 @@ function get_next_card(cards)
     else
         return nil
     end
-end
-
-function table.find(f, l)
-    for _,v in ipairs(l) do
-        if f(v) then
-            return v
-        end
-    end
-    return nil
 end
 
 -- main
