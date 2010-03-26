@@ -54,15 +54,7 @@ function game_loop()
                     break
                 end
 
-                -- TODO push these loops into function, use them for visible cards
-                -- TODO allow multiple cards to be played
-                repeat
-                    repeat
-                        io.write('Enter card number(s): ')
-                        card_num = io.stdin:read'*n'
-                    until is_valid_card(player.hand, card_num)
-                    -- TODO tell the user what/if invalid action was encountered
-                until is_valid_action(discard, player.hand, card_num)
+                play = get_cards(discard, player.hand)
       
                 -- Apply appropriate game actions
                 active_face = player.hand[card_num].face
@@ -152,8 +144,42 @@ function display_hand(num, hand)
     end
 end
 
-function is_valid_card(hand, card_num)
-    return hand[card_num]
+function get_cards(pile, hand)
+    local num = {}
+    -- TODO allow multiple cards to be played
+
+    repeat
+        repeat
+            io.write('Enter card number(s): ')
+            local str = io.stdin:read'*l'
+            for n in string.gmatch(str, "%d+") do
+                num[#num + 1] = n
+            end
+        until is_valid_card(hand, num)
+        print('got valid card')
+        -- TODO tell the user what/if invalid action was encountered
+        -- TODO build play list of cards?
+    until is_valid_action(pile, hand, num)
+end
+
+function is_valid_card(hand, num)
+    -- TODO fix this mess
+    if type(num) == 'table' then
+        for _, n in ipairs(num) do
+            local i = tonumber(n)
+            if i < 1 or type(hand[i]) == 'nil' then
+                return false
+            end
+        end
+    elseif type(num) == 'number' then
+        if num < 1 or type(hand[num]) == 'nil' then
+            return false
+        end
+    else
+        return false
+    end
+
+    return true
 end
 
 function has_valid_action(discard, hand)
@@ -169,6 +195,7 @@ end
 function is_valid_action(discard, hand, card_num)
     local active_face = hand[card_num].face
 
+    -- TODO test for table or single list
     -- TODO if multiple cards: ensure same face and treat as one
 
     if #discard == 0 then
@@ -197,16 +224,17 @@ function is_valid_action(discard, hand, card_num)
     return true
 end
 
-function pick_up_pile(discard, hand)
-    for i,card in ipairs(discard) do
+function pick_up_pile(pile, hand)
+    for i,card in ipairs(pile) do
         if card.face ~= '3' then
             table.insert(hand, card)
         end
-        discard[i] = nil
+        pile[i] = nil
     end
 end
 
 function discard_card(discard, hand, card_num)
+    -- TODO test for table or single list
     local card = table.remove(hand, card_num)
     table.insert(discard, 1, card)
 end
@@ -258,7 +286,7 @@ function get_num_cards(cards, num)
     end
     return t
 end
-
+-- TODO merge these two functions? (i.e. call get_next_card three times?)
 function get_next_card(cards)
     if #cards > 0 then
         return table.remove(cards)
