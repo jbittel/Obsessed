@@ -151,7 +151,7 @@ end
 function get_cards(pile, hand)
     repeat
         local num = {}
-        abort_play(hand)
+        clear_play(hand)
 
         repeat
             num = {}
@@ -179,17 +179,15 @@ function is_valid_card(hand, num)
 end
 
 function has_valid_play(pile, hand)
-    -- TODO this is going wrong at times where not
-    -- all cards are getting checked
     for i,_ in ipairs(hand) do
         hand[i].play = true
         if is_valid_play(pile, hand) then
-            abort_play(hand)
+            clear_play(hand)
             return true
         end
         hand[i].play = false
     end
-    abort_play(hand)
+    clear_play(hand)
 
     return false
 end
@@ -264,8 +262,8 @@ function kill_pile()
     return {}
 end
 
-function abort_play(hand)
-    for _,card in ipairs(hand) do
+function clear_play(cards)
+    for _,card in ipairs(cards) do
         card.play = false
     end
 
@@ -281,6 +279,7 @@ function play_cards(pile, hand)
             table.insert(t, card)
         end
     end
+    clear_play(pile)
 
     return t
 end
