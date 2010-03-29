@@ -1,4 +1,6 @@
 
+require "ai"
+
 FACES = { '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A' }
 SUITS = { 'C', 'D', 'H', 'S' }
 
@@ -40,12 +42,10 @@ function game_loop()
         -- TODO allow player order to be reversed for Joker
         for _,player in ipairs(players) do
             local end_turn = true
-            local card_num = nil
 
             repeat
                 print('*** '..#draw_pile..' card(s) left')
                 display_pile(pile)
-                display_hand(player.num, player.hand)
 
                 -- If no valid moves, pick up pile and lose turn
                 if not has_valid_play(pile, player.hand) then
@@ -54,10 +54,16 @@ function game_loop()
                     break
                 end
 
-                get_cards(pile, player.hand)
+                if player.ai == true then
+                    play_ai(pile, player.hand)
+                else
+                    display_hand(player.num, player.hand)
+                    get_cards(pile, player.hand)
+                end
       
                 -- Apply appropriate game actions
                 active_face = get_active_face(player.hand)
+                print('+++ Player '..player.num..' played a '..active_face)
                 if active_face == '8' then
                     player.hand = play_cards(pile, player.hand)
                     end_turn = false
@@ -71,6 +77,7 @@ function game_loop()
                 end
 
                 -- Kill pile if 4+ top cards match
+                -- TODO should four 3s kill the pile?
                 if #pile >= 4 then
                     if pile[1].face == pile[2].face and
                        pile[1].face == pile[3].face and
@@ -311,6 +318,12 @@ function deal_cards(cards, num)
             table.insert(player.hidden, draw_next_card(cards))
             table.insert(player.visible, draw_next_card(cards))
             table.insert(player.hand, draw_next_card(cards))
+        end
+
+        if i == 1 then
+            player.ai = false
+        else
+            player.ai = true
         end
     end
 end
