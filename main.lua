@@ -1,5 +1,4 @@
 
--- TODO add Joker as a playable card
 FACES = { '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A' }
 SUITS = { 'C', 'D', 'H', 'S' }
 
@@ -15,8 +14,9 @@ INVALID_MOVES = {
     ['A'] = { '4', '5', '6', '9', 'J', 'Q', 'K' },
 }
 
-NUM_DECKS = 1
+NUM_DECKS = 2
 NUM_PLAYERS = 2
+HAND_SIZE = 3
 
 players = {}
 cards = {}
@@ -29,6 +29,7 @@ function init_game()
 
     deal_cards(cards, NUM_PLAYERS)
     -- TODO allow player to swap with visible stack
+    -- TODO choose player start, low to high beginning with 4
 end
 
 function game_loop()
@@ -83,21 +84,21 @@ function game_loop()
                 if #player.hand < 3 then
                     if #draw_pile > 0 then
                         while #player.hand < 3 do
-                            local card = get_next_card(draw_pile)
+                            local card = draw_next_card(draw_pile)
                             if card ~= nil then
                                 table.insert(player.hand, card)
                             end
                         end
                     elseif #player.hand == 0 and #player.visible > 0 then
                         -- TODO allow player to select card
-                        local card = get_next_card(player.visible)
+                        local card = draw_next_card(player.visible)
                         if card ~= nil then
                             table.insert(player.hand, card)
                         end
                         print('*** Drawing from visible cards ('..#player.visible..' left)')
                     elseif #player.hand == 0 and #player.hidden > 0 then
-                        -- TODO allow player to select card
-                        local card = get_next_card(player.hidden)
+                        -- TODO allow player to select card?
+                        local card = draw_next_card(player.hidden)
                         if card ~= nil then
                             table.insert(player.hand, card)
                         end
@@ -136,9 +137,7 @@ function display_pile(pile)
 end
 
 function display_hand(num, hand)
-    if #hand == 0 then
-        return
-    end
+    if #hand == 0 then return end
 
     -- TODO display visible cards also?
     print('Player '..num..' hand:')
@@ -195,13 +194,9 @@ end
 function is_valid_play(pile, hand)
     local active_face = get_active_face(hand)
 
-    if active_face == nil then
-        return false
-    end
+    if active_face == nil then return false end
 
-    if #pile == 0 then
-        return true
-    end
+    if #pile == 0 then return true end
 
     -- TODO if Joker, look deeper into pile
     local base_face = pile[1].face
@@ -297,6 +292,7 @@ function build_decks(num)
                 card.play = false
             end
         end
+        -- TODO add Joker as a playable card
     end
 
     return cards
@@ -307,9 +303,15 @@ function deal_cards(cards, num)
         local player = {}
         table.insert(players, player)
         player.num = i
-        player.hidden = get_num_cards(cards, 3)
-        player.visible = get_num_cards(cards, 3)
-        player.hand = get_num_cards(cards, 3)
+        player.hidden = {}
+        player.visible = {}
+        player.hand = {}
+
+        for i = 1,HAND_SIZE do
+            table.insert(player.hidden, draw_next_card(cards))
+            table.insert(player.visible, draw_next_card(cards))
+            table.insert(player.hand, draw_next_card(cards))
+        end
     end
 end
 
@@ -323,16 +325,7 @@ function shuffle(cards)
     end
 end
 
-function get_num_cards(cards, num)
-    local t = {}
-    for i = 1,num do
-        local card = table.remove(cards)
-        table.insert(t, card)
-    end
-    return t
-end
--- TODO merge these two functions? (i.e. call get_next_card three times?)
-function get_next_card(cards)
+function draw_next_card(cards)
     if #cards > 0 then
         return table.remove(cards)
     else
@@ -345,7 +338,6 @@ end
 init_game()
 game_loop()
 
-print('')
 print('---------')
 print('Game Over')
 print('---------')
