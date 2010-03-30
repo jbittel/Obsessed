@@ -16,8 +16,9 @@ FACE_WEIGHT = {
 
 SPECIAL_CARDS = { '2', '3', '7', '8', '10' } 
 
--- TODO prioritize 4+ stacks of non-special cards
--- TODO add fuzzy logic when selecting active face
+-- TODO tweak weights for specific game scenarios:
+--      * killing the pile with 4+ stacks
+--      * playing 3 when next player is near winning
 function play_ai(pile, hand)
     local num = #hand
     local valid = {}
@@ -32,10 +33,10 @@ function play_ai(pile, hand)
         end
         hand[i].play = false
     end
-    clear_play(hand)
 
     -- Sort ascending by weight and take top face
     table.sort(valid, function(a, b) return a.weight < b.weight end)
+    -- TODO add fuzzy logic when selecting active face
     active_face = valid[1].face
 
     -- Mark selected face as in play
