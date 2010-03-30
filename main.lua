@@ -17,7 +17,7 @@ INVALID_MOVES = {
 }
 
 NUM_DECKS = 2
-NUM_PLAYERS = 2
+NUM_PLAYERS = 4
 HAND_SIZE = 3
 
 players = {}
