@@ -36,55 +36,43 @@ end
 function game_loop()
     local draw_pile = cards
     local pile = {}
-    local reverse = false
     -- TODO choose player start, low to high beginning with 4
     local player = players[1]
+    local reverse = change_direction()
 
     while true do
-        local end_turn = true
+        local turn_over = end_turn()
 
         repeat
-            print('*** '..#draw_pile..' card(s) left')
+            print('================')
+            print('=== PLAYER '..player.num..' ===')
+            print('================')
+            print('*** '..#draw_pile..' card(s) left to draw')
             display_pile(pile)
 
             -- If no valid moves, pick up pile and lose turn
             if not has_valid_play(pile, player.hand) then
                 print('*** Player '..player.num..' has no valid moves!')
-                pile, hand = pick_up_pile(pile, player.hand)
+                pile, player.hand = pick_up_pile(pile, player.hand)
                 break
             end
 
             if player.ai == true then
                 play_ai(pile, player.hand)
             else
-                display_hand(player.num, player.hand)
+                display_hand(player.hand)
                 get_cards(pile, player.hand)
             end
   
-            -- Apply appropriate game actions
-            active_face = get_active_face(player.hand)
-            player.hand = play_cards(pile, player.hand)
-            print('+++ Player '..player.num..' played a '..active_face)
-            if active_face == '8' then
-                end_turn = false
-            elseif active_face == '10' then
-                pile = kill_pile()
-                end_turn = false
-            elseif active_face == 'R' then
-                reverse = not reverse
-                end_turn = true
-            else
-                end_turn = true
-            end
+            pile, player.hand = play_cards(pile, player.hand, turn_over, reverse)
 
             -- Kill pile if 4+ top cards match
-            -- TODO should four 3s kill the pile?
             if #pile >= 4 then
                 if pile[1].face == pile[2].face and
                    pile[1].face == pile[3].face and
                    pile[1].face == pile[4].face then
                     pile = kill_pile()
-                    end_turn = false
+                    turn_over(false)
                 end
             end
 
@@ -117,28 +105,45 @@ function game_loop()
             -- Test for game over condition
             if #draw_pile == 0 and #player.hand == 0 and
                #player.visible == 0 and #player.hidden == 0 then
-               print('+++ Player '..player.num..' wins!')
+               print('*** Player '..player.num..' wins!')
                return
             end
-        until end_turn
+        until turn_over()
 
-        player = players[next_player(player.num, reverse)]
+        player = players[next_player(player.num, reverse())]
     end
 end
 
-function next_player(num, reverse)
-    local i = num
-
-    if not reverse then
-        i = i + 1
+function next_player(num, rev)
+    if not rev then
+        num = num + 1
     else
-        i = i - 1
+        num = num - 1
     end
 
-    if i > #players then i = 1 end
-    if i < 1 then i = #players end
+    if num > #players then num = 1 end
+    if num < 1 then num = #players end
 
-    return i
+    return num
+end
+
+function change_direction(b)
+    local reverse = false
+    return function(b)
+        if b == true then
+            reverse = not reverse
+            print('*** Direction reversed!')
+        end
+        return reverse
+    end
+end
+
+function end_turn(b)
+    local turn_over = true
+    return function(b)
+        if b ~= nil then turn_over = b end
+        return turn_over
+    end
 end
 
 function display_pile(pile)
@@ -147,24 +152,19 @@ function display_pile(pile)
         return
     end
 
-    local num = 0
-    if #pile < 5 then
-        num = #pile
-    else
-        num = 5
+    io.write('*** Pile: ')
+    for i,card in ipairs(pile) do
+        if i > 5 then break end
+        io.write(card.face..card.suit..' ')
     end
-    local t = {}
-    for i = 1,num do
-        table.insert(t, pile[i].face..pile[i].suit)
-    end
-    print('*** Pile: '..table.concat(t, ' ')..'\t['..#pile..' card(s) total]')
+    print('\t['..#pile..' card(s) total]')
 end
 
-function display_hand(num, hand)
+function display_hand(hand)
     if #hand == 0 then return end
 
     -- TODO display visible cards also?
-    print('Player '..num..' hand:')
+    print('Current hand:')
     table.sort(hand, function(a, b) return a.rank < b.rank end)
     for i,card in ipairs(hand) do
         print('  '..i..': '..card.face..card.suit)
@@ -249,7 +249,6 @@ end
 
 function get_active_face(hand)
     local active_face = nil
-
     for _,card in ipairs(hand) do
         if card.play == true then
             if active_face == nil then
@@ -266,7 +265,7 @@ function get_active_face(hand)
 end
 
 function pick_up_pile(pile, hand)
-    count = 0
+    local count = 0
     for _,card in ipairs(pile) do
         if card.face ~= '3' then
             table.insert(hand, card)
@@ -289,18 +288,34 @@ function clear_play(cards)
     end
 end
 
-function play_cards(pile, hand)
-    local t = {}
+function play_cards(pile, hand, turn_over, reverse)
+    local h = {}
+    local active_face = get_active_face(hand)
+
     for _,card in ipairs(hand) do
         if card.play == true then
+            print('+++ Played a '..card.face)
             table.insert(pile, 1, card)
         else
-            table.insert(t, card)
+            table.insert(h, card)
         end
     end
+
     clear_play(pile)
 
-    return t
+    if active_face == '8' then
+        turn_over(false)
+    elseif active_face == '10' then
+        pile = kill_pile()
+        turn_over(false)
+    elseif active_face == 'R' then
+        reverse(true)
+        turn_over(true)
+    else
+        turn_over(true)
+    end
+
+    return pile, h
 end
 
 function build_decks(num)
