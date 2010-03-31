@@ -16,19 +16,26 @@ INVALID_MOVES = {
     ['A'] = { '4', '5', '6', '9', 'J', 'Q', 'K' },
 }
 
-NUM_DECKS = 2
 NUM_PLAYERS = 4
+NUM_DECKS = math.ceil(NUM_PLAYERS / 2)
 HAND_SIZE = 3
 
 players = {}
 cards = {}
 
 function init_game()
-    cards = build_decks(NUM_DECKS)
+    print('   ____  _                      _             ')
+    print('  / __ \\| |                    (_)            ')
+    print(' | |  | | |__  ___  ___ ___ ___ _  ___  _ __  ')
+    print(' | |  | | \'_ \\/ __|/ _ | __/ __| |/ _ \\| \'_ \\ ')
+    print(' | |__| | |_) \\__ \\  __|__ \\__ \\ | (_) | | | |')
+    print('  \\____/|_.__/|___/\\___|___/___/_|\\___/|_| |_|')
+    print('')
+    print('@@@ Starting new game with '..NUM_PLAYERS..' players and '..NUM_DECKS..' decks')
 
+    cards = build_decks(NUM_DECKS)
     math.randomseed(os.time())
     shuffle(cards)
-
     deal_cards(cards, NUM_PLAYERS)
     -- TODO allow player to swap with visible stack
 end
