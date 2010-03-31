@@ -70,6 +70,9 @@ function game_loop()
             elseif active_face == '10' then
                 pile = kill_pile()
                 end_turn = false
+            elseif active_face == 'R' then
+                reverse = not reverse
+                end_turn = true
             else
                 end_turn = true
             end
@@ -213,13 +216,17 @@ end
 
 function is_valid_play(pile, hand)
     local active_face = get_active_face(hand)
+    local base_face = nil
 
     if active_face == nil then return false end
-
     if #pile == 0 then return true end
 
-    -- TODO if Joker, look deeper into pile
-    local base_face = pile[1].face
+    -- If Joker, look deeper into pile
+    local i = 1
+    while pile[i].face == 'R' and i < #pile do
+        i = i + 1
+    end
+    base_face = pile[i].face
 
     -- Cards can always be played onto themselves
     if base_face == active_face then
@@ -309,7 +316,18 @@ function build_decks(num)
                 card.play = false
             end
         end
-        -- TODO add Joker as a playable card
+
+        -- Add two Jokers to each deck
+        if NUM_PLAYERS > 2 then
+            for i=1,2 do
+                local card = {}
+                table.insert(cards, card)
+                card.suit = ''
+                card.face = 'R'
+                card.rank = #FACES + 1
+                card.play = false
+            end
+        end
     end
 
     return cards

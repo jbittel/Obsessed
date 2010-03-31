@@ -12,9 +12,10 @@ FACE_WEIGHT = {
     ['Q']  = 6,
     ['K']  = 7,
     ['A']  = 8,
+    ['R']  = 11,
 }
 
-SPECIAL_CARDS = { '2', '3', '7', '8', '10' } 
+SPECIAL_CARDS = { '2', '3', '7', '8', '10', 'R' } 
 
 -- TODO tweak weights for specific game scenarios:
 --      * killing the pile with 4+ stacks
