@@ -210,6 +210,9 @@ function is_valid_play(pile, hand)
     end
     base_face = pile[i].face
 
+    -- If nothing but Jokers, treat as empty pile
+    if base_face == 'R' then return true end
+
     -- Cards can always be played onto themselves
     if base_face == active_face then
         return true
