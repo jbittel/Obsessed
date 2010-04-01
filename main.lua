@@ -322,7 +322,7 @@ function init_cards(num_decks)
                 table.insert(cards, card)
                 card.suit = ''
                 card.face = 'R'
-                card.rank = #FACES + 1
+                card.rank = #FACES + 2
                 card.play = false
             end
         end
