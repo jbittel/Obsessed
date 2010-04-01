@@ -1,3 +1,12 @@
+--[[
+
+  ----------------------------------------------------
+  obsessed - a card game of mystery and intrigue
+  ----------------------------------------------------
+
+  Copyright (c) 2010 Jason Bittel <jason.bittel@gmail.com>
+
+--]]
 
 require "ai"
 
@@ -20,41 +29,22 @@ NUM_PLAYERS = 4
 NUM_DECKS = math.ceil(NUM_PLAYERS / 2)
 HAND_SIZE = 3
 
-players = {}
-cards = {}
-
-function init_game()
-    print('   ____  _                      _             ')
-    print('  / __ \\| |                    (_)            ')
-    print(' | |  | | |__  ___  ___ ___ ___ _  ___  _ __  ')
-    print(' | |  | | \'_ \\/ __|/ _ | __/ __| |/ _ \\| \'_ \\ ')
-    print(' | |__| | |_) \\__ \\  __|__ \\__ \\ | (_) | | | |')
-    print('  \\____/|_.__/|___/\\___|___/___/_|\\___/|_| |_|')
-    print('')
-    print('@@@ Starting new game with '..NUM_PLAYERS..' players and '..NUM_DECKS..' decks')
-
-    cards = build_decks(NUM_DECKS)
-    math.randomseed(os.time())
-    shuffle(cards)
-    deal_cards(cards, NUM_PLAYERS)
-    -- TODO allow player to swap with visible stack
-end
-
 function game_loop()
-    local draw_pile = cards
     local pile = {}
-    -- TODO choose player start, low to high beginning with 4
-    local player = players[1]
-    local reverse = change_direction()
+    local reverse = player_order()
+    local deal_card, num_cards = init_cards(NUM_DECKS)
+    local next_player = init_players(NUM_PLAYERS, HAND_SIZE, reverse, deal_card)
+    -- TODO allow players to swap with visible stack
 
     while true do
         local turn_over = end_turn()
+        local player = next_player()
 
         repeat
             print('================')
             print('=== PLAYER '..player.num..' ===')
             print('================')
-            print('*** '..#draw_pile..' card(s) left to draw')
+            print('*** '..num_cards()..' card(s) left to draw')
             display_pile(pile)
 
             -- If no valid moves, pick up pile and lose turn
@@ -85,23 +75,23 @@ function game_loop()
 
             -- Draw next card from appropriate pile as necessary
             if #player.hand < 3 then
-                if #draw_pile > 0 then
-                    while #player.hand < 3 and #draw_pile > 0 do
-                        local card = draw_next_card(draw_pile)
+                if num_cards() > 0 then
+                    while #player.hand < 3 and num_cards() > 0 do
+                        local card = deal_card()
                         if card ~= nil then
                             table.insert(player.hand, card)
                         end
                     end
                 elseif #player.hand == 0 and #player.visible > 0 then
                     -- TODO allow player to select card
-                    local card = draw_next_card(player.visible)
+                    local card = get_next_card(player.visible)
                     if card ~= nil then
                         table.insert(player.hand, card)
                     end
                     print('*** Drawing from visible cards ('..#player.visible..' left)')
                 elseif #player.hand == 0 and #player.hidden > 0 then
                     -- TODO allow player to select card?
-                    local card = draw_next_card(player.hidden)
+                    local card = get_next_card(player.hidden)
                     if card ~= nil then
                         table.insert(player.hand, card)
                     end
@@ -110,31 +100,16 @@ function game_loop()
             end
 
             -- Test for game over condition
-            if #draw_pile == 0 and #player.hand == 0 and
+            if num_cards() == 0 and #player.hand == 0 and
                #player.visible == 0 and #player.hidden == 0 then
                print('*** Player '..player.num..' wins!')
                return
             end
         until turn_over()
-
-        player = players[next_player(player.num, reverse())]
     end
 end
 
-function next_player(num, rev)
-    if not rev then
-        num = num + 1
-    else
-        num = num - 1
-    end
-
-    if num > #players then num = 1 end
-    if num < 1 then num = #players end
-
-    return num
-end
-
-function change_direction(b)
+function player_order(b)
     local reverse = false
     return function(b)
         if b == true then
@@ -325,9 +300,10 @@ function play_cards(pile, hand, turn_over, reverse)
     return pile, h
 end
 
-function build_decks(num)
+function init_cards(num_decks)
     local cards = {}
-    for deck = 1,num do
+
+    for deck = 1,num_decks do
         for _,suit in ipairs(SUITS) do
             for rank,face in ipairs(FACES) do
                 local card = {}
@@ -352,11 +328,30 @@ function build_decks(num)
         end
     end
 
-    return cards
+    math.randomseed(os.time())
+    shuffle(cards)
+
+    return function()
+        return get_next_card(cards)
+    end, function()
+        return #cards
+    end
 end
 
-function deal_cards(cards, num)
-    for i = 1,num do
+function get_next_card(cards)
+    if #cards > 0 then
+        return table.remove(cards)
+    else
+        return nil
+    end
+end
+
+function init_players(num_players, hand_size, reverse, deal_card)
+    local players = {}
+    -- TODO choose player start, low to high beginning with 4
+    local curr_player = 0
+
+    for i = 1,num_players do
         local player = {}
         table.insert(players, player)
         player.num = i
@@ -364,10 +359,10 @@ function deal_cards(cards, num)
         player.visible = {}
         player.hand = {}
 
-        for i = 1,HAND_SIZE do
-            table.insert(player.hidden, draw_next_card(cards))
-            table.insert(player.visible, draw_next_card(cards))
-            table.insert(player.hand, draw_next_card(cards))
+        for i = 1,hand_size do
+            table.insert(player.hidden, deal_card())
+            table.insert(player.visible, deal_card())
+            table.insert(player.hand, deal_card())
         end
 
         if i == 1 then
@@ -375,6 +370,19 @@ function deal_cards(cards, num)
         else
             player.ai = true
         end
+    end
+
+    return function()
+        if not reverse() then
+            curr_player = curr_player + 1
+        else
+            curr_player = curr_player - 1
+        end
+
+        if curr_player > #players then curr_player = 1 end
+        if curr_player < 1 then curr_player = #players end
+
+        return players[curr_player]
     end
 end
 
@@ -388,17 +396,17 @@ function shuffle(cards)
     end
 end
 
-function draw_next_card(cards)
-    if #cards > 0 then
-        return table.remove(cards)
-    else
-        return nil
-    end
-end
-
 -- main
 
-init_game()
+print('   ____  _                      _             ')
+print('  / __ \\| |                    (_)            ')
+print(' | |  | | |__  ___  ___ ___ ___ _  ___  _ __  ')
+print(' | |  | | \'_ \\/ __|/ _ | __/ __| |/ _ \\| \'_ \\ ')
+print(' | |__| | |_) \\__ \\  __|__ \\__ \\ | (_) | | | |')
+print('  \\____/|_.__/|___/\\___|___/___/_|\\___/|_| |_|')
+print('')
+print('@@@ Starting new game with '..NUM_PLAYERS..' players and '..NUM_DECKS..' decks')
+
 game_loop()
 
 print('---------')

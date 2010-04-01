@@ -1,3 +1,13 @@
+--[[
+
+  ----------------------------------------------------
+  obsessed - a card game of mystery and intrigue
+  ----------------------------------------------------
+
+  Copyright (c) 2010 Jason Bittel <jason.bittel@gmail.com>
+
+--]]
+
 FACE_WEIGHT = {
     ['2']  = 9,
     ['3']  = 11,
