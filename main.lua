@@ -49,7 +49,6 @@ function game_loop()
 
             -- If no valid moves, pick up pile and lose turn
             if not has_valid_play(pile, player.hand) then
-                print('*** Player '..player.num..' has no valid moves!')
                 pile, player.hand = pick_up_pile(pile, player.hand)
                 break
             end
@@ -257,7 +256,7 @@ function pick_up_pile(pile, hand)
             count = count + 1
         end
     end
-    print('*** Picked up '..count..' cards')
+    print('*** No valid moves, picked up '..count..' cards')
 
     return {}, hand
 end
@@ -408,7 +407,7 @@ print(' | |  | | \'_ \\/ __|/ _ | __/ __| |/ _ \\| \'_ \\ ')
 print(' | |__| | |_) \\__ \\  __|__ \\__ \\ | (_) | | | |')
 print('  \\____/|_.__/|___/\\___|___/___/_|\\___/|_| |_|')
 print('')
-print('@@@ Starting new game with '..NUM_PLAYERS..' players and '..NUM_DECKS..' decks')
+print('@@@ Starting a new game with '..NUM_PLAYERS..' players and '..NUM_DECKS..' decks')
 
 game_loop()
 

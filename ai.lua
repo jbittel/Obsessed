@@ -25,41 +25,75 @@ FACE_WEIGHT = {
     ['R']  = 11,
 }
 
-SPECIAL_CARDS = { '2', '3', '7', '8', '10', 'R' } 
+SPECIAL_CARDS = { '2', '3', '7', '8', '10', 'R' }
 
--- TODO tweak weights for specific game scenarios:
---      * killing the pile with 4+ stacks
---      * playing 3 when next player is near winning
 function play_ai(pile, hand)
-    local num = #hand
     local valid = {}
 
     -- Copy all valid cards in hand
-    for i,_ in ipairs(hand) do
+    for i,card in ipairs(hand) do
         hand[i].play = true
         if is_valid_play(pile, hand) then
-            local card = hand[i]
             table.insert(valid, card)
-            card.weight = FACE_WEIGHT[card.face]
         end
         hand[i].play = false
     end
 
+    -- Add and tweak card weights as necessary
+    local freq = get_frequencies(hand)
+    local pile_face, pile_count = get_pile_info(pile)
+    for _,card in ipairs(valid) do
+        card.weight = FACE_WEIGHT[card.face]
+
+        -- Prioritize killing the pile when possible
+        if not is_special_card(card.face) then
+            if freq[card.face] >= 4 then
+                card.weight = 0
+            elseif card.face == pile_face and
+                   (freq[card.face] + pile_count >= 4) then
+                card.weight = 0
+            end
+        end
+    end
+
+    -- TODO add fuzzy logic when selecting active face
     -- Sort ascending by weight and take top face
     table.sort(valid, function(a, b) return a.weight < b.weight end)
-    -- TODO add fuzzy logic when selecting active face
     active_face = valid[1].face
 
     -- Mark selected face as in play
-    for i=1,num do
-        local face = hand[i].face
-
-        if active_face == face then
+    for i,card in ipairs(hand) do
+        if active_face == card.face then
             hand[i].play = true
             -- If non-special, flag all matching faces
-            if is_special_card(face) then return end
+            if is_special_card(card.face) then return end
         end
     end
+end
+
+function get_frequencies(cards)
+    local freq = {}
+
+    for _,card in ipairs(cards) do
+        freq[card.face] = (freq[card.face] or 0) + 1
+    end
+
+    return freq
+end
+
+function get_pile_info(pile)
+    local pile_face = ''
+    local pile_count = 0
+    if #pile > 0 then
+        pile_face = pile[1].face
+        local i = 1
+        while pile_face == pile[i].face and i < #pile do
+            pile_count = pile_count + 1
+            i = i + 1
+        end
+    end
+
+    return pile_face, pile_count
 end
 
 function is_special_card(face)
