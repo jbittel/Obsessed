@@ -9,20 +9,20 @@
 --]]
 
 FACE_WEIGHT = {
-    ['2']  = 9,
+    ['2']  = 8,
     ['3']  = 11,
     ['4']  = 1,
     ['5']  = 2,
     ['6']  = 3,
-    ['7']  = 10,
+    ['7']  = 9,
     ['8']  = 10,
     ['9']  = 3,
-    ['10'] = 4,
-    ['J']  = 5,
-    ['Q']  = 6,
-    ['K']  = 7,
-    ['A']  = 8,
-    ['R']  = 11,
+    ['10'] = 10,
+    ['J']  = 4,
+    ['Q']  = 5,
+    ['K']  = 6,
+    ['A']  = 7,
+    ['R']  = 11
 }
 
 SPECIAL_CARDS = { '2', '3', '7', '8', '10', 'R' }
@@ -49,10 +49,10 @@ function play_ai(pile, hand)
 
         -- Prioritize killing the pile when possible
         if not is_special_card(card.face) then
-            if freq[card.face] >= 4 then
+            if card.face == top_face and
+               (freq[card.face] + run >= 4) then
                 card.weight = 0
-            elseif card.face == top_face and
-                   (freq[card.face] + run >= 4) then
+            elseif freq[card.face] >= 4 then
                 card.weight = 0
             end
         end
@@ -61,14 +61,14 @@ function play_ai(pile, hand)
     -- TODO add fuzzy logic when selecting active face
     -- Sort ascending by weight and take top face
     table.sort(valid, function(a, b) return a.weight < b.weight end)
-    active_face = valid[1].face
+    local active_face = valid[1].face
 
     -- Mark selected face as in play
     for i,card in ipairs(hand) do
         if active_face == card.face then
             hand[i].play = true
             -- If non-special, flag all matching faces
-            if is_special_card(card.face) then return end
+            if is_special_card(active_face) then break end
         end
     end
 end

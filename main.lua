@@ -26,13 +26,12 @@ INVALID_MOVES = {
 }
 
 NUM_PLAYERS = 4
-NUM_DECKS = math.ceil(NUM_PLAYERS / 2)
 HAND_SIZE = 3
 
 function game_loop()
     local pile = {}
     local reverse = player_order()
-    local deal_card, num_cards = init_cards(NUM_DECKS)
+    local deal_card, num_cards = init_cards(NUM_PLAYERS)
     local next_player = init_players(NUM_PLAYERS, HAND_SIZE, reverse, deal_card)
     -- TODO allow players to swap with visible stack
 
@@ -312,8 +311,9 @@ function play_cards(pile, hand, turn_over, reverse)
     return pile, h
 end
 
-function init_cards(num_decks)
+function init_cards(num_players)
     local cards = {}
+    local num_decks = math.ceil(num_players / 2)
 
     for deck = 1,num_decks do
         for _,suit in ipairs(SUITS) do
@@ -327,8 +327,8 @@ function init_cards(num_decks)
             end
         end
 
-        -- Add two Jokers to each deck
-        if NUM_PLAYERS > 2 then
+        if num_players > 2 then
+            -- Add two Jokers to each deck
             for i=1,2 do
                 local card = {}
                 table.insert(cards, card)
@@ -378,7 +378,7 @@ function init_players(num_players, hand_size, reverse, deal_card)
         end
 
         if i == 1 then
-            player.ai = false
+            player.ai = true
         else
             player.ai = true
         end
@@ -417,7 +417,7 @@ print(' | |  | | \'_ \\/ __|/ _ | __/ __| |/ _ \\| \'_ \\ ')
 print(' | |__| | |_) \\__ \\  __|__ \\__ \\ | (_) | | | |')
 print('  \\____/|_.__/|___/\\___|___/___/_|\\___/|_| |_|')
 print('')
-print('@@@ Starting a new game with '..NUM_PLAYERS..' players and '..NUM_DECKS..' decks')
+print('@@@ Starting a new game with '..NUM_PLAYERS..' players')
 
 game_loop()
 
