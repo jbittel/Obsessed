@@ -41,7 +41,8 @@ function play_ai(pile, hand)
 
     -- Add and tweak card weights as necessary
     local freq = get_frequencies(hand)
-    local top_face, run = get_pile_info(pile)
+    local top_face = get_pile_top(pile)
+    local run = get_pile_run(pile)
 
     for _,card in ipairs(valid) do
         card.weight = FACE_WEIGHT[card.face]

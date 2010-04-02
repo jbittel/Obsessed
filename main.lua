@@ -63,13 +63,9 @@ function game_loop()
             pile, player.hand = play_cards(pile, player.hand, turn_over, reverse)
 
             -- Kill pile if 4+ top cards match
-            if #pile >= 4 then
-                local _, run = get_pile_info(pile)
-
-                if run >= 4 then
-                    pile = kill_pile()
-                    turn_over(false)
-                end
+            if get_pile_run(pile) >= 4 then
+                pile = kill_pile()
+                turn_over(false)
             end
 
             -- Draw next card from appropriate pile as necessary
@@ -141,25 +137,33 @@ function display_pile(pile)
     print('\t['..#pile..' card(s) total]')
 end
 
-function get_pile_info(pile)
-    local top_face = ''
+function get_pile_top(pile)
+    for _,card in ipairs(pile) do
+        if card.face ~= 'R' then
+            return card.face
+        end
+    end
+
+    return nil
+end
+
+function get_pile_run(pile)
+    local top_face = get_pile_top(pile)
     local run = 0
 
-    if #pile > 0 then
-        top_face = pile[1].face
+    if top_face == nil then return 0 end
 
-        for _,card in ipairs(pile) do
-            if card.face ~= 'R' then
-                if top_face == card.face then
-                    run = run + 1
-                else
-                    break
-                end
+    for _,card in ipairs(pile) do
+        if card.face ~= 'R' then
+            if top_face == card.face then
+                run = run + 1
+            else
+                break
             end
         end
     end
 
-    return top_face, run
+    return run
 end
 
 function display_hand(hand)
@@ -176,6 +180,7 @@ end
 function get_cards(pile, hand)
     repeat
         local num = {}
+
         clear_play(hand)
 
         repeat
@@ -218,33 +223,16 @@ end
 
 function is_valid_play(pile, hand)
     local active_face = get_active_face(hand)
-    local base_face = nil
+    local top_face = get_pile_top(pile)
 
     if active_face == nil then return false end
-    if #pile == 0 then return true end
+    if top_face == nil then return true end
+    if top_face == active_face then return true end
 
-    -- If Joker, look deeper into pile
-    local i = 1
-    while pile[i].face == 'R' and i < #pile do
-        i = i + 1
-    end
-    base_face = pile[i].face
-
-    -- If nothing but Jokers, treat as empty pile
-    if base_face == 'R' then return true end
-
-    -- Cards can always be played onto themselves
-    if base_face == active_face then
-        return true
-    end
-
-    for face,moves in pairs(INVALID_MOVES) do
-        if face == base_face then
-            for _,move in ipairs(moves) do
-                if move == active_face then
---                    print('--- Cannot play a '..active_face..' on a '..base_face)
-                    return false
-                end
+    if INVALID_MOVES[top_face] ~= nil then
+        for _,move in ipairs(INVALID_MOVES[top_face]) do
+            if move == active_face then
+                return false
             end
         end
     end
@@ -254,6 +242,7 @@ end
 
 function get_active_face(hand)
     local active_face = nil
+
     for _,card in ipairs(hand) do
         if card.play == true then
             if active_face == nil then
