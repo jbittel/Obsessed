@@ -41,7 +41,8 @@ function play_ai(pile, hand)
 
     -- Add and tweak card weights as necessary
     local freq = get_frequencies(hand)
-    local pile_face, pile_count = get_pile_info(pile)
+    local top_face, run = get_pile_info(pile)
+
     for _,card in ipairs(valid) do
         card.weight = FACE_WEIGHT[card.face]
 
@@ -49,8 +50,8 @@ function play_ai(pile, hand)
         if not is_special_card(card.face) then
             if freq[card.face] >= 4 then
                 card.weight = 0
-            elseif card.face == pile_face and
-                   (freq[card.face] + pile_count >= 4) then
+            elseif card.face == top_face and
+                   (freq[card.face] + run >= 4) then
                 card.weight = 0
             end
         end
@@ -79,21 +80,6 @@ function get_frequencies(cards)
     end
 
     return freq
-end
-
-function get_pile_info(pile)
-    local pile_face = ''
-    local pile_count = 0
-    if #pile > 0 then
-        pile_face = pile[1].face
-        local i = 1
-        while pile_face == pile[i].face and i < #pile do
-            pile_count = pile_count + 1
-            i = i + 1
-        end
-    end
-
-    return pile_face, pile_count
 end
 
 function is_special_card(face)

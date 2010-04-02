@@ -64,9 +64,9 @@ function game_loop()
 
             -- Kill pile if 4+ top cards match
             if #pile >= 4 then
-                if pile[1].face == pile[2].face and
-                   pile[1].face == pile[3].face and
-                   pile[1].face == pile[4].face then
+                local _, run = get_pile_info(pile)
+
+                if run >= 4 then
                     pile = kill_pile()
                     turn_over(false)
                 end
@@ -139,6 +139,27 @@ function display_pile(pile)
         io.write(card.face..card.suit..' ')
     end
     print('\t['..#pile..' card(s) total]')
+end
+
+function get_pile_info(pile)
+    local top_face = ''
+    local run = 0
+
+    if #pile > 0 then
+        top_face = pile[1].face
+
+        for _,card in ipairs(pile) do
+            if card.face ~= 'R' then
+                if top_face == card.face then
+                    run = run + 1
+                else
+                    break
+                end
+            end
+        end
+    end
+
+    return top_face, run
 end
 
 function display_hand(hand)
@@ -350,7 +371,7 @@ end
 
 function init_players(num_players, hand_size, reverse, deal_card)
     local players = {}
-    -- TODO choose player start, low to high beginning with 4
+    -- TODO choose player start, low to high beginning with 4s
     local curr_player = 0
 
     for i = 1,num_players do
