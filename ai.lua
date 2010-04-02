@@ -31,15 +31,15 @@ function play_ai(pile, hand)
     local valid = {}
 
     -- Copy all valid cards in hand
-    for i,card in ipairs(hand) do
+    for i,_ in ipairs(hand) do
         hand[i].play = true
         if is_valid_play(pile, hand) then
-            table.insert(valid, card)
+            table.insert(valid, hand[i])
         end
         hand[i].play = false
     end
 
-    -- Add and tweak card weights as necessary
+    -- Tweak card weights as necessary
     local freq = get_frequencies(hand)
     local top_face = get_pile_top(pile)
     local run = get_pile_run(pile)

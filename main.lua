@@ -190,7 +190,7 @@ function get_cards(pile, hand)
             for n in string.gmatch(str, "%d+") do
                 table.insert(num, tonumber(n))
             end
-        until is_valid_card(hand, num)
+        until is_valid_cards(hand, num)
 
         for _,n in ipairs(num) do
             hand[n].play = true
@@ -198,9 +198,9 @@ function get_cards(pile, hand)
     until is_valid_play(pile, hand)
 end
 
-function is_valid_card(hand, num)
+function is_valid_cards(hand, num)
     for _,n in ipairs(num) do
-        if n < 1 or type(hand[n]) == 'nil' then
+        if hand[n] == nil then
             return false
         end
     end
