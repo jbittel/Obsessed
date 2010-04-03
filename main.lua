@@ -378,7 +378,7 @@ function init_players(num_players, hand_size, reverse, deal_card)
         end
 
         if i == 1 then
-            player.ai = true
+            player.ai = false
         else
             player.ai = true
         end
