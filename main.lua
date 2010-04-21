@@ -385,17 +385,31 @@ function init_players(num_players, hand_size, reverse, deal_card)
     end
 
     return function()
-        if not reverse() then
-            curr_player = curr_player + 1
+        if curr_player == 0 then
+            curr_player = init_player_num(players)
         else
-            curr_player = curr_player - 1
+            curr_player = next_player_num(#players, curr_player, reverse)
         end
-
-        if curr_player > #players then curr_player = 1 end
-        if curr_player < 1 then curr_player = #players end
 
         return players[curr_player]
     end
+end
+
+function init_player_num(players)
+    return 1
+end
+
+function next_player_num(num_players, curr_player, reverse)
+    if not reverse() then
+        num = curr_player + 1
+    else
+        num = curr_player - 1
+    end
+
+    if num > num_players then num = 1 end
+    if num < 1 then num = num_players end
+
+    return num
 end
 
 -- Implementation of the Knuth shuffle
