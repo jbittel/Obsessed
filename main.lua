@@ -33,7 +33,6 @@ function game_loop()
     local reverse = player_order()
     local deal_card, num_cards = init_cards(NUM_PLAYERS)
     local next_player = init_players(NUM_PLAYERS, HAND_SIZE, reverse, deal_card)
-    -- TODO allow players to swap with visible stack
 
     while true do
         local turn_over = end_turn()
@@ -53,7 +52,7 @@ function game_loop()
             end
 
             if player.ai == true then
-                play_ai(pile, player.hand)
+                ai_play(pile, player.hand)
             else
                 display_hand(player.hand)
                 get_cards(pile, player.hand)
@@ -358,9 +357,8 @@ function get_next_card(cards)
     end
 end
 
-function init_players(num_players, hand_size, reverse, deal_card)
+function init_players(num_players, num_cards, reverse, deal_card)
     local players = {}
-    -- TODO choose player start, low to high beginning with 4s
     local curr_player = 0
 
     for i = 1,num_players do
@@ -371,7 +369,7 @@ function init_players(num_players, hand_size, reverse, deal_card)
         player.visible = {}
         player.hand = {}
 
-        for i = 1,hand_size do
+        for i = 1,num_cards do
             table.insert(player.hidden, deal_card())
             table.insert(player.visible, deal_card())
             table.insert(player.hand, deal_card())
@@ -381,6 +379,11 @@ function init_players(num_players, hand_size, reverse, deal_card)
             player.ai = false
         else
             player.ai = true
+        end
+    
+        -- TODO allow human players to swap with visible stack
+        if player.ai == true then
+            player.visible, player.hand = ai_swap_cards(player.visible, player.hand, num_cards)
         end
     end
 
@@ -396,6 +399,20 @@ function init_players(num_players, hand_size, reverse, deal_card)
 end
 
 function init_player_num(players)
+    local start_order = { '4', '5', '6', '9', 'J', 'Q', 'K', 'A' }
+
+    -- Pick starting player by matching the first instance of
+    -- a face in start_order with a card in a player's hand
+    for _,face in ipairs(start_order) do
+        for _,player in ipairs(players) do
+            for _,card in ipairs(player.hand) do
+                if face == card.face then
+                    return player.num
+                end
+            end
+        end
+    end
+
     return 1
 end
 
@@ -420,6 +437,18 @@ function shuffle(cards)
         cards[n], cards[k] = cards[k], cards[n]
         n = n - 1
     end
+end
+
+function slice(list, start, len)
+    local t = {}
+    local len = len or (#list - start + 1)
+    local stop = start + len - 1
+  
+    for i = start,stop do
+        table.insert(t, list[i])
+    end
+  
+    return t
 end
 
 -- main
