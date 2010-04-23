@@ -25,7 +25,6 @@ AI_FACE_WEIGHT = {
     ['R']  = 12
 }
 
-AI_SPECIAL_CARDS = { '2', '3', '7', '8', '10', 'R' }
 
 function ai_play(pile, hand)
     local valid = {}
@@ -58,16 +57,14 @@ function ai_play(pile, hand)
         end
     end
 
-    -- TODO add fuzzy logic when selecting active face
-    -- Sort ascending by weight and take top face
-    table.sort(valid, function(a, b) return a.weight < b.weight end)
-    local active_face = valid[1].face
+    local active_face = ai_select_card(valid)
 
     -- Mark selected face as in play
     for i,card in ipairs(hand) do
         if active_face == card.face then
             hand[i].play = true
             -- If non-special, flag all matching faces
+            -- TODO there are times we want to play multiple special cards
             if ai_is_special_card(active_face) then break end
         end
     end
@@ -83,8 +80,28 @@ function ai_get_frequencies(cards)
     return freq
 end
 
+function ai_select_card(cards)
+    local faces = {}
+    local face = nil
+
+    -- Extract a list of unique card faces
+    table.sort(cards, function(a, b) return a.rank < b.rank end)
+    for _,card in ipairs(cards) do
+        if face ~= card.face then
+            face = card.face
+            table.insert(faces, card)
+        end
+    end
+
+    -- Sort card faces by associated weight
+    table.sort(faces, function(a, b) return a.weight < b.weight end)
+ 
+    -- TODO add fuzzy logic when selecting active face
+    return faces[1].face
+end
+
 function ai_is_special_card(face)
-    for _,card in ipairs(AI_SPECIAL_CARDS) do
+    for _,card in ipairs(SPECIAL_CARDS) do
         if card == face then
             return true
         end

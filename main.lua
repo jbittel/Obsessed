@@ -13,6 +13,9 @@ require "ai"
 FACES = { '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A' }
 SUITS = { 'C', 'D', 'H', 'S' }
 
+SPECIAL_CARDS = { '2', '3', '7', '8', '10', 'R' }
+NON_SPECIAL_CARDS = { '4', '5', '6', '9', 'J', 'Q', 'K', 'A' }
+
 INVALID_MOVES = {
     ['3'] = { '2', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A' },
     ['5'] = { '4' },
@@ -104,6 +107,7 @@ end
 
 function player_order(b)
     local reverse = false
+
     return function(b)
         if b == true then
             reverse = not reverse
@@ -115,6 +119,7 @@ end
 
 function end_turn(b)
     local turn_over = true
+
     return function(b)
         if b ~= nil then turn_over = b end
         return turn_over
@@ -258,6 +263,7 @@ end
 
 function pick_up_pile(pile, hand)
     local count = 0
+
     for _,card in ipairs(pile) do
         if card.face ~= '3' then
             table.insert(hand, card)
@@ -399,11 +405,9 @@ function init_players(num_players, num_cards, reverse, deal_card)
 end
 
 function init_player_num(players)
-    local start_order = { '4', '5', '6', '9', 'J', 'Q', 'K', 'A' }
-
     -- Pick starting player by matching the first instance of
     -- a face in start_order with a card in a player's hand
-    for _,face in ipairs(start_order) do
+    for _,face in ipairs(NON_SPECIAL_CARDS) do
         for _,player in ipairs(players) do
             for _,card in ipairs(player.hand) do
                 if face == card.face then
@@ -432,6 +436,7 @@ end
 -- Implementation of the Knuth shuffle
 function shuffle(cards)
     local n = #cards
+
     while n > 1 do
         local k = math.random(n)
         cards[n], cards[k] = cards[k], cards[n]
