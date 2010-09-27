@@ -25,7 +25,6 @@ AI_FACE_WEIGHT = {
     ['R']  = 12
 }
 
-
 function ai_play(pile, hand)
     local valid = {}
 
@@ -60,6 +59,7 @@ function ai_play(pile, hand)
     local active_face = ai_select_card(valid)
 
     -- Mark selected face as in play
+    -- TODO prioritize longer runs?
     for i,card in ipairs(hand) do
         if active_face == card.face then
             hand[i].play = true

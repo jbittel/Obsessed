@@ -181,24 +181,36 @@ function display_hand(hand)
 end
 
 function get_cards(pile, hand)
-    repeat
+    while true do
         local num = {}
 
         clear_play(hand)
 
-        repeat
+        while true do
             num = {}
             io.write('Enter card number(s): ')
             local str = io.stdin:read'*l'
             for n in string.gmatch(str, "%d+") do
                 table.insert(num, tonumber(n))
             end
-        until is_valid_cards(hand, num)
+        
+            if is_valid_cards(hand, num) then
+                break
+            else
+                print('!!! Invalid card number')
+            end
+        end
 
         for _,n in ipairs(num) do
             hand[n].play = true
         end
-    until is_valid_play(pile, hand)
+    
+        if is_valid_play(pile, hand) then
+            return
+        else
+            print('!!! Invalid play')
+        end
+    end
 end
 
 function is_valid_cards(hand, num)
@@ -407,6 +419,7 @@ end
 function init_player_num(players)
     -- Pick starting player by matching the first instance of
     -- a face in start_order with a card in a player's hand
+    -- TODO should they be forced to play it?
     for _,face in ipairs(NON_SPECIAL_CARDS) do
         for _,player in ipairs(players) do
             for _,card in ipairs(player.hand) do
@@ -469,6 +482,6 @@ print('@@@ Starting a new game with '..NUM_PLAYERS..' players')
 
 game_loop()
 
-print('---------')
-print('Game Over')
-print('---------')
+print('=================')
+print('=== Game Over ===')
+print('=================')
