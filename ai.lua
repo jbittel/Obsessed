@@ -27,7 +27,10 @@ AI_FACE_WEIGHT = {
 
 function ai_play(pile, hand)
     local valid = {}
-
+    local freq = ai_get_frequencies(hand)
+    local top_face = get_pile_top(pile)
+    local run = get_pile_run(pile)
+ 
     -- Copy all valid cards in hand
     for i,_ in ipairs(hand) do
         hand[i].play = true
@@ -38,10 +41,6 @@ function ai_play(pile, hand)
     end
 
     -- Tweak card weights as necessary
-    local freq = ai_get_frequencies(hand)
-    local top_face = get_pile_top(pile)
-    local run = get_pile_run(pile)
-
     for _,card in ipairs(valid) do
         card.weight = AI_FACE_WEIGHT[card.face]
 
@@ -49,9 +48,9 @@ function ai_play(pile, hand)
         if not ai_is_special_card(card.face) then
             if card.face == top_face and
                (freq[card.face] + run >= 4) then
-                card.weight = 0
+                card.weight = card.weight - 1
             elseif freq[card.face] >= 4 then
-                card.weight = 0
+                card.weight = card.weight - 2
             end
         end
     end
@@ -101,16 +100,21 @@ end
 
 function ai_fuzzy_select(first, last)
     local a = {}
-    local num = 100
-    local start = 1
+    local pos = 1
+    local step = 100
+    local num = step
+
+    if last - first <= 0 then return 1 end
 
     for i = first, last do
-        for j = start, num do
+        for j = pos, num do
             table.insert(a, i)
         end
 
-        num = math.floor(num / 4)
-        start = num
+        step = math.floor(step / 4)
+        if step < 1 then break end
+        pos = num + 1
+        num = num + step
     end
 
     return a[math.random(#a)]
