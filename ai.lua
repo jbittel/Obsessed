@@ -96,8 +96,24 @@ function ai_select_card(cards)
     -- Sort card faces by associated weight
     table.sort(faces, function(a, b) return a.weight < b.weight end)
  
-    -- TODO add fuzzy logic when selecting active face
-    return faces[1].face
+    return faces[ai_fuzzy_select(1, #faces)].face
+end
+
+function ai_fuzzy_select(first, last)
+    local a = {}
+    local num = 100
+    local start = 1
+
+    for i = first, last do
+        for j = start, num do
+            table.insert(a, i)
+        end
+
+        num = math.floor(num / 4)
+        start = num
+    end
+
+    return a[math.random(#a)]
 end
 
 function ai_is_special_card(face)
