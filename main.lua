@@ -36,6 +36,7 @@ function game_loop()
     local reverse = player_order()
     local deal_card, num_cards = init_cards(NUM_PLAYERS)
     local next_player = init_players(NUM_PLAYERS, HAND_SIZE, reverse, deal_card)
+    local write_log = log_game_state()
 
     while true do
         local turn_over = end_turn()
@@ -50,6 +51,7 @@ function game_loop()
 
             -- If no valid moves, pick up pile and lose turn
             if not has_valid_play(pile, player.hand) then
+                write_log(pile, player)
                 pile, player.hand = pick_up_pile(pile, player.hand)
                 break
             end
@@ -61,6 +63,7 @@ function game_loop()
                 get_cards(pile, player.hand)
             end
   
+            write_log(pile, player)
             pile, player.hand = play_cards(pile, player.hand, turn_over, reverse)
 
             -- Kill pile if 4+ top cards match
@@ -86,7 +89,7 @@ function game_loop()
                     end
                     print('*** Drawing from visible cards ('..#player.visible..' left)')
                 elseif #player.hand == 0 and #player.hidden > 0 then
-                    -- TODO allow player to select card?
+                    -- TODO allow player to select card
                     local card = get_next_card(player.hidden)
                     if card ~= nil then
                         table.insert(player.hand, card)
@@ -97,11 +100,43 @@ function game_loop()
 
             -- Test for game over condition
             if num_cards() == 0 and #player.hand == 0 and
-               #player.visible == 0 and #player.hidden == 0 then
-               print('*** Player '..player.num..' wins!')
-               return
+                #player.visible == 0 and #player.hidden == 0 then
+                print('*** Player '..player.num..' wins!')
+                return
             end
         until turn_over()
+    end
+end
+
+function log_game_state()
+    local log = io.open('game.log', 'a+')
+
+    return function (pile, player)
+        log:write('pile\t')
+        for _,card in ipairs(pile) do
+            log:write(card.face..card.suit..' ')
+        end
+        log:write('\n')
+
+        log:write('player'..player.num..'\t')
+        for _,card in ipairs(player.hand) do
+            if card.play == true then
+                log:write(card.face..card.suit..'* ')
+            else
+                log:write(card.face..card.suit..' ')
+            end
+        end
+        log:write('\t')
+        for _,card in ipairs(player.visible) do
+            log:write(card.face..card.suit..' ')
+        end
+        log:write('\t')
+        for _,card in ipairs(player.hidden) do
+            log:write(card.face..card.suit..' ')
+        end
+        log:write('\n')
+
+        log:flush()
     end
 end
 
@@ -289,6 +324,7 @@ end
 
 function kill_pile()
     print('*** Killed pile')
+    -- TODO store discard pile?
     return {}
 end
 

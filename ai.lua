@@ -99,12 +99,13 @@ function ai_select_card(cards)
 end
 
 function ai_fuzzy_select(first, last)
+    local diff = (last - first) + 1
+    if diff <= 1 then return 1 end
+
     local a = {}
     local pos = 1
-    local step = 100
+    local step = diff ^ 2
     local num = step
-
-    if last - first <= 0 then return 1 end
 
     for i = first, last do
         for j = pos, num do
