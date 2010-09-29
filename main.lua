@@ -89,7 +89,7 @@ function game_loop()
                     end
                     print('*** Drawing from visible cards ('..#player.visible..' left)')
                 elseif #player.hand == 0 and #player.hidden > 0 then
-                    -- TODO allow player to select card
+                    -- TODO allow player to select card?
                     local card = get_next_card(player.hidden)
                     if card ~= nil then
                         table.insert(player.hand, card)
@@ -111,6 +111,8 @@ end
 function log_game_state()
     local log = io.open('game.log', 'a+')
 
+    log:write('game\t'..os.date()..' '..NUM_PLAYERS..'\n')
+
     return function (pile, player)
         log:write('pile\t')
         for _,card in ipairs(pile) do
@@ -118,7 +120,7 @@ function log_game_state()
         end
         log:write('\n')
 
-        log:write('player'..player.num..'\t')
+        log:write('player\t'..player.num..'\t')
         for _,card in ipairs(player.hand) do
             if card.play == true then
                 log:write(card.face..card.suit..'* ')
