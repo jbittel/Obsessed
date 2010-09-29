@@ -73,9 +73,9 @@ function game_loop()
             end
 
             -- Draw next card from appropriate pile as necessary
-            if #player.hand < 3 then
+            if #player.hand < HAND_SIZE then
                 if num_cards() > 0 then
-                    while #player.hand < 3 and num_cards() > 0 do
+                    while #player.hand < HAND_SIZE and num_cards() > 0 do
                         local card = deal_card()
                         if card ~= nil then
                             table.insert(player.hand, card)
