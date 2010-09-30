@@ -28,11 +28,12 @@ INVALID_MOVES = {
     ['A'] = { '4', '5', '6', '9', 'J', 'Q', 'K' },
 }
 
-NUM_PLAYERS = 4
+NUM_PLAYERS = 2
 HAND_SIZE = 3
 
 function game_loop()
     local pile = {}
+    local turn = 1
     local reverse = player_order()
     local deal_card, num_cards = init_cards(NUM_PLAYERS)
     local next_player = init_players(NUM_PLAYERS, HAND_SIZE, reverse, deal_card)
@@ -49,21 +50,26 @@ function game_loop()
             print('*** '..num_cards()..' card(s) left to draw')
             display_pile(pile)
 
-            -- If no valid moves, pick up pile and lose turn
-            if not has_valid_play(pile, player.hand) then
-                write_log(pile, player)
-                pile, player.hand = pick_up_pile(pile, player.hand)
-                break
-            end
+            -- If first turn, the card to play has been
+            -- set by init_player_num()
+            if turn ~= 1 then
+                -- If no valid moves, pick up pile and lose turn
+                if not has_valid_play(pile, player.hand) then
+                    write_log(turn, pile, player)
+                    pile, player.hand = pick_up_pile(pile, player.hand)
+                    write_log(turn, pile, player)
+                    break
+                end
 
-            if player.ai == true then
-                ai_play(pile, player.hand)
-            else
-                display_hand(player.hand)
-                get_cards(pile, player.hand)
+                if player.ai == true then
+                    ai_play(pile, player.hand)
+                else
+                    display_hand(player.hand)
+                    get_cards(pile, player.hand)
+                end
             end
   
-            write_log(pile, player)
+            write_log(turn, pile, player)
             pile, player.hand = play_cards(pile, player.hand, turn_over, reverse)
 
             -- Kill pile if 4+ top cards match
@@ -98,6 +104,8 @@ function game_loop()
                 end
             end
 
+            write_log(turn, pile, player)
+
             -- Test for game over condition
             if num_cards() == 0 and #player.hand == 0 and
                 #player.visible == 0 and #player.hidden == 0 then
@@ -105,6 +113,8 @@ function game_loop()
                 return
             end
         until turn_over()
+
+        turn = turn + 1
     end
 end
 
@@ -113,14 +123,14 @@ function log_game_state()
 
     log:write('game\t'..os.date()..' '..NUM_PLAYERS..'\n')
 
-    return function (pile, player)
-        log:write('pile\t')
+    return function (turn, pile, player)
+        log:write('pile\t'..turn..'\t')
         for _,card in ipairs(pile) do
             log:write(card.face..card.suit..' ')
         end
         log:write('\n')
 
-        log:write('player\t'..player.num..'\t')
+        log:write('player\t'..turn..'\t'..player.num..'\t')
         for _,card in ipairs(player.hand) do
             if card.play == true then
                 log:write(card.face..card.suit..'* ')
@@ -456,12 +466,26 @@ end
 
 function init_player_num(players)
     -- Pick starting player by matching the first instance of
-    -- a face in start_order with a card in a player's hand
-    -- TODO should they be forced to play it?
+    -- a non-special face with a card in a player's hand and
+    -- marking that card for play
     for _,face in ipairs(NON_SPECIAL_CARDS) do
         for _,player in ipairs(players) do
             for _,card in ipairs(player.hand) do
                 if face == card.face then
+                    card.play = true
+                    return player.num
+                end
+            end
+        end
+    end
+
+    -- Tiebreaker: if a matching non-special card isn't found,
+    -- look at special cards also
+    for _,face in ipairs(SPECIAL_CARDS) do
+        for _,player in ipairs(players) do
+            for _,card in ipairs(player.hand) do
+                if face == card.face then
+                    card.play = true
                     return player.num
                 end
             end
