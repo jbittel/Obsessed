@@ -121,16 +121,6 @@ function ai_fuzzy_select(first, last)
     return a[math.random(#a)]
 end
 
-function ai_is_special_card(face)
-    for _,card in ipairs(SPECIAL_CARDS) do
-        if card == face then
-            return true
-        end
-    end
-
-    return false
-end
-
 function ai_swap_cards(visible, hand, num)
     local t = {}
 

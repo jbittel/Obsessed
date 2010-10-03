@@ -8,13 +8,8 @@
 
 --]]
 
+require "cards"
 require "ai"
-
-FACES = { '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A' }
-SUITS = { 'C', 'D', 'H', 'S' }
-
-SPECIAL_CARDS = { '2', '3', '7', '8', '10', 'R' }
-NON_SPECIAL_CARDS = { '4', '5', '6', '9', 'J', 'Q', 'K', 'A' }
 
 INVALID_MOVES = {
     ['3'] = { '2', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A' },
@@ -32,12 +27,15 @@ NUM_PLAYERS = 2
 HAND_SIZE = 3
 
 function game_loop()
-    local pile = {}
+    local draw_pile = DrawPile:new()
+    local discard_pile = DiscardPile:new()
+
     local turn = 1
     local reverse = player_order()
-    local deal_card, num_cards = init_cards(NUM_PLAYERS)
     local next_player = init_players(NUM_PLAYERS, HAND_SIZE, reverse, deal_card)
     local write_log = log_game_state()
+
+    draw_pile:init_cards()
 
     while true do
         local turn_over = end_turn()
@@ -47,8 +45,8 @@ function game_loop()
             print('================')
             print('=== PLAYER '..player.num..' ===')
             print('================')
-            print('*** '..num_cards()..' card(s) left to draw')
-            display_pile(pile)
+            print('*** '..draw_pile:get_num_cards()..' card(s) left to draw')
+            draw_pile:display_cards()
 
             -- If first turn, the card to play has been
             -- set by init_player_num()
@@ -82,7 +80,7 @@ function game_loop()
             if #player.hand < HAND_SIZE then
                 if num_cards() > 0 then
                     while #player.hand < HAND_SIZE and num_cards() > 0 do
-                        local card = deal_card()
+                        local card = draw_pile:deal_card()
                         if card ~= nil then
                             table.insert(player.hand, card)
                         end
@@ -171,49 +169,6 @@ function end_turn(b)
         if b ~= nil then turn_over = b end
         return turn_over
     end
-end
-
-function display_pile(pile)
-    if #pile == 0 then
-        print('*** The pile is empty')
-        return
-    end
-
-    io.write('*** Pile: ')
-    for i,card in ipairs(pile) do
-        if i > 5 then break end
-        io.write(card.face..card.suit..' ')
-    end
-    print('\t['..#pile..' card(s) total]')
-end
-
-function get_pile_top(pile)
-    for _,card in ipairs(pile) do
-        if card.face ~= 'R' then
-            return card.face
-        end
-    end
-
-    return nil
-end
-
-function get_pile_run(pile)
-    local top_face = get_pile_top(pile)
-    local run = 0
-
-    if top_face == nil then return 0 end
-
-    for _,card in ipairs(pile) do
-        if card.face ~= 'R' then
-            if top_face == card.face then
-                run = run + 1
-            else
-                break
-            end
-        end
-    end
-
-    return run
 end
 
 function display_hand(hand)
@@ -320,26 +275,6 @@ function get_active_face(hand)
     return active_face
 end
 
-function pick_up_pile(pile, hand)
-    local count = 0
-
-    for _,card in ipairs(pile) do
-        if card.face ~= '3' then
-            table.insert(hand, card)
-            count = count + 1
-        end
-    end
-    print('*** No valid moves, picked up '..count..' cards')
-
-    return {}, hand
-end
-
-function kill_pile()
-    print('*** Killed pile')
-    -- TODO store discard pile?
-    return {}
-end
-
 function clear_play(cards)
     for _,card in ipairs(cards) do
         card.play = false
@@ -374,53 +309,6 @@ function play_cards(pile, hand, turn_over, reverse)
     end
 
     return pile, h
-end
-
-function init_cards(num_players)
-    local cards = {}
-    local num_decks = math.ceil(num_players / 2)
-
-    for deck = 1,num_decks do
-        for _,suit in ipairs(SUITS) do
-            for rank,face in ipairs(FACES) do
-                local card = {}
-                table.insert(cards, card)
-                card.suit = suit
-                card.face = face
-                card.rank = rank + 1
-                card.play = false
-            end
-        end
-
-        if num_players > 2 then
-            -- Add two Jokers to each deck
-            for i=1,2 do
-                local card = {}
-                table.insert(cards, card)
-                card.suit = ''
-                card.face = 'R'
-                card.rank = #FACES + 2
-                card.play = false
-            end
-        end
-    end
-
-    math.randomseed(os.time())
-    shuffle(cards)
-
-    return function()
-        return get_next_card(cards)
-    end, function()
-        return #cards
-    end
-end
-
-function get_next_card(cards)
-    if #cards > 0 then
-        return table.remove(cards)
-    else
-        return nil
-    end
 end
 
 function init_players(num_players, num_cards, reverse, deal_card)
@@ -506,17 +394,6 @@ function next_player_num(num_players, curr_player, reverse)
     if num < 1 then num = num_players end
 
     return num
-end
-
--- Implementation of the Knuth shuffle
-function shuffle(cards)
-    local n = #cards
-
-    while n > 1 do
-        local k = math.random(n)
-        cards[n], cards[k] = cards[k], cards[n]
-        n = n - 1
-    end
 end
 
 function slice(list, start, len)
