@@ -25,7 +25,35 @@ AI_FACE_WEIGHT = {
     ['R']  = 12
 }
 
-function ai_play(pile, hand)
+
+AIPlayer = Player:new{ ai = true }
+
+function AIPlayer:init_player()
+    self.hand = PlayerHand:new()
+    self.visible = PlayerVisible:new()
+    self.hidden = PlayerHidden:new()
+end
+
+function AIPlayer:swap_cards()
+    local t = {}
+
+    for _,card in ipairs(self.visible) do
+        card.weight = AI_FACE_WEIGHT[card.face]
+        table.insert(t, card)
+    end
+
+    for _,card in ipairs(self.hand) do
+        card.weight = AI_FACE_WEIGHT[card.face]
+        table.insert(t, card)
+    end
+
+    table.sort(t, function(a, b) return a.weight > b.weight end)
+
+    self.visible = slice(t, 1, HAND_SIZE)
+    self.hand = slice(t, HAND_SIZE + 1, HAND_SIZE)
+end
+
+function AIPlayer:play_turn(pile, hand)
     local valid = {}
     local freq = ai_get_frequencies(hand)
     local top_face = get_pile_top(pile)
@@ -69,7 +97,7 @@ function ai_play(pile, hand)
     end
 end
 
-function ai_get_frequencies(cards)
+function AIPlayer:ai_get_frequencies(cards)
     local freq = {}
 
     for _,card in ipairs(cards) do
@@ -79,7 +107,7 @@ function ai_get_frequencies(cards)
     return freq
 end
 
-function ai_select_card(cards)
+function AIPlayer:ai_select_card(cards)
     local faces = {}
     local face = nil
 
@@ -98,7 +126,7 @@ function ai_select_card(cards)
     return faces[ai_fuzzy_select(1, #faces)].face
 end
 
-function ai_fuzzy_select(first, last)
+function AIPlayer:ai_fuzzy_select(first, last)
     local diff = (last - first) + 1
     if diff <= 1 then return 1 end
 
@@ -119,22 +147,4 @@ function ai_fuzzy_select(first, last)
     end
 
     return a[math.random(#a)]
-end
-
-function ai_swap_cards(visible, hand, num)
-    local t = {}
-
-    for _,card in ipairs(visible) do
-        card.weight = AI_FACE_WEIGHT[card.face]
-        table.insert(t, card)
-    end
-
-    for _,card in ipairs(hand) do
-        card.weight = AI_FACE_WEIGHT[card.face]
-        table.insert(t, card)
-    end
-
-    table.sort(t, function(a, b) return a.weight > b.weight end)
-
-    return slice(t, 1, num), slice(t, num + 1, num)
 end

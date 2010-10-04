@@ -14,7 +14,7 @@ SPECIAL_CARDS = { '2', '3', '7', '8', '10', 'R' }
 NON_SPECIAL_CARDS = { '4', '5', '6', '9', 'J', 'Q', 'K', 'A' }
 
 
-Card = { suit = '', face = '', rank = -1 }
+Card = { suit = '', face = '', rank = -1, play = false }
 
 function Card:new(o)
     o = o or {}
@@ -82,7 +82,7 @@ function DrawPile:init_cards()
             end
         end
 
-        if num_players > 2 then
+        if NUM_PLAYERS > 2 then
             -- Add two Jokers to each deck
             for i=1,2 do
                 local card = Card:new{suit = '', face = 'R', rank = #FACES + 2}
@@ -152,24 +152,40 @@ function DiscardPile:get_run_length()
     return run
 end
 
-function DiscardPile:pick_up_pile(hand)
+function DiscardPile:pick_up_pile(player)
     local count = 0
 
     for _,card in ipairs(self.cards) do
         if card.face ~= '3' then
-            table.insert(hand, card)
+            table.insert(player.hand, card)
             count = count + 1
         end
     end
 
     self.cards = {}
     print('*** No valid moves, picked up '..count..' cards')
-    
-    return hand
 end
 
 
 PlayerHand = CardPile:new()
+
+function PlayerHand:get_active_face()
+    local active_face = nil
+
+    for _,card in ipairs(self.cards) do
+        if card.play == true then
+            if active_face == nil then
+                active_face = card.face
+            else
+                if active_face ~= card.face then
+                    return nil 
+                end
+            end
+        end
+    end
+
+    return active_face
+end
 
 
 PlayerVisible = CardPile:new()
