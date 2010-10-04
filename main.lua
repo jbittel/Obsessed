@@ -65,8 +65,7 @@ function game_loop()
             end
   
 --            write_log(turn, pile, player)
-            -- TODO make this into a generic execute_turn() function
-            pile, player.hand = play_cards(pile, player.hand, turn_over, reverse)
+            play_cards(discard_pile, player, player_list)
 
             -- Kill pile if 4+ top cards match
             if get_pile_run(pile) >= 4 then
@@ -199,26 +198,22 @@ function is_valid_cards(hand, num)
     return true
 end
 
-function clear_play(cards)
-    for _,card in ipairs(cards) do
-        card.play = false
-    end
-end
 
-function play_cards(pile, hand, turn_over, reverse)
+function play_cards(discard_pile, player, player_list)
     local h = {}
-    local active_face = get_active_face(hand)
+    local active_face = player.hand:get_active_face()
 
-    for _,card in ipairs(hand) do
+    for _,card in ipairs(player.hand) do
         if card.play == true then
             print('+++ Played a '..card.face)
-            table.insert(pile, 1, card)
+            table.insert(discard_pile.cards, 1, card)
         else
             table.insert(h, card)
         end
     end
 
-    clear_play(pile)
+    player.hand = h
+    discard_pile:clear_play()
 
     if active_face == '8' then
         turn_over(false)
@@ -226,13 +221,11 @@ function play_cards(pile, hand, turn_over, reverse)
         pile = kill_pile()
         turn_over(false)
     elseif active_face == 'R' then
-        reverse(true)
+        player_list:reverse_order()
         turn_over(true)
     else
         turn_over(true)
     end
-
-    return pile, h
 end
 
 function slice(list, start, len)

@@ -68,6 +68,12 @@ function CardPile:sort_by_rank()
     table.sort(self.cards, function(a, b) return a.rank < b.rank end)
 end
 
+function CardPile:clear_play()
+    for _,card in ipairs(self.cards) do
+        card.play = false
+    end
+end
+
 
 DrawPile = CardPile:new()
 
