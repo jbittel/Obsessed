@@ -9,6 +9,7 @@
 --]]
 
 require "cards"
+require "players"
 require "ai"
 
 INVALID_MOVES = {
@@ -23,16 +24,17 @@ INVALID_MOVES = {
     ['A'] = { '4', '5', '6', '9', 'J', 'Q', 'K' },
 }
 
-NUM_PLAYERS = 2
+NUM_PLAYERS = 4
 HAND_SIZE = 3
 
 function game_loop()
     local draw_pile = DrawPile:new()
     local discard_pile = DiscardPile:new()
 
+    local player_list = PlayerList:new()
+
     local turn = 1
     local reverse = player_order()
-    local next_player = init_players(NUM_PLAYERS, HAND_SIZE, reverse, deal_card)
     local write_log = log_game_state()
 
     draw_pile:init_cards()
@@ -46,7 +48,7 @@ function game_loop()
             print('=== PLAYER '..player.num..' ===')
             print('================')
             print('*** '..draw_pile:get_num_cards()..' card(s) left to draw')
-            draw_pile:display_cards()
+            discard_pile:display_cards(5)
 
             -- If first turn, the card to play has been
             -- set by init_player_num()
@@ -168,17 +170,6 @@ function end_turn(b)
     return function(b)
         if b ~= nil then turn_over = b end
         return turn_over
-    end
-end
-
-function display_hand(hand)
-    if #hand == 0 then return end
-
-    -- TODO display visible cards also?
-    print('Current hand:')
-    table.sort(hand, function(a, b) return a.rank < b.rank end)
-    for i,card in ipairs(hand) do
-        print('  '..i..': '..card.face..card.suit)
     end
 end
 
@@ -309,47 +300,6 @@ function play_cards(pile, hand, turn_over, reverse)
     end
 
     return pile, h
-end
-
-function init_players(num_players, num_cards, reverse, deal_card)
-    local players = {}
-    local curr_player = 0
-
-    for i = 1,num_players do
-        local player = {}
-        table.insert(players, player)
-        player.num = i
-        player.hidden = {}
-        player.visible = {}
-        player.hand = {}
-
-        for i = 1,num_cards do
-            table.insert(player.hidden, deal_card())
-            table.insert(player.visible, deal_card())
-            table.insert(player.hand, deal_card())
-        end
-
-        if i == 1 then
-            player.ai = false
-        else
-            player.ai = true
-        end
-    
-        -- TODO allow human players to swap with visible stack
-        if player.ai == true then
-            player.visible, player.hand = ai_swap_cards(player.visible, player.hand, num_cards)
-        end
-    end
-
-    return function()
-        if curr_player == 0 then
-            curr_player = init_player_num(players)
-        else
-            curr_player = next_player_num(#players, curr_player, reverse)
-        end
-
-        return players[curr_player]
-    end
 end
 
 function init_player_num(players)

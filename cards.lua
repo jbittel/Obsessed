@@ -14,7 +14,7 @@ SPECIAL_CARDS = { '2', '3', '7', '8', '10', 'R' }
 NON_SPECIAL_CARDS = { '4', '5', '6', '9', 'J', 'Q', 'K', 'A' }
 
 
-Card = {}
+Card = { suit = '', face = '', rank = -1 }
 
 function Card:new(o)
     o = o or {}
@@ -35,14 +35,12 @@ function Card:is_special_card()
 end
 
 
-CardPile = {}
+CardPile = { cards = {} }
 
 function CardPile:new(o)
     o = o or {}
     setmetatable(o, self)
     self.__index = self
-
-    self.cards = {}
 
     return o
 end
@@ -51,18 +49,23 @@ function CardPile:get_num_cards()
     return #self.cards
 end
 
-function CardPile:display_cards()
+function CardPile:display_cards(limit)
+    limit = limit or 0
+
     if #self.cards == 0 then
         print('*** No cards to display')
         return
     end
 
-    io.write('*** Cards: ')
+    io.write('*** '..#self.cards..' cards: ')
     for i,card in ipairs(self.cards) do
-        if i > 5 then break end
-        io.write(card.face..card.suit..' ')
+        if limit ~= 0 and i > limit then break end
+        io.write(i..':'..card.face..card.suit..' ')
     end
-    print('\t['..#self.cards..' card(s) total]')
+end
+
+function CardPile:sort_by_rank()
+    table.sort(self.cards, function(a, b) return a.rank < b.rank end)
 end
 
 
@@ -165,5 +168,11 @@ function DiscardPile:pick_up_pile(hand)
     return hand
 end
 
-draw_pile = DrawPile:new()
-draw_pile:display_cards()
+
+PlayerHand = CardPile:new()
+
+
+PlayerVisible = CardPile:new()
+
+
+PlayerHidden = CardPile:new()
