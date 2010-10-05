@@ -62,6 +62,7 @@ function CardPile:display_cards(limit)
         if limit ~= 0 and i > limit then break end
         io.write(i..':'..card.face..card.suit..' ')
     end
+    io.write('\n')
 end
 
 function CardPile:sort_by_rank()
@@ -191,6 +192,38 @@ function PlayerHand:get_active_face()
     end
 
     return active_face
+end
+
+function PlayerHand:has_valid_play(discard_pile)
+    for i,_ in ipairs(self.cards) do
+        self.cards[i].play = true
+        if self:is_valid_play(discard_pile) then
+            self.cards[i].play = false
+            return true
+        end
+        self.cards[i].play = false
+    end
+
+    return false
+end
+
+function PlayerHand:is_valid_play(discard_pile)
+    local active_face = self:get_active_face()
+    local top_face = discard_pile:get_top_face()
+
+    if active_face == nil then return false end
+    if top_face == nil then return true end
+    if top_face == active_face then return true end
+
+    if INVALID_MOVES[top_face] ~= nil then
+        for _,move in ipairs(INVALID_MOVES[top_face]) do
+            if move == active_face then
+                return false
+            end
+        end
+    end
+
+    return true
 end
 
 

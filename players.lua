@@ -9,7 +9,7 @@
 --]]
 
 
-Player = { num = 0, ai = false }
+Player = { num = 0 }
 
 function Player:new(o)
     o = o or {}
@@ -21,15 +21,6 @@ function Player:new(o)
     self.hidden = PlayerHidden:new()
 
     return o
-end
-
-function Player:swap_cards()
-    -- TODO allow human players to swap with visible stack
-    return
-end
-
-function Player:play_turn()
-    self:display_hand()
 end
 
 function Player:is_ai_player()
@@ -51,36 +42,16 @@ function Player:get_num_cards()
     return #self.hand + #self.visible + #self.hidden
 end
 
-function Player:has_valid_play(discard_pile)
-    for i,_ in ipairs(self.hand) do
-        hand[i].play = true
-        if self:is_valid_play(discard_pile) then
-            hand[i].play = false
-            return true
-        end
-        hand[i].play = false
-    end
 
-    return false
+HumanPlayer = Player:new{ ai = false }
+
+function HumanPlayer:swap_cards()
+    -- TODO allow human players to swap with visible stack
+    return
 end
 
-function Player:is_valid_play(discard_pile)
-    local active_face = self.hand:get_active_face()
-    local top_face = discard_pile:get_top_face()
-
-    if active_face == nil then return false end
-    if top_face == nil then return true end
-    if top_face == active_face then return true end
-
-    if INVALID_MOVES[top_face] ~= nil then
-        for _,move in ipairs(INVALID_MOVES[top_face]) do
-            if move == active_face then
-                return false
-            end
-        end
-    end
-
-    return true
+function HumanPlayer:play_turn()
+    self:display_hand()
 end
 
 
@@ -93,6 +64,7 @@ function PlayerList:new(o)
 
     self.curr_player = 0
     self.reverse = false
+    self.turn_over = true
 
     return o
 end
@@ -100,7 +72,7 @@ end
 function PlayerList:init_players(draw_pile)
     for i = 1, NUM_PLAYERS do
         if i == 1 then
-            player = Player:new{ num = i }
+            player = HumanPlayer:new{ num = i }
         else
             player = AIPlayer:new{ num = i }
         end
@@ -127,6 +99,14 @@ end
 
 function PlayerList:reverse_order()
     self.reverse = not self.reverse
+end
+
+function PlayerList:end_turn(b)
+    self.turn_over = b
+end
+
+function PlayerList:is_turn_over()
+    return self.turn_over
 end
 
 function PlayerList:init_player_num()

@@ -40,8 +40,8 @@ function game_loop()
     player_list:init_players(draw_pile)
 
     while true do
-        local turn_over = end_turn()
         local player = player_list:get_next_player()
+        player_list:end_turn(true)
 
         repeat
             print('================')
@@ -54,7 +54,7 @@ function game_loop()
             -- set by init_player_num()
             if turn ~= 1 then
                 -- If no valid moves, pick up pile and lose turn
-                if not player:has_valid_play(discard_pile) then
+                if not player.hand:has_valid_play(discard_pile) then
 --                    write_log(turn, pile, player)
                     discard_pile:pick_up_pile(player)
 --                    write_log(turn, pile, player)
@@ -68,14 +68,14 @@ function game_loop()
             play_cards(discard_pile, player, player_list)
 
             -- Kill pile if 4+ top cards match
-            if get_pile_run(pile) >= 4 then
-                pile = kill_pile()
-                turn_over(false)
+            if discard_pile:get_run_length() >= 4 then
+                discard_pile:kill_pile()
+                player_list:end_turn(false)
             end
 
             -- Draw next card from appropriate pile as necessary
             if #player.hand < HAND_SIZE then
-                if num_cards() > 0 then
+                if draw_pile:get_num_cards() > 0 then
                     while #player.hand < HAND_SIZE and num_cards() > 0 do
                         local card = draw_pile:deal_card()
                         if card ~= nil then
@@ -106,7 +106,7 @@ function game_loop()
                 print('*** Player '..player.num..' wins!')
                 return
             end
-        until turn_over()
+        until player_list:is_turn_over()
 
         turn = turn + 1
     end
@@ -143,15 +143,6 @@ function log_game_state()
         log:write('\n')
 
         log:flush()
-    end
-end
-
-function end_turn(b)
-    local turn_over = true
-
-    return function(b)
-        if b ~= nil then turn_over = b end
-        return turn_over
     end
 end
 
@@ -216,15 +207,15 @@ function play_cards(discard_pile, player, player_list)
     discard_pile:clear_play()
 
     if active_face == '8' then
-        turn_over(false)
+        player_list:end_turn(false)
     elseif active_face == '10' then
         pile = kill_pile()
-        turn_over(false)
+        player_list:end_turn(false)
     elseif active_face == 'R' then
         player_list:reverse_order()
-        turn_over(true)
+        player_list:end_turn(true)
     else
-        turn_over(true)
+        player_list:end_turn(true)
     end
 end
 
