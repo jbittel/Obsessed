@@ -39,6 +39,11 @@ function game_loop()
     draw_pile:init_cards()
     player_list:init_players(draw_pile)
 
+    draw_pile:display_cards()
+    discard_pile:display_cards()
+--    player.hand:display_cards()
+--    print(player:get_num_cards())
+
     while true do
         local player = player_list:get_next_player()
         player_list:end_turn(true)
@@ -47,7 +52,6 @@ function game_loop()
             print('================')
             print('=== PLAYER '..player.num..' ===')
             print('================')
-            print('*** '..draw_pile:get_num_cards()..' card(s) left to draw')
             discard_pile:display_cards(5)
 
             -- If first turn, the card to play has been
@@ -74,28 +78,28 @@ function game_loop()
             end
 
             -- Draw next card from appropriate pile as necessary
-            if #player.hand < HAND_SIZE then
+            if #player.hand.cards < HAND_SIZE then
                 if draw_pile:get_num_cards() > 0 then
-                    while #player.hand < HAND_SIZE and num_cards() > 0 do
-                        local card = draw_pile:deal_card()
+                    while #player.hand.cards < HAND_SIZE and draw_pile:get_num_cards() > 0 do
+                        local card = draw_pile:draw_card()
                         if card ~= nil then
-                            table.insert(player.hand, card)
+                            table.insert(player.hand.cards, card)
                         end
                     end
-                elseif #player.hand == 0 and #player.visible > 0 then
+                elseif #player.hand.cards == 0 and #player.visible.cards > 0 then
                     -- TODO allow player to select card
                     local card = get_next_card(player.visible)
                     if card ~= nil then
-                        table.insert(player.hand, card)
+                        table.insert(player.hand.cards, card)
                     end
-                    print('*** Drawing from visible cards ('..#player.visible..' left)')
-                elseif #player.hand == 0 and #player.hidden > 0 then
+                    print('*** Drawing from visible cards ('..#player.visible.cards..' left)')
+                elseif #player.hand.cards == 0 and #player.hidden.cards > 0 then
                     -- TODO allow player to select card?
                     local card = get_next_card(player.hidden)
                     if card ~= nil then
-                        table.insert(player.hand, card)
+                        table.insert(player.hand.cards, card)
                     end
-                    print('*** Drawing from hidden cards ('..#player.hidden..' left)')
+                    print('*** Drawing from hidden cards ('..#player.hidden.cards..' left)')
                 end
             end
 

@@ -28,12 +28,6 @@ AI_FACE_WEIGHT = {
 
 AIPlayer = Player:new{ ai = true }
 
-function AIPlayer:init_player()
-    self.hand = PlayerHand:new()
-    self.visible = PlayerVisible:new()
-    self.hidden = PlayerHidden:new()
-end
-
 function AIPlayer:swap_cards()
     local t = {}
 

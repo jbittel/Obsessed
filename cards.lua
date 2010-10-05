@@ -52,12 +52,12 @@ end
 function CardPile:display_cards(limit)
     limit = limit or 0
 
-    if #self.cards == 0 then
+    if self:get_num_cards() == 0 then
         print('*** No cards to display')
         return
     end
 
-    io.write('*** '..#self.cards..' cards: ')
+    io.write('*** '..self:get_num_cards()..' cards: ')
     for i,card in ipairs(self.cards) do
         if limit ~= 0 and i > limit then break end
         io.write(i..':'..card.face..card.suit..' ')
@@ -102,7 +102,7 @@ function DrawPile:init_cards()
 end
 
 function DrawPile:shuffle()
-    local n = #self.cards
+    local n = self:get_num_cards()
 
     math.randomseed(os.time())
 
@@ -115,7 +115,7 @@ function DrawPile:shuffle()
 end
 
 function DrawPile:draw_card()
-    if #self.cards > 0 then
+    if self:get_num_cards() > 0 then
         return table.remove(self.cards)
     else
         return nil

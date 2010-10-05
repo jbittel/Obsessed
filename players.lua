@@ -8,8 +8,7 @@
 
 --]]
 
-
-Player = { num = 0 }
+Player = { num = 0, ai = false }
 
 function Player:new(o)
     o = o or {}
@@ -39,7 +38,7 @@ function Player:display_hand()
 end
 
 function Player:get_num_cards()
-    return #self.hand + #self.visible + #self.hidden
+    return self.hand:get_num_cards() + self.visible:get_num_cards() + self.hidden:get_num_cards()
 end
 
 
@@ -70,21 +69,21 @@ function PlayerList:new(o)
 end
 
 function PlayerList:init_players(draw_pile)
-    for i = 1, NUM_PLAYERS do
+    for i = 1,NUM_PLAYERS do
         if i == 1 then
             player = HumanPlayer:new{ num = i }
         else
             player = AIPlayer:new{ num = i }
         end
-        table.insert(self.players, player)
 
         for i = 1,HAND_SIZE do
-            table.insert(player.hidden, draw_pile:draw_card())
-            table.insert(player.visible, draw_pile:draw_card())
-            table.insert(player.hand, draw_pile:draw_card())
+            table.insert(player.hidden.cards, draw_pile:draw_card())
+            table.insert(player.visible.cards, draw_pile:draw_card())
+            table.insert(player.hand.cards, draw_pile:draw_card())
         end
 
         player:swap_cards()
+        table.insert(self.players, player)
     end
 end
 
@@ -109,13 +108,31 @@ function PlayerList:is_turn_over()
     return self.turn_over
 end
 
+function PlayerList:next_player_num(curr_player)
+    local num_players = self:get_num_players()
+
+    if self.curr_player == 0 then
+        self.curr_player = self:init_player_num()
+        return
+    end
+
+    if not self.reverse then
+        self.curr_player = self.curr_player + 1
+    else
+        self.curr_player = self.curr_player - 1
+    end
+
+    if self.curr_player > num_players then self.curr_player = 1 end
+    if self.curr_player < 1 then self.curr_player = num_players end
+end
+
 function PlayerList:init_player_num()
     -- Pick starting player by matching the first instance of
     -- a non-special face with a card in a player's hand and
     -- marking that card for play
     for _,face in ipairs(NON_SPECIAL_CARDS) do
         for _,player in ipairs(self.players) do
-            for _,card in ipairs(player.hand) do
+            for _,card in ipairs(player.hand.cards) do
                 if face == card.face then
                     card.play = true
                     return player.num
@@ -128,7 +145,7 @@ function PlayerList:init_player_num()
     -- look at special cards also
     for _,face in ipairs(SPECIAL_CARDS) do
         for _,player in ipairs(self.players) do
-            for _,card in ipairs(player.hand) do
+            for _,card in ipairs(player.hand.cards) do
                 if face == card.face then
                     card.play = true
                     return player.num
@@ -138,17 +155,4 @@ function PlayerList:init_player_num()
     end
 
     return 1
-end
-
-function PlayerList:next_player_num(curr_player)
-    local num_players = self:get_num_players()
-
-    if not self.reverse then
-        self.curr_player = self.curr_player + 1
-    else
-        self.curr_player = self.curr_player - 1
-    end
-
-    if self.curr_player > num_players then self.curr_player = 1 end
-    if self.curr_player < 1 then self.curr_player = num_players end
 end
