@@ -39,14 +39,10 @@ function game_loop()
     draw_pile:init_cards()
     player_list:init_players(draw_pile)
 
-    draw_pile:display_cards()
-    discard_pile:display_cards()
---    player.hand:display_cards()
---    print(player:get_num_cards())
-
     while true do
         local player = player_list:get_next_player()
         player_list:end_turn(true)
+        player:get_num_cards()
 
         repeat
             print('================')
@@ -56,20 +52,20 @@ function game_loop()
 
             -- If first turn, the card to play has been
             -- set by init_player_num()
-            if turn ~= 1 then
+--            if turn ~= 1 then
                 -- If no valid moves, pick up pile and lose turn
-                if not player.hand:has_valid_play(discard_pile) then
+--                if not player.hand:has_valid_play(discard_pile) then
 --                    write_log(turn, pile, player)
-                    discard_pile:pick_up_pile(player)
+--                    discard_pile:pick_up_pile(player)
 --                    write_log(turn, pile, player)
-                    break
-                end
+--                    break
+--                end
 
-                player:play_turn()
-            end
+--                player:play_turn()
+--            end
   
 --            write_log(turn, pile, player)
-            play_cards(discard_pile, player, player_list)
+            play_cards(discard_pile, player.hand, player_list)
 
             -- Kill pile if 4+ top cards match
             if discard_pile:get_run_length() >= 4 then
@@ -194,9 +190,9 @@ function is_valid_cards(hand, num)
 end
 
 
-function play_cards(discard_pile, player, player_list)
+function play_cards(discard_pile, hand, player_list)
     local h = {}
-    local active_face = player.hand:get_active_face()
+    local active_face = hand:get_active_face()
 
     for _,card in ipairs(player.hand) do
         if card.play == true then

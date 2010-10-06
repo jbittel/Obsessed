@@ -35,13 +35,13 @@ function Card:is_special_card()
 end
 
 
-CardPile = { cards = {} }
+CardPile = {}
 
 function CardPile:new(o)
     o = o or {}
     setmetatable(o, self)
     self.__index = self
-
+    self.cards = {}
     return o
 end
 
@@ -116,7 +116,7 @@ end
 
 function DrawPile:draw_card()
     if self:get_num_cards() > 0 then
-        return table.remove(self.cards)
+        return table.remove(self.cards, 1)
     else
         return nil
     end

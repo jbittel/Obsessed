@@ -15,6 +15,8 @@ function Player:new(o)
     setmetatable(o, self)
     self.__index = self
 
+    self.num = num
+    self.ai = ai
     self.hand = PlayerHand:new()
     self.visible = PlayerVisible:new()
     self.hidden = PlayerHidden:new()
