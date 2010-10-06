@@ -10,39 +10,61 @@
 
 FACES = { '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A' }
 SUITS = { 'C', 'D', 'H', 'S' }
+
 SPECIAL_CARDS = { '2', '3', '7', '8', '10', 'R' }
 NON_SPECIAL_CARDS = { '4', '5', '6', '9', 'J', 'Q', 'K', 'A' }
 
+INVALID_MOVES = {
+    ['3'] = { '2', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A' },
+    ['5'] = { '4' },
+    ['6'] = { '4', '5' },
+    ['7'] = { '8', '9', 'J', 'Q', 'K', 'A' },
+    ['9'] = { '4', '5', '6' },
+    ['J'] = { '4', '5', '6', '9' },
+    ['Q'] = { '4', '5', '6', '9', 'J' },
+    ['K'] = { '4', '5', '6', '9', 'J', 'Q' },
+    ['A'] = { '4', '5', '6', '9', 'J', 'Q', 'K' },
+}
 
-Card = { suit = '', face = '', rank = -1, play = false }
+AI_FACE_WEIGHT = {
+    ['2']  = 8,
+    ['3']  = 12,
+    ['4']  = 1,
+    ['5']  = 2,
+    ['6']  = 3,
+    ['7']  = 9,
+    ['8']  = 10,
+    ['9']  = 3,
+    ['10'] = 11,
+    ['J']  = 4,
+    ['Q']  = 5,
+    ['K']  = 6,
+    ['A']  = 7,
+    ['R']  = 12
+}
 
-function Card:new(o)
-    o = o or {}
-    setmetatable(o, self)
-    self.__index = self
 
-    return o
+Card = class('Card')
+
+function Card:initialize(face, suit, rank)
+    self.face = face
+    self.suit = suit
+    self.rank = rank
+    self.weight = AI_FACE_WEIGHT[face]
 end
 
 function Card:is_special_card()
     for _,card in ipairs(SPECIAL_CARDS) do
-        if card == self.face then
-            return true
-        end
+        if card == self.face then return true end
     end
-
     return false
 end
 
 
-CardPile = {}
+CardPile = class('CardPile')
 
-function CardPile:new(o)
-    o = o or {}
-    setmetatable(o, self)
-    self.__index = self
+function CardPile:initialize()
     self.cards = {}
-    return o
 end
 
 function CardPile:get_num_cards()
@@ -52,12 +74,12 @@ end
 function CardPile:display_cards(limit)
     limit = limit or 0
 
-    if self:get_num_cards() == 0 then
+    if #self.cards == 0 then
         print('*** No cards to display')
         return
     end
 
-    io.write('*** '..self:get_num_cards()..' cards: ')
+    io.write('*** '..#self.cards..' cards: ')
     for i,card in ipairs(self.cards) do
         if limit ~= 0 and i > limit then break end
         io.write(i..':'..card.face..card.suit..' ')
@@ -69,22 +91,21 @@ function CardPile:sort_by_rank()
     table.sort(self.cards, function(a, b) return a.rank < b.rank end)
 end
 
-function CardPile:clear_play()
-    for _,card in ipairs(self.cards) do
-        card.play = false
-    end
+function CardPile:add_card(card)
+    table.insert(self.cards, card)
 end
 
 
-DrawPile = CardPile:new()
+DrawPile = class('DrawPile', CardPile)
 
-function DrawPile:init_cards()
+function DrawPile:initialize()
+    super.initialize(self)
     local num_decks = math.ceil(NUM_PLAYERS / 2)
 
     for deck = 1,num_decks do
         for _,suit in ipairs(SUITS) do
             for rank,face in ipairs(FACES) do
-                local card = Card:new{suit = suit, face = face, rank = rank + 1}
+                local card = Card:new(face, suit, rank + 1)
                 table.insert(self.cards, card)
             end
         end
@@ -92,7 +113,7 @@ function DrawPile:init_cards()
         if NUM_PLAYERS > 2 then
             -- Add two Jokers to each deck
             for i=1,2 do
-                local card = Card:new{suit = '', face = 'R', rank = #FACES + 2}
+                local card = Card:new('R', '', #FACES + 2)
                 table.insert(self.cards, card)
             end
         end
@@ -102,7 +123,7 @@ function DrawPile:init_cards()
 end
 
 function DrawPile:shuffle()
-    local n = self:get_num_cards()
+    local n = #self.cards
 
     math.randomseed(os.time())
 
@@ -115,7 +136,7 @@ function DrawPile:shuffle()
 end
 
 function DrawPile:draw_card()
-    if self:get_num_cards() > 0 then
+    if #self.cards > 0 then
         return table.remove(self.cards, 1)
     else
         return nil
@@ -123,20 +144,21 @@ function DrawPile:draw_card()
 end
 
 
-DiscardPile = CardPile:new()
+DiscardPile = class('DiscardPile', CardPile)
+
+function DiscardPile:initialize()
+    super.initialize(self)
+end
 
 function DiscardPile:kill_pile()
-    print('*** Killed pile')
     self.cards = {}
+    print('*** Killed pile')
 end
 
 function DiscardPile:get_top_face()
     for _,card in ipairs(self.cards) do
-        if card.face ~= 'R' then
-            return card.face
-        end
+        if card.face ~= 'R' then return card.face end
     end
-
     return nil
 end
 
@@ -174,7 +196,11 @@ function DiscardPile:pick_up_pile(player)
 end
 
 
-PlayerHand = CardPile:new()
+PlayerHand = class('PlayerHand', CardPile)
+
+function PlayerHand:initialize()
+    super.initialize(self)
+end
 
 function PlayerHand:get_active_face()
     local active_face = nil
@@ -195,22 +221,17 @@ function PlayerHand:get_active_face()
 end
 
 function PlayerHand:has_valid_play(discard_pile)
-    for i,_ in ipairs(self.cards) do
-        self.cards[i].play = true
-        if self:is_valid_play(discard_pile) then
-            self.cards[i].play = false
-            return true
-        end
-        self.cards[i].play = false
+    local top_face = discard_pile:get_top_face()
+    for _,card in ipairs(self.cards) do
+        if self:is_valid_play(card.face, top_face) then return true end
     end
-
     return false
 end
 
-function PlayerHand:is_valid_play(discard_pile)
-    local active_face = self:get_active_face()
-    local top_face = discard_pile:get_top_face()
+-- TODO add get_valid_play that returns a CardPile object
+-- containing valid cards to play
 
+function PlayerHand:is_valid_play(active_face, top_face)
     if active_face == nil then return false end
     if top_face == nil then return true end
     if top_face == active_face then return true end
@@ -226,8 +247,23 @@ function PlayerHand:is_valid_play(discard_pile)
     return true
 end
 
+function PlayerHand:has_card(face)
+    for _,card in ipairs(self.cards) do
+        if card.face == face then return true end
+    end
+    return false
+end
 
-PlayerVisible = CardPile:new()
+
+PlayerVisible = class('PlayerVisible', CardPile)
+
+function PlayerVisible:initialize()
+    super.initialize(self)
+end
 
 
-PlayerHidden = CardPile:new()
+PlayerHidden = class('PlayerHidden', CardPile)
+
+function PlayerHidden:initialize()
+    super.initialize(self)
+end
