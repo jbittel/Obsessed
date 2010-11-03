@@ -34,20 +34,11 @@ function AIPlayer:swap_cards()
     self.hand.cards = slice(t, HAND_SIZE + 1, HAND_SIZE)
 end
 
-function AIPlayer:execute_turn(discard_pile)
-    local valid = {}
-    local freq = self:get_frequencies(self.hand.cards)
+function AIPlayer:execute_turn()
     local top_face = discard_pile:get_top_face()
+    local valid = self.hand:get_valid_play(top_face)
+    local freq = self:get_frequencies(self.hand.cards)
     local run = discard_pile:get_run_length()
- 
-    -- Copy all valid cards in hand
-    for i,_ in ipairs(self.hand.cards) do
-        self.hand.cards[i].play = true
-        if self.hand:is_valid_play(discard_pile) then
-            table.insert(valid, self.hand.cards[i])
-        end
-        self.hand.cards[i].play = false
-    end
 
     -- Tweak card weights as necessary
     for _,card in ipairs(valid) do
@@ -68,15 +59,18 @@ function AIPlayer:execute_turn(discard_pile)
 
     -- Mark selected face as in play
     -- TODO prioritize longer runs?
-    -- TODO skip the play flag and play these cards directly
-    for i,card in ipairs(self.hand.cards) do
+    local hand = {}
+    for _,card in ipairs(self.hand.cards) do
         if active_face == card.face then
-            self.hand.cards[i].play = true
+            discard_pile:add_card(card)
             -- If non-special, flag all matching faces
             -- TODO there are times we want to play multiple special cards
             if card:is_special_card() then break end
+        else
+            table.insert(hand, card)
         end
     end
+    self.hand.cards = hand
 end
 
 function AIPlayer:get_frequencies(cards)

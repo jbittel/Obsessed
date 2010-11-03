@@ -16,10 +16,25 @@ require 'ai'
 NUM_PLAYERS = 4
 HAND_SIZE = 3
 
+draw_pile = nil
+discard_pile = nil
+
+function game_init()
+    print('   ____  _                      _             ')
+    print('  / __ \\| |                    (_)            ')
+    print(' | |  | | |__  ___  ___ ___ ___ _  ___  _ __  ')
+    print(' | |  | | \'_ \\/ __|/ _ | __/ __| |/ _ \\| \'_ \\ ')
+    print(' | |__| | |_) \\__ \\  __|__ \\__ \\ | (_) | | | |')
+    print('  \\____/|_.__/|___/\\___|___/___/_|\\___/|_| |_|')
+    print('')
+    print('@@@ Starting a new game with '..NUM_PLAYERS..' players')
+
+    draw_pile = DrawPile:new()
+    discard_pile = DiscardPile:new()
+end
+
 function game_loop()
-    local draw_pile = DrawPile:new()
-    local discard_pile = DiscardPile:new()
-    local player_list = PlayerList:new(draw_pile)
+    local player_list = PlayerList:new()
 
     local turn = 1
 --    local write_log = log_game_state()
@@ -33,24 +48,23 @@ function game_loop()
 
         repeat
             print('*** '..draw_pile:get_num_cards()..' cards left')
-            discard_pile:display_cards(5)
+            discard_pile:display_cards('Discard Pile', 5)
 
             -- If first turn, the card to play has been
             -- set by init_player_num()
 --            if turn ~= 1 then
                 -- If no valid moves, pick up pile and lose turn
-                if not player.hand:has_valid_play(discard_pile) then
+                if not player.hand:has_valid_play() then
 --                    write_log(turn, pile, player)
                     discard_pile:pick_up_pile(player)
 --                    write_log(turn, pile, player)
                     break
                 end
 
-                player:execute_turn(discard_pile)
+                player:execute_turn()
 --            end
   
 --            write_log(turn, pile, player)
-            play_cards(discard_pile, player)
 
             local top_face = discard_pile:get_top_face()
             if top_face == '8' then
@@ -72,27 +86,18 @@ function game_loop()
             end
 
             -- Draw next card from appropriate pile as necessary
-            if #player.hand.cards < HAND_SIZE then
+            if player:get_num_hand_cards() < HAND_SIZE then
                 if draw_pile:get_num_cards() > 0 then
-                    while #player.hand.cards < HAND_SIZE and draw_pile:get_num_cards() > 0 do
-                        local card = draw_pile:draw_card()
-                        if card ~= nil then
-                            table.insert(player.hand.cards, card)
-                        end
+                    while player:get_num_hand_cards < HAND_SIZE and draw_pile:get_num_cards() > 0 do
+                        player:draw_card(draw_pile)
                     end
-                elseif #player.hand.cards == 0 and #player.visible.cards > 0 then
+                elseif player:get_num_hand_cards() == 0 and player:get_num_visible_cards() > 0 then
                     -- TODO allow player to select card
-                    local card = player.visible:get_next_card()
-                    if card ~= nil then
-                        table.insert(player.hand.cards, card)
-                    end
-                    print('*** Drawing from visible cards ('..#player.visible.cards..' left)')
-                elseif #player.hand.cards == 0 and #player.hidden.cards > 0 then
+                    player:draw_card(player.visible)
+                    print('*** Drawing from visible cards ('..player:get_num_visible_cards()..' left)')
+                elseif player:get_num_hand_cards() == 0 and player:get_num_hidden_cards() > 0 then
                     -- TODO allow player to select card?
-                    local card = player.hidden:get_next_card()
-                    if card ~= nil then
-                        table.insert(player.hand.cards, card)
-                    end
+                    player:draw_card(player.hidden)
                     print('*** Drawing from hidden cards ('..#player.hidden.cards..' left)')
                 end
             end
@@ -108,6 +113,12 @@ function game_loop()
 
         turn = turn + 1
     end
+end
+
+function game_end()
+    print('=================')
+    print('=== Game Over ===')
+    print('=================')
 end
 
 function log_game_state()
@@ -144,22 +155,6 @@ function log_game_state()
     end
 end
 
-function play_cards(discard_pile, player)
-    local h = {}
-
-    -- TODO move this logic into the individual play(execute?)_card functions
-    for _,card in ipairs(player.hand.cards) do
-        if card.play == true then
-            print('+++ Played a '..card.face)
-            table.insert(discard_pile.cards, 1, card)
-        else
-            table.insert(h, card)
-        end
-    end
-
-    player.hand.cards = h
-end
-
 function slice(list, start, len)
     local t = {}
     local len = len or (#list - start + 1)
@@ -174,17 +169,6 @@ end
 
 -- main
 
-print('   ____  _                      _             ')
-print('  / __ \\| |                    (_)            ')
-print(' | |  | | |__  ___  ___ ___ ___ _  ___  _ __  ')
-print(' | |  | | \'_ \\/ __|/ _ | __/ __| |/ _ \\| \'_ \\ ')
-print(' | |__| | |_) \\__ \\  __|__ \\__ \\ | (_) | | | |')
-print('  \\____/|_.__/|___/\\___|___/___/_|\\___/|_| |_|')
-print('')
-print('@@@ Starting a new game with '..NUM_PLAYERS..' players')
-
+game_init()
 game_loop()
-
-print('=================')
-print('=== Game Over ===')
-print('=================')
+game_end()

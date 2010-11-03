@@ -71,15 +71,15 @@ function CardPile:get_num_cards()
     return #self.cards
 end
 
-function CardPile:display_cards(limit)
+function CardPile:display_cards(prefix, limit)
     limit = limit or 0
 
     if #self.cards == 0 then
-        print('*** No cards to display')
+        print('*** ['..prefix..'] No cards to display')
         return
     end
 
-    io.write('*** '..#self.cards..' cards: ')
+    io.write('*** ['..prefix..'] '..#self.cards..' cards: ')
     for i,card in ipairs(self.cards) do
         if limit ~= 0 and i > limit then break end
         io.write(i..':'..card.face..card.suit..' ')
@@ -92,7 +92,15 @@ function CardPile:sort_by_rank()
 end
 
 function CardPile:add_card(card)
-    table.insert(self.cards, card)
+    table.insert(self.cards, 1, card)
+end
+
+function CardPile:draw_card()
+    if #self.cards > 0 then
+        return table.remove(self.cards, 1)
+    else
+        return nil
+    end
 end
 
 
@@ -132,14 +140,6 @@ function DrawPile:shuffle()
         local k = math.random(n)
         self.cards[n], self.cards[k] = self.cards[k], self.cards[n]
         n = n - 1
-    end
-end
-
-function DrawPile:draw_card()
-    if #self.cards > 0 then
-        return table.remove(self.cards, 1)
-    else
-        return nil
     end
 end
 
@@ -200,27 +200,12 @@ PlayerHand = class('PlayerHand', CardPile)
 
 function PlayerHand:initialize()
     super.initialize(self)
-end
-
-function PlayerHand:get_active_face()
-    local active_face = nil
-
-    for _,card in ipairs(self.cards) do
-        if card.play == true then
-            if active_face == nil then
-                active_face = card.face
-            else
-                if active_face ~= card.face then
-                    return nil 
-                end
-            end
-        end
+    for i = 1,HAND_SIZE do
+        self:add_card(draw_pile:draw_card())
     end
-
-    return active_face
 end
 
-function PlayerHand:has_valid_play(discard_pile)
+function PlayerHand:has_valid_play()
     local top_face = discard_pile:get_top_face()
     for _,card in ipairs(self.cards) do
         if self:is_valid_play(card.face, top_face) then return true end
@@ -228,8 +213,15 @@ function PlayerHand:has_valid_play(discard_pile)
     return false
 end
 
--- TODO add get_valid_play that returns a CardPile object
--- containing valid cards to play
+function PlayerHand:get_valid_play(top_face)
+    local valid = {}
+    for _,card in ipairs(self.cards) do
+        if self:is_valid_play(card.face, top_face) then
+            table.insert(valid, card)
+        end
+    end
+    return valid
+end
 
 function PlayerHand:is_valid_play(active_face, top_face)
     if active_face == nil then return false end
@@ -254,11 +246,20 @@ function PlayerHand:has_card(face)
     return false
 end
 
+function PlayerHand:play_cards(set, discard_pile)
+    local hand = {}
+
+    return hand
+end
+
 
 PlayerVisible = class('PlayerVisible', CardPile)
 
 function PlayerVisible:initialize()
     super.initialize(self)
+    for i = 1,HAND_SIZE do
+        self:add_card(draw_pile:draw_card())
+    end
 end
 
 
@@ -266,4 +267,7 @@ PlayerHidden = class('PlayerHidden', CardPile)
 
 function PlayerHidden:initialize()
     super.initialize(self)
+    for i = 1,HAND_SIZE do
+        self:add_card(draw_pile:draw_card())
+    end
 end

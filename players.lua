@@ -28,13 +28,31 @@ end
 
 function Player:display_hand()
     if self.hand:get_num_cards() == 0 then return end
-
     self.hand:sort_by_rank()
-    self.hand:display_cards()
+    self.hand:display_cards('Hand')
 end
 
 function Player:get_num_cards()
     return self.hand:get_num_cards() + self.visible:get_num_cards() + self.hidden:get_num_cards()
+end
+
+function Player:get_num_hand_cards()
+    return self.hand:get_num_cards()
+end
+
+function Player:get_num_visible_cards()
+    return self.visible:get_num_cards()
+end
+
+function Player:get_num_hidden_cards()
+    return self.hidden:get_num_cards()
+end
+
+function Player:draw_card(cards)
+    local card = cards:draw_card()
+    if card ~= nil then
+        self.hand:add_card(card)
+    end
 end
 
 
@@ -49,7 +67,9 @@ function HumanPlayer:swap_cards()
     return
 end
 
-function HumanPlayer:execute_turn(discard_pile)
+function HumanPlayer:execute_turn()
+    local top_face = discard_pile:get_top_face()
+
     self:display_hand()
 
     while true do
@@ -62,39 +82,33 @@ function HumanPlayer:execute_turn(discard_pile)
             for n in string.gmatch(str, "%d+") do
                 table.insert(num, tonumber(n))
             end
-        
-            if self:is_valid_cards(num) then
-                break
-            else
-                print('!!! Invalid card number')
-            end
         end
 
         -- TODO ensure all selected cards are the same face
         -- TODO skip the play flag and play these cards directly
+        local hand = {}
         for _,n in ipairs(num) do
-            self.hand.cards[n].play = true
-        end
-    
-        if self.hand:is_valid_play(discard_pile) then
-            return
-        else
-            print('!!! Invalid play')
-        end
-    end
-end
+            local card = self.hand.cards[n]
 
-function HumanPlayer:is_valid_cards(num)
-    for _,n in ipairs(num) do
-        if self.hand.cards[n] == nil then return false end
+            if card == nil then
+                print('!!! Invalid card number')
+                break
+            end
+
+            if not self.hand:is_valid_play(card.face, top_face) then
+                print('!!! Invalid play')
+                break
+            end
+        end
+        self.hand.cards = hand
+        return
     end
-    return true
 end
 
 
 PlayerList = class('PlayerList')
 
-function PlayerList:initialize(draw_pile)
+function PlayerList:initialize()
     self.players = {}
     self.curr_player = 0
     self.reverse = false
@@ -105,12 +119,6 @@ function PlayerList:initialize(draw_pile)
             player = HumanPlayer:new(i)
         else
             player = AIPlayer:new(i)
-        end
-
-        for i = 1,HAND_SIZE do
-            player.hidden:add_card(draw_pile:draw_card())
-            player.visible:add_card(draw_pile:draw_card())
-            player.hand:add_card(draw_pile:draw_card())
         end
 
         player:swap_cards()
@@ -166,6 +174,7 @@ function PlayerList:init_player_num()
         for _,player in ipairs(self.players) do
             if player.hand:has_card(face) then
 --                    card.play = true
+                    print('*** Starting with player '..player.num)
                     return player.num
             end
         end
