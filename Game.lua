@@ -9,9 +9,9 @@
 --]]
 
 require 'MiddleClass'
-require 'cards'
-require 'players'
-require 'ai'
+require 'Cards'
+require 'Players'
+require 'Ai'
 
 NUM_PLAYERS = 4
 HAND_SIZE = 3
