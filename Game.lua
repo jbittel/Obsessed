@@ -42,12 +42,11 @@ function game_loop()
     while true do
         local player = player_list:get_next_player()
 
-        print('================')
-        print('=== PLAYER '..player.num..' ===')
-        print('================')
+        print('')
+        print('=== PLAYER '..player.num)
 
         repeat
-            print('[Draw Pile] '..draw_pile:get_num_cards()..' cards left')
+            draw_pile:display_cards('Draw Pile', 0)
             discard_pile:display_cards('Discard Pile', 5)
 
             -- If first turn, the card to play has been
@@ -155,12 +154,12 @@ function log_game_state()
     end
 end
 
-function slice(list, start, len)
-    local t = {}
+function table.slice(list, start, len)
+    local s = {}
     local len = len or (#list - start + 1)
     local stop = start + len - 1
-    for i = start,stop do table.insert(t, list[i]) end
-    return t
+    for i = start,stop do table.insert(s, list[i]) end
+    return s
 end
 
 function table.set(list)

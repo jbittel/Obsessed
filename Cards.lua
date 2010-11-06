@@ -72,16 +72,10 @@ function CardPile:get_num_cards()
 end
 
 function CardPile:display_cards(prefix, limit)
-    limit = limit or 0
-
-    if #self.cards == 0 then
-        print('['..prefix..'] No cards to display')
-        return
-    end
-
-    io.write('['..prefix..'] '..#self.cards..' cards\t')
+    local limit = limit or -1
+    io.write('### '..prefix..':\t'..#self.cards..' cards\t')
     for i,card in ipairs(self.cards) do
-        if limit > 0 and i > limit then break end
+        if limit ~= -1 and i > limit then break end
         io.write(i..':'..card.face..card.suit..' ')
     end
     io.write('\n')
@@ -130,12 +124,10 @@ function DrawPile:initialize()
     self:shuffle()
 end
 
+-- Implementation of the Knuth shuffle
 function DrawPile:shuffle()
     local n = #self.cards
-
     math.randomseed(os.time())
-
-    -- Implementation of the Knuth shuffle
     while n > 1 do
         local k = math.random(n)
         self.cards[n], self.cards[k] = self.cards[k], self.cards[n]
@@ -156,6 +148,11 @@ function DiscardPile:kill_pile()
 end
 
 function DiscardPile:get_top_face()
+    if #self.cards == 0 then return nil end
+    return self.cards[1].face
+end
+
+function DiscardPile:get_active_face()
     for _,card in ipairs(self.cards) do
         if card.face ~= 'R' then return card.face end
     end
@@ -163,14 +160,14 @@ function DiscardPile:get_top_face()
 end
 
 function DiscardPile:get_run_length()
-    local top_face = self:get_top_face()
+    local active_face = self:get_active_face()
     local run = 0
 
-    if top_face == nil then return 0 end
+    if active_face == nil then return 0 end
 
     for _,card in ipairs(self.cards) do
         if card.face ~= 'R' then
-            if top_face == card.face then
+            if active_face == card.face then
                 run = run + 1
             else
                 break
@@ -183,14 +180,12 @@ end
 
 function DiscardPile:pick_up_pile(player)
     local count = 0
-
     for _,card in ipairs(self.cards) do
         if card.face ~= '3' then
-            table.insert(player.hand, card)
+            player.hand:add_card(card)
             count = count + 1
         end
     end
-
     self.cards = {}
     print('*** No valid moves, picked up '..count..' cards')
 end
@@ -206,36 +201,31 @@ function PlayerHand:initialize()
 end
 
 function PlayerHand:has_valid_play()
-    local top_face = discard_pile:get_top_face()
     for _,card in ipairs(self.cards) do
-        if self:is_valid_play(card.face, top_face) then return true end
+        if self:is_valid_play(card.face) then return true end
     end
     return false
 end
 
-function PlayerHand:get_valid_play(top_face)
+function PlayerHand:get_valid_play()
     local valid = {}
     for _,card in ipairs(self.cards) do
-        if self:is_valid_play(card.face, top_face) then
+        if self:is_valid_play(card.face) then
             table.insert(valid, card)
         end
     end
     return valid
 end
 
-function PlayerHand:is_valid_play(active_face, top_face)
-    if active_face == nil then return false end
-    if top_face == nil then return true end
-    if top_face == active_face then return true end
-
-    if INVALID_MOVES[top_face] ~= nil then
-        for _,move in ipairs(INVALID_MOVES[top_face]) do
-            if move == active_face then
-                return false
-            end
+function PlayerHand:is_valid_play(face)
+    local active_face = discard_pile:get_active_face()
+    if active_face == nil then return true end
+    if active_face == face then return true end
+    if INVALID_MOVES[active_face] ~= nil then
+        for _,move in ipairs(INVALID_MOVES[active_face]) do
+            if move == face then return false end
         end
     end
-
     return true
 end
 
@@ -247,7 +237,6 @@ function PlayerHand:has_card(face)
 end
 
 function PlayerHand:play_cards(cards)
-    print('here')
     local hand = {}
     local set = table.set(cards)
     for i,card in ipairs(self.cards) do

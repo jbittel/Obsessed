@@ -30,13 +30,13 @@ function AIPlayer:swap_cards()
 
     table.sort(t, function(a, b) return a.weight > b.weight end)
 
-    self.visible.cards = slice(t, 1, HAND_SIZE)
-    self.hand.cards = slice(t, HAND_SIZE + 1, HAND_SIZE)
+    self.visible.cards = table.slice(t, 1, HAND_SIZE)
+    self.hand.cards = table.slice(t, HAND_SIZE + 1, HAND_SIZE)
 end
 
 function AIPlayer:execute_turn()
-    local top_face = discard_pile:get_top_face()
-    local valid = self.hand:get_valid_play(top_face)
+    local active_face = discard_pile:get_active_face()
+    local valid = self.hand:get_valid_play()
     local freq = self:get_frequencies(self.hand.cards)
     local run = discard_pile:get_run_length()
 
@@ -46,8 +46,7 @@ function AIPlayer:execute_turn()
 
         -- Prioritize killing the pile when possible
         if not card:is_special_card() then
-            if card.face == top_face and
-               (freq[card.face] + run >= 4) then
+            if card.face == active_face and freq[card.face] + run >= 4 then
                 card.weight = card.weight - 1
             elseif freq[card.face] >= 4 then
                 card.weight = card.weight - 2
@@ -57,20 +56,17 @@ function AIPlayer:execute_turn()
 
     local active_face = self:select_card(valid)
 
-    -- Mark selected face as in play
+    -- Select indices of cards to play
     -- TODO prioritize longer runs?
-    local hand = {}
-    for _,card in ipairs(self.hand.cards) do
+    local num = {}
+    for i,card in ipairs(self.hand.cards) do
         if active_face == card.face then
-            discard_pile:add_card(card)
-            -- If non-special, flag all matching faces
+            table.insert(num, i)
             -- TODO there are times we want to play multiple special cards
             if card:is_special_card() then break end
-        else
-            table.insert(hand, card)
         end
     end
-    self.hand.cards = hand
+    self.hand:play_cards(num)
 end
 
 function AIPlayer:get_frequencies(cards)

@@ -68,8 +68,6 @@ function HumanPlayer:swap_cards()
 end
 
 function HumanPlayer:execute_turn()
-    local top_face = discard_pile:get_top_face()
-
     self:display_hand()
 
     while true do
@@ -89,21 +87,17 @@ function HumanPlayer:execute_turn()
         -- TODO ensure all selected cards are the same face
         -- TODO test for a valid play
         self.hand:play_cards(num)
---        local hand = {}
---        for _,n in ipairs(num) do
---            local card = self.hand.cards[n]
---
---            if card == nil then
---                print('!!! Invalid card number')
---                break
---            end
---
---            if not self.hand:is_valid_play(card.face, top_face) then
---                print('!!! Invalid play')
---                break
---            end
+
+--        if card == nil then
+--            print('!!! Invalid card number')
+--            break
 --        end
---        self.hand.cards = hand
+
+--        if not self.hand:is_valid_play(card.face) then
+--            print('!!! Invalid play')
+--            break
+--        end
+
         return
     end
 end
@@ -171,25 +165,22 @@ end
 
 function PlayerList:init_player_num()
     -- Pick starting player by matching the first instance of
-    -- a non-special face with a card in a player's hand and
-    -- marking that card for play
+    -- a non-special face with a card in a player's hand
     for _,face in ipairs(NON_SPECIAL_CARDS) do
         for _,player in ipairs(self.players) do
             if player.hand:has_card(face) then
---                    card.play = true
                     print('*** Starting with player '..player.num)
                     return player.num
             end
         end
     end
 
-    -- Tiebreaker: if a matching non-special card isn't found,
+    -- TODO Tiebreaker: if a matching non-special card isn't found,
     -- look at special cards also
 --    for _,face in ipairs(SPECIAL_CARDS) do
 --        for _,player in ipairs(self.players) do
 --            for _,card in ipairs(player.hand.cards) do
 --                if face == card.face then
---                    card.play = true
 --                    return player.num
 --                end
 --            end
