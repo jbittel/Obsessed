@@ -47,7 +47,7 @@ function game_loop()
         print('================')
 
         repeat
-            print('*** '..draw_pile:get_num_cards()..' cards left')
+            print('[Draw Pile] '..draw_pile:get_num_cards()..' cards left')
             discard_pile:display_cards('Discard Pile', 5)
 
             -- If first turn, the card to play has been
@@ -88,7 +88,7 @@ function game_loop()
             -- Draw next card from appropriate pile as necessary
             if player:get_num_hand_cards() < HAND_SIZE then
                 if draw_pile:get_num_cards() > 0 then
-                    while player:get_num_hand_cards < HAND_SIZE and draw_pile:get_num_cards() > 0 do
+                    while player:get_num_hand_cards() < HAND_SIZE and draw_pile:get_num_cards() > 0 do
                         player:draw_card(draw_pile)
                     end
                 elseif player:get_num_hand_cards() == 0 and player:get_num_visible_cards() > 0 then
@@ -159,12 +159,14 @@ function slice(list, start, len)
     local t = {}
     local len = len or (#list - start + 1)
     local stop = start + len - 1
-  
-    for i = start,stop do
-        table.insert(t, list[i])
-    end
-  
+    for i = start,stop do table.insert(t, list[i]) end
     return t
+end
+
+function table.set(list)
+    local s = {}
+    for _,v in ipairs(list) do s[v] = true end
+    return s
 end
 
 -- main

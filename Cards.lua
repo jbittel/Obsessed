@@ -75,13 +75,13 @@ function CardPile:display_cards(prefix, limit)
     limit = limit or 0
 
     if #self.cards == 0 then
-        print('*** ['..prefix..'] No cards to display')
+        print('['..prefix..'] No cards to display')
         return
     end
 
-    io.write('*** ['..prefix..'] '..#self.cards..' cards: ')
+    io.write('['..prefix..'] '..#self.cards..' cards\t')
     for i,card in ipairs(self.cards) do
-        if limit ~= 0 and i > limit then break end
+        if limit > 0 and i > limit then break end
         io.write(i..':'..card.face..card.suit..' ')
     end
     io.write('\n')
@@ -246,10 +246,19 @@ function PlayerHand:has_card(face)
     return false
 end
 
-function PlayerHand:play_cards(set, discard_pile)
+function PlayerHand:play_cards(cards)
+    print('here')
     local hand = {}
-
-    return hand
+    local set = table.set(cards)
+    for i,card in ipairs(self.cards) do
+        if set[i] then
+            print('*** Playing a '..card.face..card.suit)
+            discard_pile:add_card(card)
+        else
+            table.insert(hand, card)
+        end
+    end
+    self.cards = hand
 end
 
 

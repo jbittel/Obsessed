@@ -82,25 +82,28 @@ function HumanPlayer:execute_turn()
             for n in string.gmatch(str, "%d+") do
                 table.insert(num, tonumber(n))
             end
+            -- TODO test for invalid indexes
+            break
         end
 
         -- TODO ensure all selected cards are the same face
-        -- TODO skip the play flag and play these cards directly
-        local hand = {}
-        for _,n in ipairs(num) do
-            local card = self.hand.cards[n]
-
-            if card == nil then
-                print('!!! Invalid card number')
-                break
-            end
-
-            if not self.hand:is_valid_play(card.face, top_face) then
-                print('!!! Invalid play')
-                break
-            end
-        end
-        self.hand.cards = hand
+        -- TODO test for a valid play
+        self.hand:play_cards(num)
+--        local hand = {}
+--        for _,n in ipairs(num) do
+--            local card = self.hand.cards[n]
+--
+--            if card == nil then
+--                print('!!! Invalid card number')
+--                break
+--            end
+--
+--            if not self.hand:is_valid_play(card.face, top_face) then
+--                print('!!! Invalid play')
+--                break
+--            end
+--        end
+--        self.hand.cards = hand
         return
     end
 end
