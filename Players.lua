@@ -72,6 +72,8 @@ function HumanPlayer:execute_turn()
     local get_cards = true
 
     self:display_hand()
+    self.visible:display_cards('Visible')
+    self.hidden:display_cards('Hidden', 0)
 
     while get_cards do
         local get_input = true

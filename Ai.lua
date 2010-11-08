@@ -40,10 +40,12 @@ function AIPlayer:execute_turn()
     local freq = self:get_frequencies(self.hand.cards)
     local run = discard_pile:get_run_length()
 
+    self.hand:display_cards('Hand', 0)
+    self.visible:display_cards('Visible')
+    self.hidden:display_cards('Hidden', 0)
+
     -- Tweak card weights as necessary
     for _,card in ipairs(valid) do
---        card.weight = AI_FACE_WEIGHT[card.face]
-
         -- Prioritize killing the pile when possible
         if not card:is_special_card() then
             if card.face == active_face and freq[card.face] + run >= 4 then
@@ -98,10 +100,9 @@ function AIPlayer:select_card(cards)
     return faces[self:fuzzy_select(1, #faces)].face
 end
 
--- TODO improve fuzzy selection methodology
 function AIPlayer:fuzzy_select(first, last)
+    if first == last or first > last then return first end
     local diff = (last - first) + 1
-    if diff <= 1 then return 1 end
 
     local a = {}
     local pos = 1
@@ -109,8 +110,9 @@ function AIPlayer:fuzzy_select(first, last)
     local num = step
 
     for i = first, last do
-        for j = pos, num do
+        while pos < num do
             table.insert(a, i)
+            pos = pos + 1
         end
 
         step = math.floor(step / 4)

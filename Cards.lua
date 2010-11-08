@@ -246,7 +246,7 @@ function PlayerHand:play_cards(cards)
     local set = table.set(cards)
     for i,card in ipairs(self.cards) do
         if set[i] then
-            print('*** Playing a '..card.face..card.suit)
+            print('*** Played a '..card.face..card.suit)
             discard_pile:add_card(card)
         else
             table.insert(hand, card)

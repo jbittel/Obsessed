@@ -47,7 +47,7 @@ function game_loop()
 
         repeat
             draw_pile:display_cards('Draw Pile', 0)
-            discard_pile:display_cards('Discard Pile', 5)
+            discard_pile:display_cards('Discard', 5)
 
             -- TODO force starting player to play card
             -- If no valid moves, pick up pile and lose turn
