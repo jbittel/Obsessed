@@ -68,38 +68,49 @@ function HumanPlayer:swap_cards()
 end
 
 function HumanPlayer:execute_turn()
+    local num = {}
+    local get_cards = true
+
     self:display_hand()
 
-    while true do
-        local num = {}
+    while get_cards do
+        local get_input = true
 
-        while true do
+        while get_input do
             num = {}
             io.write('Enter card number(s): ')
             local str = io.stdin:read'*l'
             for n in string.gmatch(str, "%d+") do
                 table.insert(num, tonumber(n))
             end
-            -- TODO test for invalid indexes
-            break
+
+            -- Ensure the numbers provided are valid indexes
+            get_input = false
+            for _,n in ipairs(num) do
+                if n < 1 or n > self.hand:get_num_cards() then
+                    print('!!! Invalid card selection')
+                    get_input = true
+                    break
+                end
+            end
         end
 
-        -- TODO ensure all selected cards are the same face
-        -- TODO test for a valid play
-        self.hand:play_cards(num)
-
---        if card == nil then
---            print('!!! Invalid card number')
---            break
---        end
-
---        if not self.hand:is_valid_play(card.face) then
---            print('!!! Invalid play')
---            break
---        end
-
-        return
+        get_cards = false
+        local face = nil
+        for _,i in ipairs(num) do
+            local card = self.hand:get_card(i)
+            if face == nil then face = card.face end
+            -- Ensure all selected cards are valid plays
+            -- and are the same face
+            if not self.hand:is_valid_play(card.face) or face ~= card.face then
+                print('!!! Invalid play')
+                get_cards = true
+                break
+            end
+        end
     end
+
+    self.hand:play_cards(num)
 end
 
 
@@ -169,23 +180,22 @@ function PlayerList:init_player_num()
     for _,face in ipairs(NON_SPECIAL_CARDS) do
         for _,player in ipairs(self.players) do
             if player.hand:has_card(face) then
-                    print('*** Starting with player '..player.num)
-                    return player.num
+                print('*** Starting with player '..player.num)
+                return player.num
             end
         end
     end
 
-    -- TODO Tiebreaker: if a matching non-special card isn't found,
+    -- Tiebreaker: if a matching non-special card isn't found,
     -- look at special cards also
---    for _,face in ipairs(SPECIAL_CARDS) do
---        for _,player in ipairs(self.players) do
---            for _,card in ipairs(player.hand.cards) do
---                if face == card.face then
---                    return player.num
---                end
---            end
---        end
---    end
+    for _,face in ipairs(SPECIAL_CARDS) do
+        for _,player in ipairs(self.players) do
+            if player.hand:has_card(face) then
+                print('*** Starting with player '..player.num)
+                return player.num
+            end
+        end
+    end
 
     return 1
 end

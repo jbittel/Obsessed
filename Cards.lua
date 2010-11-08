@@ -97,6 +97,11 @@ function CardPile:draw_card()
     end
 end
 
+function CardPile:get_card(num)
+    local num = num or 1
+    return self.cards[num]
+end
+
 
 DrawPile = class('DrawPile', CardPile)
 
@@ -230,10 +235,10 @@ function PlayerHand:is_valid_play(face)
 end
 
 function PlayerHand:has_card(face)
-    for _,card in ipairs(self.cards) do
-        if card.face == face then return true end
+    for i,card in ipairs(self.cards) do
+        if card.face == face then return i end
     end
-    return false
+    return nil
 end
 
 function PlayerHand:play_cards(cards)

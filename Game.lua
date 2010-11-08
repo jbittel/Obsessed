@@ -49,19 +49,16 @@ function game_loop()
             draw_pile:display_cards('Draw Pile', 0)
             discard_pile:display_cards('Discard Pile', 5)
 
-            -- If first turn, the card to play has been
-            -- set by init_player_num()
---            if turn ~= 1 then
-                -- If no valid moves, pick up pile and lose turn
-                if not player.hand:has_valid_play() then
---                    write_log(turn, pile, player)
-                    discard_pile:pick_up_pile(player)
---                    write_log(turn, pile, player)
-                    break
-                end
+            -- TODO force starting player to play card
+            -- If no valid moves, pick up pile and lose turn
+            if not player.hand:has_valid_play() then
+--                write_log(turn, pile, player)
+                discard_pile:pick_up_pile(player)
+--                write_log(turn, pile, player)
+                break
+            end
 
-                player:execute_turn()
---            end
+            player:execute_turn()
   
 --            write_log(turn, pile, player)
 
@@ -95,7 +92,7 @@ function game_loop()
                     player:draw_card(player.visible)
                     print('*** Drawing from visible cards ('..player:get_num_visible_cards()..' left)')
                 elseif player:get_num_hand_cards() == 0 and player:get_num_hidden_cards() > 0 then
-                    -- TODO allow player to select card?
+                    -- TODO allow player to select card
                     player:draw_card(player.hidden)
                     print('*** Drawing from hidden cards ('..#player.hidden.cards..' left)')
                 end

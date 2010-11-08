@@ -98,6 +98,7 @@ function AIPlayer:select_card(cards)
     return faces[self:fuzzy_select(1, #faces)].face
 end
 
+-- TODO improve fuzzy selection methodology
 function AIPlayer:fuzzy_select(first, last)
     local diff = (last - first) + 1
     if diff <= 1 then return 1 end
