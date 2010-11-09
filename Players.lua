@@ -16,6 +16,8 @@ function Player:initialize(num)
     self.hand = PlayerHand:new()
     self.visible = PlayerVisible:new()
     self.hidden = PlayerHidden:new()
+
+    self:swap_cards()
 end
 
 function Player:is_ai_player()
@@ -55,8 +57,26 @@ function HumanPlayer:initialize(num)
 end
 
 function HumanPlayer:swap_cards()
-    -- TODO allow human players to swap with visible stack
-    return
+    local cards = {}
+    for _,card in ipairs(self.hand.cards) do table.insert(cards, card) end
+    for _,card in ipairs(self.visible.cards) do table.insert(cards, card) end
+    self.hand.cards = {}
+    self.visible.cards = {}
+ 
+    print('Select your VISIBLE cards')
+    io.write('### Starting cards:\t')
+    for i,card in ipairs(cards) do io.write(i..':'..card.face..card.suit..' ') end
+    io.write('\n')
+
+    local num = self:get_card_input(1, #cards, 3)
+    local set = table.set(num)
+    for i,card in ipairs(cards) do
+        if set[i] then
+            table.insert(self.visible.cards, card)
+        else
+            table.insert(self.hand.cards, card)
+        end
+    end
 end
 
 function HumanPlayer:execute_turn()
@@ -153,7 +173,6 @@ function PlayerList:initialize()
             player = AIPlayer:new(i)
         end
 
-        player:swap_cards()
         table.insert(self.players, player)
     end
 end
