@@ -116,6 +116,7 @@ function HumanPlayer:get_card_input(min, max, total)
                 break
             end
         end
+        if #num == 0 then get_input = true end
     end
 
     return num
@@ -148,6 +149,7 @@ function HumanPlayer:draw_visible_card()
             print('!!! Invalid draw')
         end
     end
+    -- TODO fix drawing multiple visible cards
     for _,n in ipairs(num) do self:draw_card(self.visible, n) end
 end
 
