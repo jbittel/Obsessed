@@ -13,7 +13,11 @@ AIPlayer = class('AIPlayer', Player)
 function AIPlayer:initialize(num)
     super.initialize(self, num)
     self.ai = true
-end    
+end
+
+function AIPlayer:display_hand()
+    self.hand:display_cards('Hand', 0)
+end
 
 function AIPlayer:swap_cards()
     local t = {}
@@ -34,15 +38,20 @@ function AIPlayer:swap_cards()
     self.hand.cards = table.slice(t, HAND_SIZE + 1, HAND_SIZE)
 end
 
+function AIPlayer:draw_visible_card()
+    -- TODO sort by valid cards and card weight before selecting
+    self:draw_card(self.visible, self:fuzzy_select(1, self:get_num_visible_cards()))
+end
+
+function AIPlayer:draw_hidden_card()
+    self:draw_card(self.hidden)
+end
+
 function AIPlayer:execute_turn()
     local active_face = discard_pile:get_active_face()
     local valid = self.hand:get_valid_play()
     local freq = self:get_frequencies(self.hand.cards)
     local run = discard_pile:get_run_length()
-
-    self.hand:display_cards('Hand', 0)
-    self.visible:display_cards('Visible')
-    self.hidden:display_cards('Hidden', 0)
 
     -- Tweak card weights as necessary
     for _,card in ipairs(valid) do
@@ -56,13 +65,13 @@ function AIPlayer:execute_turn()
         end
     end
 
-    local active_face = self:select_card(valid)
+    local face = self:select_card(valid)
 
     -- Select indices of cards to play
     -- TODO prioritize longer runs?
     local num = {}
     for i,card in ipairs(self.hand.cards) do
-        if active_face == card.face then
+        if face == card.face then
             table.insert(num, i)
             -- TODO there are times we want to play multiple special cards
             if card:is_special_card() then break end
@@ -73,11 +82,7 @@ end
 
 function AIPlayer:get_frequencies(cards)
     local freq = {}
-
-    for _,card in ipairs(cards) do
-        freq[card.face] = (freq[card.face] or 0) + 1
-    end
-
+    for _,card in ipairs(cards) do freq[card.face] = (freq[card.face] or 0) + 1 end
     return freq
 end
 
@@ -100,16 +105,16 @@ function AIPlayer:select_card(cards)
     return faces[self:fuzzy_select(1, #faces)].face
 end
 
-function AIPlayer:fuzzy_select(first, last)
-    if first == last or first > last then return first end
-    local diff = (last - first) + 1
+function AIPlayer:fuzzy_select(min, max)
+    if min == max or min > max then return min end
+    local diff = (max - min) + 1
 
     local a = {}
     local pos = 1
     local step = diff ^ 2
     local num = step
 
-    for i = first, last do
+    for i = min, max do
         while pos < num do
             table.insert(a, i)
             pos = pos + 1

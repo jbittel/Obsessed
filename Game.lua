@@ -46,22 +46,38 @@ function game_loop()
         print('=== PLAYER '..player.num)
 
         repeat
+            -- Display game board
             draw_pile:display_cards('Draw Pile', 0)
             discard_pile:display_cards('Discard', 5)
+            player.visible:display_cards('Visible')
+            player.hidden:display_cards('Hidden', 0)
+
+            -- Draw cards from visible/hidden piles if necessary
+            if player:get_num_hand_cards() == 0 and player:get_num_visible_cards() > 0 then
+                if player.visible:has_valid_play() then
+                    player:draw_visible_card()
+                    print('*** Drawing from visible cards ('..player:get_num_visible_cards()..' left)')
+                else
+                    discard_pile:pick_up_pile(player)
+                    break
+                end
+            elseif player:get_num_hand_cards() == 0 and player:get_num_hidden_cards() > 0 then
+                player:draw_hidden_card()
+                print('*** Drawing from hidden cards ('..player:get_num_hidden_cards()..' left)')
+            end
+
+            player:display_hand()
 
             -- TODO force starting player to play card
             -- If no valid moves, pick up pile and lose turn
             if not player.hand:has_valid_play() then
---                write_log(turn, pile, player)
                 discard_pile:pick_up_pile(player)
---                write_log(turn, pile, player)
                 break
             end
 
             player:execute_turn()
   
---            write_log(turn, pile, player)
-
+            -- Apply card face rules
             local top_face = discard_pile:get_top_face()
             if top_face == '8' then
                 player_list:end_turn(false)
@@ -81,24 +97,10 @@ function game_loop()
                 player_list:end_turn(false)
             end
 
-            -- Draw next card from appropriate pile as necessary
-            if player:get_num_hand_cards() < HAND_SIZE then
-                if draw_pile:get_num_cards() > 0 then
-                    while player:get_num_hand_cards() < HAND_SIZE and draw_pile:get_num_cards() > 0 do
-                        player:draw_card(draw_pile)
-                    end
-                elseif player:get_num_hand_cards() == 0 and player:get_num_visible_cards() > 0 then
-                    -- TODO allow player to select card
-                    player:draw_card(player.visible)
-                    print('*** Drawing from visible cards ('..player:get_num_visible_cards()..' left)')
-                elseif player:get_num_hand_cards() == 0 and player:get_num_hidden_cards() > 0 then
-                    -- TODO allow player to select card
-                    player:draw_card(player.hidden)
-                    print('*** Drawing from hidden cards ('..#player.hidden.cards..' left)')
-                end
+            -- Keep player's hand at a minimum of 3 cards
+            while player:get_num_hand_cards() < HAND_SIZE and draw_pile:get_num_cards() > 0 do
+                player:draw_card(draw_pile)
             end
-
---            write_log(turn, pile, player)
 
             -- Test for game over condition
             if draw_pile:get_num_cards() == 0 and player:get_num_cards() == 0 then

@@ -89,12 +89,10 @@ function CardPile:add_card(card)
     table.insert(self.cards, 1, card)
 end
 
-function CardPile:draw_card()
-    if #self.cards > 0 then
-        return table.remove(self.cards, 1)
-    else
-        return nil
-    end
+function CardPile:draw_card(num)
+    if #self.cards == 0 then return nil end
+    local num = num or 1
+    return table.remove(self.cards, num)
 end
 
 function CardPile:get_card(num)
@@ -102,12 +100,42 @@ function CardPile:get_card(num)
     return self.cards[num]
 end
 
+function CardPile:has_valid_play()
+    for _,card in ipairs(self.cards) do
+        if self:is_valid_play(card.face) then return true end
+    end
+    return false
+end
+
+function CardPile:get_valid_play()
+    local valid = {}
+    for _,card in ipairs(self.cards) do
+        if self:is_valid_play(card.face) then
+            table.insert(valid, card)
+        end
+    end
+    return valid
+end
+
+function CardPile:is_valid_play(face)
+    local active_face = discard_pile:get_active_face()
+    if active_face == nil then return true end
+    if active_face == face then return true end
+    if INVALID_MOVES[active_face] ~= nil then
+        for _,move in ipairs(INVALID_MOVES[active_face]) do
+            if move == face then return false end
+        end
+    end
+    return true
+end
+
 
 DrawPile = class('DrawPile', CardPile)
 
 function DrawPile:initialize()
     super.initialize(self)
-    local num_decks = math.ceil(NUM_PLAYERS / 2)
+--    local num_decks = math.ceil(NUM_PLAYERS / 2)
+    local num_decks = 1
 
     for deck = 1,num_decks do
         for _,suit in ipairs(SUITS) do
@@ -203,35 +231,6 @@ function PlayerHand:initialize()
     for i = 1,HAND_SIZE do
         self:add_card(draw_pile:draw_card())
     end
-end
-
-function PlayerHand:has_valid_play()
-    for _,card in ipairs(self.cards) do
-        if self:is_valid_play(card.face) then return true end
-    end
-    return false
-end
-
-function PlayerHand:get_valid_play()
-    local valid = {}
-    for _,card in ipairs(self.cards) do
-        if self:is_valid_play(card.face) then
-            table.insert(valid, card)
-        end
-    end
-    return valid
-end
-
-function PlayerHand:is_valid_play(face)
-    local active_face = discard_pile:get_active_face()
-    if active_face == nil then return true end
-    if active_face == face then return true end
-    if INVALID_MOVES[active_face] ~= nil then
-        for _,move in ipairs(INVALID_MOVES[active_face]) do
-            if move == face then return false end
-        end
-    end
-    return true
 end
 
 function PlayerHand:has_card(face)
