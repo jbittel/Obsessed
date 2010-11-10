@@ -39,18 +39,34 @@ function AIPlayer:swap_cards()
 end
 
 function AIPlayer:draw_visible_card()
-    -- TODO sort by valid cards and card weight before selecting
-    self:draw_card(self.visible, self:fuzzy_select(1, self:get_num_visible_cards()))
+    local face = self:select_card_face(self.visible)
+    for i,card in ipairs(self.visible.cards) do
+        if face == card.face then self:add_to_hand(self.visible, i) end
+    end
 end
 
 function AIPlayer:draw_hidden_card()
-    self:draw_card(self.hidden)
+    self:add_to_hand(self.hidden)
 end
 
 function AIPlayer:execute_turn()
+    local face = self:select_card_face(self.hand)
+
+    -- Select indices of cards to play
+    local num = {}
+    for i,card in ipairs(self.hand.cards) do
+        if face == card.face then
+            table.insert(num, i)
+            if card:is_special_card() then break end
+        end
+    end
+    self.hand:play_cards(num)
+end
+
+function AIPlayer:select_card_face(cardpile)
     local active_face = discard_pile:get_active_face()
-    local valid = self.hand:get_valid_play()
-    local freq = self:get_frequencies(self.hand.cards)
+    local valid = cardpile:get_valid_play()
+    local freq = self:get_frequencies(cardpile.cards)
     local run = discard_pile:get_run_length()
 
     -- Tweak card weights as necessary
@@ -65,44 +81,14 @@ function AIPlayer:execute_turn()
         end
     end
 
-    local face = self:select_card(valid)
-
-    -- Select indices of cards to play
-    -- TODO prioritize longer runs?
-    local num = {}
-    for i,card in ipairs(self.hand.cards) do
-        if face == card.face then
-            table.insert(num, i)
-            -- TODO there are times we want to play multiple special cards
-            if card:is_special_card() then break end
-        end
-    end
-    self.hand:play_cards(num)
+    table.sort(valid, function(a, b) return a.weight < b.weight end)
+    return valid[self:fuzzy_select(1, #valid)].face
 end
 
 function AIPlayer:get_frequencies(cards)
     local freq = {}
     for _,card in ipairs(cards) do freq[card.face] = (freq[card.face] or 0) + 1 end
     return freq
-end
-
-function AIPlayer:select_card(cards)
-    local faces = {}
-    local face = nil
-
-    -- Extract a list of unique card faces
-    table.sort(cards, function(a, b) return a.rank < b.rank end)
-    for _,card in ipairs(cards) do
-        if face ~= card.face then
-            face = card.face
-            table.insert(faces, card)
-        end
-    end
-
-    -- Sort card faces by associated weight
-    table.sort(faces, function(a, b) return a.weight < b.weight end)
- 
-    return faces[self:fuzzy_select(1, #faces)].face
 end
 
 function AIPlayer:fuzzy_select(min, max)

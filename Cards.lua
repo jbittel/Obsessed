@@ -89,13 +89,13 @@ function CardPile:add_card(card)
     table.insert(self.cards, 1, card)
 end
 
-function CardPile:draw_card(num)
+function CardPile:get_card(num)
     if #self.cards == 0 then return nil end
     local num = num or 1
     return table.remove(self.cards, num)
 end
 
-function CardPile:get_card(num)
+function CardPile:show_card(num)
     local num = num or 1
     return self.cards[num]
 end
@@ -109,8 +109,11 @@ end
 
 function CardPile:get_valid_play()
     local valid = {}
+    local face = nil
+    table.sort(self.cards, function(a, b) return a.rank < b.rank end)
     for _,card in ipairs(self.cards) do
-        if self:is_valid_play(card.face) then
+        if face ~= card.face and self:is_valid_play(card.face) then
+            face = card.face
             table.insert(valid, card)
         end
     end
@@ -228,7 +231,7 @@ PlayerHand = class('PlayerHand', CardPile)
 function PlayerHand:initialize()
     super.initialize(self)
     for i = 1,HAND_SIZE do
-        self:add_card(draw_pile:draw_card())
+        self:add_card(draw_pile:get_card())
     end
 end
 
@@ -259,7 +262,7 @@ PlayerVisible = class('PlayerVisible', CardPile)
 function PlayerVisible:initialize()
     super.initialize(self)
     for i = 1,HAND_SIZE do
-        self:add_card(draw_pile:draw_card())
+        self:add_card(draw_pile:get_card())
     end
 end
 
@@ -269,6 +272,6 @@ PlayerHidden = class('PlayerHidden', CardPile)
 function PlayerHidden:initialize()
     super.initialize(self)
     for i = 1,HAND_SIZE do
-        self:add_card(draw_pile:draw_card())
+        self:add_card(draw_pile:get_card())
     end
 end

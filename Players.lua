@@ -44,8 +44,8 @@ function Player:get_num_hidden_cards()
     return self.hidden:get_num_cards()
 end
 
-function Player:draw_card(cards, num)
-    local card = cards:draw_card(num)
+function Player:add_to_hand(cards, num)
+    local card = cards:get_card(num)
     if card ~= nil then self.hand:add_card(card) end
 end
 
@@ -125,7 +125,7 @@ end
 function HumanPlayer:validate_card_input(cards, num)
     local face = nil
     for _,i in ipairs(num) do
-        local card = cards:get_card(i)
+        local card = cards:show_card(i)
         if face == nil then face = card.face end
         -- Ensure all selected cards are valid plays and are the same face
         if not cards:is_valid_play(card.face) or face ~= card.face then return false end
@@ -149,14 +149,15 @@ function HumanPlayer:draw_visible_card()
             print('!!! Invalid draw')
         end
     end
-    -- TODO fix drawing multiple visible cards
-    for _,n in ipairs(num) do self:draw_card(self.visible, n) end
+    -- TODO fix drawing multiple visible cards; the index changes as the loop runs
+    -- TODO force drawn cards to be played
+    for _,n in ipairs(num) do self:add_to_hand(self.visible, n) end
 end
 
 function HumanPlayer:draw_hidden_card()
     print('Select a hidden card')
     local num = self:get_card_input(1, self.hidden:get_num_cards(), 1)
-    for _,n in ipairs(num) do self:draw_card(self.hidden, n) end
+    for _,n in ipairs(num) do self:add_to_hand(self.hidden, n) end
 end
 
 

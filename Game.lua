@@ -99,7 +99,7 @@ function game_loop()
 
             -- Keep player's hand at a minimum of 3 cards
             while player:get_num_hand_cards() < HAND_SIZE and draw_pile:get_num_cards() > 0 do
-                player:draw_card(draw_pile)
+                player:add_to_hand(draw_pile)
             end
 
             -- Test for game over condition
