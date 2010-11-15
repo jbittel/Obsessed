@@ -149,9 +149,18 @@ function HumanPlayer:draw_visible_card()
             print('!!! Invalid draw')
         end
     end
-    -- TODO fix drawing multiple visible cards; the index changes as the loop runs
+
     -- TODO force drawn cards to be played
-    for _,n in ipairs(num) do self:add_to_hand(self.visible, n) end
+    local set = table.set(num)
+    local v = {}
+    for i,card in ipairs(self.visible.cards) do
+        if set[i] then
+            self.hand:add_card(card)
+        else
+            table.insert(v, card)
+        end
+    end
+    self.visible.cards = v
 end
 
 function HumanPlayer:draw_hidden_card()
