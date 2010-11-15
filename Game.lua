@@ -37,7 +37,7 @@ function game_loop()
     local player_list = PlayerList:new()
 
     local turn = 1
---    local write_log = log_game_state()
+    local write_log = log_game_state()
 
     while true do
         local player = player_list:get_next_player()
@@ -51,6 +51,7 @@ function game_loop()
             discard_pile:display_cards('Discard', 5)
             player.visible:display_cards('Visible')
             player.hidden:display_cards('Hidden', 0)
+            write_log(turn, player)
 
             -- Draw cards from visible/hidden piles if necessary
             if player:get_num_hand_cards() == 0 and player:get_num_visible_cards() > 0 then
@@ -114,6 +115,7 @@ function game_loop()
 end
 
 function game_end()
+    print('')
     print('=================')
     print('=== Game Over ===')
     print('=================')
@@ -122,31 +124,19 @@ end
 function log_game_state()
     local log = io.open('game.log', 'a+')
 
-    log:write('game\t'..os.date()..' '..NUM_PLAYERS..'\n')
+    log:write('0\tgame\t'..os.date()..' '..NUM_PLAYERS..'\n')
 
-    return function (turn, pile, player)
-        log:write('pile\t'..turn..'\t')
-        for _,card in ipairs(pile) do
-            log:write(card.face..card.suit..' ')
-        end
+    return function (turn, player)
+        log:write(turn..'\tdiscard\t')
+        for _,card in ipairs(discard_pile.cards) do log:write(card.face..card.suit..' ') end
         log:write('\n')
 
-        log:write('player\t'..turn..'\t'..player.num..'\t')
-        for _,card in ipairs(player.hand) do
-            if card.play == true then
-                log:write(card.face..card.suit..'* ')
-            else
-                log:write(card.face..card.suit..' ')
-            end
-        end
+        log:write(turn..'\tplayer\t'..player.num..'\t')
+        for _,card in ipairs(player.hand.cards) do log:write(card.face..card.suit..' ') end
         log:write('\t')
-        for _,card in ipairs(player.visible) do
-            log:write(card.face..card.suit..' ')
-        end
+        for _,card in ipairs(player.visible.cards) do log:write(card.face..card.suit..' ') end
         log:write('\t')
-        for _,card in ipairs(player.hidden) do
-            log:write(card.face..card.suit..' ')
-        end
+        for _,card in ipairs(player.hidden.cards) do log:write(card.face..card.suit..' ') end
         log:write('\n')
 
         log:flush()
