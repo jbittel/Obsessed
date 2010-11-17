@@ -12,7 +12,6 @@ AIPlayer = class('AIPlayer', Player)
 
 function AIPlayer:initialize(num)
     super.initialize(self, num)
-    self.ai = true
 end
 
 function AIPlayer:display_hand()

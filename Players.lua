@@ -12,7 +12,6 @@ Player = class('Player')
 
 function Player:initialize(num)
     self.num = num
-    self.ai = false
     self.hand = PlayerHand:new()
     self.visible = PlayerVisible:new()
     self.hidden = PlayerHidden:new()
@@ -70,7 +69,7 @@ function HumanPlayer:swap_cards()
     self.hand.cards = {}
     self.visible.cards = {}
  
-    print('\nSelect your VISIBLE cards')
+    print('\n+++ Select your three VISIBLE cards')
     io.write('### Starting cards:\t')
     for i,card in ipairs(cards) do io.write(i..':'..card.face..card.suit..' ') end
     io.write('\n')
@@ -122,9 +121,9 @@ function HumanPlayer:play_from_hidden()
 end
 
 function HumanPlayer:get_card_input(min, max, total)
-    local get_input = true
     local total = total or 0
     local num = {}
+    local get_input = true
 
     while get_input do
         num = {}
@@ -139,8 +138,8 @@ function HumanPlayer:get_card_input(min, max, total)
                 print('!!! Invalid card selection')
                 get_input = true
                 break
-            elseif total ~= 0 and #num > total then
-                print('!!! Limited to '..total..' cards')
+            elseif total ~= 0 and #num ~= total then
+                print('!!! You must select '..total..' cards')
                 get_input = true
                 break
             end

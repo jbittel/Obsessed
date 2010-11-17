@@ -64,8 +64,7 @@ function game_loop()
                 elseif player:get_num_hand_cards() == 0 and player:get_num_hidden_cards() > 0 then
                     -- Play cards from hidden set
                     player:play_from_hidden()
-                    -- If the hand isn't empty, it means the drawn
-                    -- card couldn't be played
+                    -- If the hand isn't empty, the drawn card couldn't be played
                     if player:get_num_hand_cards() ~= 0 then
                         discard_pile:pick_up_pile(player)
                         break
