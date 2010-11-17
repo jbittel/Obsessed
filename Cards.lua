@@ -240,9 +240,9 @@ function PlayerHand:has_card(face)
     return nil
 end
 
-function PlayerHand:play_cards(cards)
+function PlayerHand:play_cards(num)
     local hand = {}
-    local set = table.set(cards)
+    local set = table.set(num)
     for i,card in ipairs(self.cards) do
         if set[i] then
             print('*** Played a '..card.face..card.suit)

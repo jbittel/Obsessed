@@ -43,10 +43,13 @@ function AIPlayer:draw_visible_card()
     for i,card in ipairs(self.visible.cards) do
         if face == card.face then self:add_to_hand(self.visible, i) end
     end
+    print('*** Drawing from visible cards ('..self:get_num_visible_cards()..' left)')
+    -- TODO force drawn cards to be played immediately
 end
 
 function AIPlayer:draw_hidden_card()
     self:add_to_hand(self.hidden)
+    print('*** Drawing from hidden cards ('..self:get_num_hidden_cards()..' left)')
 end
 
 function AIPlayer:execute_turn()
@@ -92,7 +95,7 @@ function AIPlayer:get_frequencies(cards)
 end
 
 function AIPlayer:fuzzy_select(min, max)
-    if min == max or min > max then return min end
+    if min >= max then return min end
     local diff = (max - min) + 1
 
     local a = {}

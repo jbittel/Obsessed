@@ -20,10 +20,6 @@ function Player:initialize(num)
     self:swap_cards()
 end
 
-function Player:is_ai_player()
-    return self.ai
-end
-
 function Player:get_player_num()
     return self.num
 end
@@ -49,6 +45,17 @@ function Player:add_to_hand(cards, num)
     if card ~= nil then self.hand:add_card(card) end
 end
 
+function Player:play_initial_card(face)
+    local num = {}
+    for i,card in ipairs(self.hand.cards) do
+        if face == card.face then
+            table.insert(num, i)
+            break
+        end
+    end
+    self.hand:play_cards(num)
+end
+
 
 HumanPlayer = class('HumanPlayer', Player)
 
@@ -63,7 +70,7 @@ function HumanPlayer:swap_cards()
     self.hand.cards = {}
     self.visible.cards = {}
  
-    print('Select your VISIBLE cards')
+    print('\nSelect your VISIBLE cards')
     io.write('### Starting cards:\t')
     for i,card in ipairs(cards) do io.write(i..':'..card.face..card.suit..' ') end
     io.write('\n')
@@ -150,7 +157,7 @@ function HumanPlayer:draw_visible_card()
         end
     end
 
-    -- TODO force drawn cards to be played
+    -- TODO force drawn cards to be played immediately
     local set = table.set(num)
     local v = {}
     for i,card in ipairs(self.visible.cards) do
@@ -190,7 +197,7 @@ function PlayerList:initialize()
 end
 
 function PlayerList:get_next_player()
-    self:next_player_num()
+    self.curr_player = self:next_player_num()
     return self.players[self.curr_player]
 end
 
@@ -211,46 +218,40 @@ function PlayerList:is_turn_over()
     return self.turn_over
 end
 
-function PlayerList:next_player_num(curr_player)
+function PlayerList:next_player_num()
     local num_players = #self.players
+    local curr_player = self.curr_player
 
-    if self.curr_player == 0 then
-        self.curr_player = self:init_player_num()
-        return
-    end
+    if curr_player == 0 then return self:init_player_num() end
 
     if not self.reverse then
-        self.curr_player = self.curr_player + 1
+        curr_player = curr_player + 1
     else
-        self.curr_player = self.curr_player - 1
+        curr_player = curr_player - 1
     end
 
-    if self.curr_player > num_players then self.curr_player = 1 end
-    if self.curr_player < 1 then self.curr_player = num_players end
+    if curr_player > num_players then curr_player = 1 end
+    if curr_player < 1 then curr_player = num_players end
+
+    print('\n=== PLAYER '..curr_player)
+    return curr_player
 end
 
+-- Pick starting player by matching the first instance of
+-- a non-special face with a card in a player's hand
 function PlayerList:init_player_num()
-    -- Pick starting player by matching the first instance of
-    -- a non-special face with a card in a player's hand
-    for _,face in ipairs(NON_SPECIAL_CARDS) do
+    local start_order = {}
+
+    for _,face in ipairs(NON_SPECIAL_CARDS) do table.insert(start_order, face) end
+    for _,face in ipairs(SPECIAL_CARDS) do table.insert(start_order, face) end
+ 
+    for _,face in ipairs(start_order) do
         for _,player in ipairs(self.players) do
             if player.hand:has_card(face) then
-                print('*** Starting with player '..player.num)
+                print('\n=== PLAYER '..player.num)
+                player:play_initial_card(face)
                 return player.num
             end
         end
     end
-
-    -- Tiebreaker: if a matching non-special card isn't found,
-    -- look at special cards also
-    for _,face in ipairs(SPECIAL_CARDS) do
-        for _,player in ipairs(self.players) do
-            if player.hand:has_card(face) then
-                print('*** Starting with player '..player.num)
-                return player.num
-            end
-        end
-    end
-
-    return 1
 end

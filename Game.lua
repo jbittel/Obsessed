@@ -42,42 +42,40 @@ function game_loop()
     while true do
         local player = player_list:get_next_player()
 
-        print('')
-        print('=== PLAYER '..player.num)
-
         repeat
-            -- Display game board
-            draw_pile:display_cards('Draw Pile', 0)
-            discard_pile:display_cards('Discard', 5)
-            player.visible:display_cards('Visible')
-            player.hidden:display_cards('Hidden', 0)
-            write_log(turn, player)
+            if turn ~= 1 then
+                -- Display game board
+                draw_pile:display_cards('Draw', 0)
+                discard_pile:display_cards('Discard', 5)
+                player:display_hand()
+                player.visible:display_cards('Visible')
+                player.hidden:display_cards('Hidden', 0)
 
-            -- Draw cards from visible/hidden piles if necessary
-            if player:get_num_hand_cards() == 0 and player:get_num_visible_cards() > 0 then
-                if player.visible:has_valid_play() then
-                    player:draw_visible_card()
-                    print('*** Drawing from visible cards ('..player:get_num_visible_cards()..' left)')
-                else
+                write_log(turn, player)
+
+                -- Draw cards from visible/hidden piles if necessary
+                if player:get_num_hand_cards() == 0 and player:get_num_visible_cards() > 0 then
+                    if player.visible:has_valid_play() then
+                        player:draw_visible_card()
+                        player:display_hand()
+                    else
+                        discard_pile:pick_up_pile(player)
+                        break
+                    end
+                elseif player:get_num_hand_cards() == 0 and player:get_num_hidden_cards() > 0 then
+                    player:draw_hidden_card()
+                    player:display_hand()
+                end
+
+                -- If no valid moves, pick up pile and lose turn
+                if not player.hand:has_valid_play() then
                     discard_pile:pick_up_pile(player)
                     break
                 end
-            elseif player:get_num_hand_cards() == 0 and player:get_num_hidden_cards() > 0 then
-                player:draw_hidden_card()
-                print('*** Drawing from hidden cards ('..player:get_num_hidden_cards()..' left)')
+
+                player:execute_turn()
             end
 
-            player:display_hand()
-
-            -- TODO force starting player to play card
-            -- If no valid moves, pick up pile and lose turn
-            if not player.hand:has_valid_play() then
-                discard_pile:pick_up_pile(player)
-                break
-            end
-
-            player:execute_turn()
-  
             -- Apply card face rules
             local top_face = discard_pile:get_top_face()
             if top_face == '8' then
