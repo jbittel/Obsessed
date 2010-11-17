@@ -132,6 +132,26 @@ function CardPile:is_valid_play(face)
     return true
 end
 
+function CardPile:has_card(face)
+    for i,card in ipairs(self.cards) do
+        if card.face == face then return i end
+    end
+    return nil
+end
+
+function CardPile:play_cards(num)
+    local cards = {}
+    local set = table.set(num)
+    for i,card in ipairs(self.cards) do
+        if set[i] then
+            print('*** Played a '..card.face..card.suit)
+            discard_pile:add_card(card)
+        else
+            table.insert(cards, card)
+        end
+    end
+    self.cards = cards
+end
 
 DrawPile = class('DrawPile', CardPile)
 
@@ -231,27 +251,6 @@ PlayerHand = class('PlayerHand', CardPile)
 function PlayerHand:initialize()
     super.initialize(self)
     for i = 1,HAND_SIZE do self:add_card(draw_pile:get_card()) end
-end
-
-function PlayerHand:has_card(face)
-    for i,card in ipairs(self.cards) do
-        if card.face == face then return i end
-    end
-    return nil
-end
-
-function PlayerHand:play_cards(num)
-    local hand = {}
-    local set = table.set(num)
-    for i,card in ipairs(self.cards) do
-        if set[i] then
-            print('*** Played a '..card.face..card.suit)
-            discard_pile:add_card(card)
-        else
-            table.insert(hand, card)
-        end
-    end
-    self.cards = hand
 end
 
 

@@ -86,17 +86,39 @@ function HumanPlayer:swap_cards()
     end
 end
 
-function HumanPlayer:execute_turn()
+function HumanPlayer:play_from_hand()
     local num = {}
+    print('+++ Select cards from your hand')
     while true do
         num = self:get_card_input(1, self.hand:get_num_cards())
         if self:validate_card_input(self.hand, num) then
             break
         else
-            print('!!! Invalid play')
+            print('!!! Invalid selection')
         end
     end
     self.hand:play_cards(num)
+end
+
+function HumanPlayer:play_from_visible()
+    local num = {}
+    print('+++ Select cards from your visible set')
+    while true do
+        num = self:get_card_input(1, self.visible:get_num_cards())
+        if self:validate_card_input(self.visible, num) then
+            break
+        else
+            print('!!! Invalid selection')
+        end
+    end
+    self.visible:play_cards(num)
+end
+
+function HumanPlayer:play_from_hidden()
+    print('+++ Select a card from your hidden set')
+    local num = self:get_card_input(1, self.hidden:get_num_cards(), 1)
+    for _,n in ipairs(num) do self:add_to_hand(self.hidden, n) end
+    if self.hand:has_valid_play() then self.hand:play_cards({1}) end
 end
 
 function HumanPlayer:get_card_input(min, max, total)
@@ -106,7 +128,7 @@ function HumanPlayer:get_card_input(min, max, total)
 
     while get_input do
         num = {}
-        io.write('Enter card number(s): ')
+        io.write('+++ Enter card number(s): ')
         local str = io.stdin:read'*l'
         for n in string.gmatch(str, "%d+") do table.insert(num, tonumber(n)) end
 
@@ -143,37 +165,6 @@ end
 function HumanPlayer:display_hand()
     self.hand:sort_by_rank()
     self.hand:display_cards('Hand')
-end
-
-function HumanPlayer:draw_visible_card()
-    local num = {}
-    print('Select a visible card')
-    while true do
-        num = self:get_card_input(1, self.visible:get_num_cards())
-        if self:validate_card_input(self.visible, num) then
-            break
-        else
-            print('!!! Invalid draw')
-        end
-    end
-
-    -- TODO force drawn cards to be played immediately
-    local set = table.set(num)
-    local v = {}
-    for i,card in ipairs(self.visible.cards) do
-        if set[i] then
-            self.hand:add_card(card)
-        else
-            table.insert(v, card)
-        end
-    end
-    self.visible.cards = v
-end
-
-function HumanPlayer:draw_hidden_card()
-    print('Select a hidden card')
-    local num = self:get_card_input(1, self.hidden:get_num_cards(), 1)
-    for _,n in ipairs(num) do self:add_to_hand(self.hidden, n) end
 end
 
 

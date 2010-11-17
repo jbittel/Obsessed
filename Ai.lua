@@ -38,24 +38,8 @@ function AIPlayer:swap_cards()
     self.hand.cards = table.slice(t, HAND_SIZE + 1, HAND_SIZE)
 end
 
-function AIPlayer:draw_visible_card()
-    local face = self:select_card_face(self.visible)
-    for i,card in ipairs(self.visible.cards) do
-        if face == card.face then self:add_to_hand(self.visible, i) end
-    end
-    print('*** Drawing from visible cards ('..self:get_num_visible_cards()..' left)')
-    -- TODO force drawn cards to be played immediately
-end
-
-function AIPlayer:draw_hidden_card()
-    self:add_to_hand(self.hidden)
-    print('*** Drawing from hidden cards ('..self:get_num_hidden_cards()..' left)')
-end
-
-function AIPlayer:execute_turn()
+function AIPlayer:play_from_hand()
     local face = self:select_card_face(self.hand)
-
-    -- Select indices of cards to play
     local num = {}
     for i,card in ipairs(self.hand.cards) do
         if face == card.face then
@@ -64,6 +48,22 @@ function AIPlayer:execute_turn()
         end
     end
     self.hand:play_cards(num)
+end
+
+function AIPlayer:play_from_visible()
+    local face = self:select_card_face(self.visible)
+    local num = {}
+    for i,card in ipairs(self.visible.cards) do
+        if face == card.face then table.insert(num, i) end
+    end
+    self.visible:play_cards(num)
+    print('*** Drawing from visible cards ('..self:get_num_visible_cards()..' left)')
+end
+
+function AIPlayer:play_from_hidden()
+    self:add_to_hand(self.hidden)
+    print('*** Drawing from hidden cards ('..self:get_num_hidden_cards()..' left)')
+    if self.hand:has_valid_play() then self.hand:play_cards({1}) end
 end
 
 function AIPlayer:select_card_face(cardpile)

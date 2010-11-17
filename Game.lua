@@ -53,27 +53,39 @@ function game_loop()
 
                 write_log(turn, player)
 
-                -- Draw cards from visible/hidden piles if necessary
                 if player:get_num_hand_cards() == 0 and player:get_num_visible_cards() > 0 then
+                    -- Play cards from visible set
                     if player.visible:has_valid_play() then
-                        player:draw_visible_card()
-                        player:display_hand()
+                        player:play_from_visible()
                     else
                         discard_pile:pick_up_pile(player)
                         break
                     end
                 elseif player:get_num_hand_cards() == 0 and player:get_num_hidden_cards() > 0 then
-                    player:draw_hidden_card()
-                    player:display_hand()
+                    -- Play cards from hidden set
+                    player:play_from_hidden()
+                    -- If the hand isn't empty, it means the drawn
+                    -- card couldn't be played
+                    if player:get_num_hand_cards() ~= 0 then
+                        discard_pile:pick_up_pile(player)
+                        break
+                    end
+                else
+                    -- Play cards from hand
+                    if player.hand:has_valid_play() then
+                        player:play_from_hand()
+                    else
+                        discard_pile:pick_up_pile(player)
+                        break
+                    end
                 end
 
-                -- If no valid moves, pick up pile and lose turn
-                if not player.hand:has_valid_play() then
-                    discard_pile:pick_up_pile(player)
-                    break
-                end
-
-                player:execute_turn()
+            end
+            
+            -- Test for game over condition
+            if draw_pile:get_num_cards() == 0 and player:get_num_cards() == 0 then
+                print('*** Player '..player.num..' wins!')
+                return
             end
 
             -- Apply card face rules
@@ -99,12 +111,6 @@ function game_loop()
             -- Keep player's hand at a minimum of 3 cards
             while player:get_num_hand_cards() < HAND_SIZE and draw_pile:get_num_cards() > 0 do
                 player:add_to_hand(draw_pile)
-            end
-
-            -- Test for game over condition
-            if draw_pile:get_num_cards() == 0 and player:get_num_cards() == 0 then
-                print('*** Player '..player.num..' wins!')
-                return
             end
         until player_list:is_turn_over()
 
