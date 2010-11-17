@@ -15,6 +15,8 @@ require 'Ai'
 
 NUM_PLAYERS = 4
 HAND_SIZE = 3
+VISIBLE_SIZE = 3
+HIDDEN_SIZE = 3
 
 draw_pile = nil
 discard_pile = nil

@@ -258,7 +258,7 @@ PlayerVisible = class('PlayerVisible', CardPile)
 
 function PlayerVisible:initialize()
     super.initialize(self)
-    for i = 1,HAND_SIZE do self:add_card(draw_pile:get_card()) end
+    for i = 1,VISIBLE_SIZE do self:add_card(draw_pile:get_card()) end
 end
 
 
@@ -266,5 +266,5 @@ PlayerHidden = class('PlayerHidden', CardPile)
 
 function PlayerHidden:initialize()
     super.initialize(self)
-    for i = 1,HAND_SIZE do self:add_card(draw_pile:get_card()) end
+    for i = 1,HIDDEN_SIZE do self:add_card(draw_pile:get_card()) end
 end

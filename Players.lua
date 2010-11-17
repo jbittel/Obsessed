@@ -69,12 +69,12 @@ function HumanPlayer:swap_cards()
     self.hand.cards = {}
     self.visible.cards = {}
  
-    print('\n+++ Select your three VISIBLE cards')
+    print('\n+++ Select your '..VISIBLE_SIZE..' VISIBLE cards')
     io.write('### Starting cards:\t')
     for i,card in ipairs(cards) do io.write(i..':'..card.face..card.suit..' ') end
     io.write('\n')
 
-    local num = self:get_card_input(1, #cards, 3)
+    local num = self:get_card_input(1, #cards, VISIBLE_SIZE) 
     local set = table.set(num)
     for i,card in ipairs(cards) do
         if set[i] then
