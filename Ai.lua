@@ -75,9 +75,9 @@ function AIPlayer:select_card_face(cardpile)
     for _,card in ipairs(valid) do
         -- Prioritize killing the pile when possible
         if not card:is_special_card() then
-            if card.face == active_face and freq[card.face] + run >= 4 then
+            if card.face == active_face and freq[card.face] + run >= KILL_RUN_LEN then
                 card.weight = card.weight - 1
-            elseif freq[card.face] >= 4 then
+            elseif freq[card.face] >= KILL_RUN_LEN then
                 card.weight = card.weight - 2
             end
         end

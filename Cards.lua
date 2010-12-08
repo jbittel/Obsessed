@@ -167,12 +167,10 @@ function DrawPile:initialize()
             end
         end
 
-        if NUM_PLAYERS > 2 then
-            -- Add two Jokers to each deck
-            for i=1,2 do
-                local card = Card:new('R', '', #FACES + 2)
-                table.insert(self.cards, card)
-            end
+        -- Add two Jokers to each deck
+        for i=1,2 do
+            local card = Card:new('R', '', #FACES + 2)
+            table.insert(self.cards, card)
         end
     end
 

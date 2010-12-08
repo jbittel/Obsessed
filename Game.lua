@@ -13,10 +13,15 @@ require 'Cards'
 require 'Players'
 require 'Ai'
 
-NUM_PLAYERS = 4
+NUM_PLAYERS = 2
 HAND_SIZE = 3
 VISIBLE_SIZE = 3
 HIDDEN_SIZE = 3
+
+KILL_RUN_LEN = 4
+if NUM_PLAYERS == 2 then
+    KILL_RUN_LEN = 3
+end
 
 draw_pile = nil
 discard_pile = nil
@@ -80,7 +85,8 @@ function game_loop()
                         break
                     end
                 end
-
+            else
+                write_log(turn, player)
             end
             
             -- Test for game over condition
@@ -104,12 +110,12 @@ function game_loop()
             end
 
             -- Kill pile if 4+ top cards match
-            if discard_pile:get_run_length() >= 4 then
+            if discard_pile:get_run_length() >= KILL_RUN_LEN then
                 discard_pile:kill_pile()
                 player_list:end_turn(false)
             end
 
-            -- Keep player's hand at a minimum of 3 cards
+            -- Keep player's hand at a minimum of HAND_SIZE cards
             while player:get_num_hand_cards() < HAND_SIZE and draw_pile:get_num_cards() > 0 do
                 player:add_to_hand(draw_pile)
             end
