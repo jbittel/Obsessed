@@ -84,7 +84,7 @@ function AIPlayer:select_card_face(cardpile)
     end
 
     table.sort(valid, function(a, b) return a.weight < b.weight end)
-    return valid[self:fuzzy_select(1, #valid)].face
+    return valid[self:weighted_rand(1, #valid)].face
 end
 
 function AIPlayer:get_frequencies(cards)
@@ -93,26 +93,9 @@ function AIPlayer:get_frequencies(cards)
     return freq
 end
 
-function AIPlayer:fuzzy_select(min, max)
-    if min >= max then return min end
-    local diff = (max - min) + 1
-
-    local a = {}
-    local pos = 1
-    local step = diff ^ 2
-    local num = step
-
-    for i = min, max do
-        while pos < num do
-            table.insert(a, i)
-            pos = pos + 1
-        end
-
-        step = math.floor(step / 4)
-        if step < 1 then break end
-        pos = num + 1
-        num = num + step
-    end
-
-    return a[math.random(#a)]
+function AIPlayer:weighted_rand(min, max)
+    local r = math.floor(min + (max - min) * math.random() ^ 10)
+    if r > max then r = max end
+    if r < min then r = min end
+    return r
 end
