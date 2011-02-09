@@ -12,6 +12,7 @@ AIPlayer = class('AIPlayer', Player)
 
 function AIPlayer:initialize(num)
     super.initialize(self, num)
+    self.face_weight = BASE_AI_FACE_WEIGHT
 end
 
 function AIPlayer:display_hand()
@@ -21,15 +22,8 @@ end
 function AIPlayer:swap_cards()
     local t = {}
 
-    for _,card in ipairs(self.visible.cards) do
-        card.weight = AI_FACE_WEIGHT[card.face]
-        table.insert(t, card)
-    end
-
-    for _,card in ipairs(self.hand.cards) do
-        card.weight = AI_FACE_WEIGHT[card.face]
-        table.insert(t, card)
-    end
+    for _,card in ipairs(self.visible.cards) do table.insert(t, card) end
+    for _,card in ipairs(self.hand.cards) do table.insert(t, card) end
 
     table.sort(t, function(a, b) return a.weight > b.weight end)
 
@@ -71,8 +65,11 @@ function AIPlayer:select_card_face(cardpile)
     local freq = self:get_frequencies(cardpile.cards)
     local run = discard_pile:get_run_length()
 
-    -- Tweak card weights as necessary
+    -- TODO Adjust card weight table as necessary
+ 
+    -- Apply current card weights
     for _,card in ipairs(valid) do
+        card.weight = self.face_weight[card.face]
         -- Prioritize killing the pile when possible
         if not card:is_special_card() then
             if card.face == active_face and freq[card.face] + run >= KILL_RUN_LEN then
@@ -84,7 +81,7 @@ function AIPlayer:select_card_face(cardpile)
     end
 
     table.sort(valid, function(a, b) return a.weight < b.weight end)
-    return valid[self:weighted_rand(1, #valid)].face
+    return valid[self:biased_rand(1, #valid)].face
 end
 
 function AIPlayer:get_frequencies(cards)
@@ -93,7 +90,7 @@ function AIPlayer:get_frequencies(cards)
     return freq
 end
 
-function AIPlayer:weighted_rand(min, max)
+function AIPlayer:biased_rand(min, max)
     local r = math.floor(min + (max - min) * math.random() ^ 10)
     if r > max then r = max end
     if r < min then r = min end

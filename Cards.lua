@@ -26,7 +26,7 @@ INVALID_MOVES = {
     ['A'] = { '4', '5', '6', '9', 'J', 'Q', 'K' },
 }
 
-AI_FACE_WEIGHT = {
+BASE_AI_FACE_WEIGHT = {
     ['2']  = 8,
     ['3']  = 12,
     ['4']  = 1,
@@ -50,7 +50,7 @@ function Card:initialize(face, suit, rank)
     self.face = face
     self.suit = suit
     self.rank = rank
-    self.weight = AI_FACE_WEIGHT[face]
+    self.weight = BASE_AI_FACE_WEIGHT[self.face]
 end
 
 function Card:is_special_card()
@@ -177,7 +177,7 @@ function DrawPile:initialize()
     self:shuffle()
 end
 
--- Implementation of the Knuth shuffle
+-- Implementation of the Fisher-Yates shuffle
 function DrawPile:shuffle()
     local n = #self.cards
     math.randomseed(os.time())
