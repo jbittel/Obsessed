@@ -156,7 +156,7 @@ end
 DrawPile = class('DrawPile', CardPile)
 
 function DrawPile:initialize()
-    super.initialize(self)
+    CardPile.initialize(self)
     local num_decks = math.ceil(NUM_PLAYERS / 2)
 
     for deck = 1,num_decks do
@@ -192,7 +192,7 @@ end
 DiscardPile = class('DiscardPile', CardPile)
 
 function DiscardPile:initialize()
-    super.initialize(self)
+    CardPile.initialize(self)
 end
 
 function DiscardPile:kill_pile()
@@ -247,7 +247,7 @@ end
 PlayerHand = class('PlayerHand', CardPile)
 
 function PlayerHand:initialize()
-    super.initialize(self)
+    CardPile.initialize(self)
     for i = 1,HAND_SIZE do self:add_card(draw_pile:get_card()) end
 end
 
@@ -255,7 +255,7 @@ end
 PlayerVisible = class('PlayerVisible', CardPile)
 
 function PlayerVisible:initialize()
-    super.initialize(self)
+    CardPile.initialize(self)
     for i = 1,VISIBLE_SIZE do self:add_card(draw_pile:get_card()) end
 end
 
@@ -263,6 +263,6 @@ end
 PlayerHidden = class('PlayerHidden', CardPile)
 
 function PlayerHidden:initialize()
-    super.initialize(self)
+    CardPile.initialize(self)
     for i = 1,HIDDEN_SIZE do self:add_card(draw_pile:get_card()) end
 end

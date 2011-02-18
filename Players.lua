@@ -59,7 +59,7 @@ end
 HumanPlayer = class('HumanPlayer', Player)
 
 function HumanPlayer:initialize(num)
-    super.initialize(self, num)
+    Player.initialize(self, num)
 end
 
 function HumanPlayer:swap_cards()

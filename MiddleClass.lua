@@ -1,100 +1,93 @@
------------------------------------------------------------------------------------
--- MiddleClass.lua
+-----------------------------------------------------------------------------------------------------------------------
+-- middleclass.lua - v1.3
 -- Enrique García ( enrique.garcia.cota [AT] gmail [DOT] com ) - 19 Oct 2009
 -- Based on YaciCode, from Julien Patte and LuaObject, from Sébastien Rocca-Serra
------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------
 
-local _classes = setmetatable({}, {__mode = "k"})   -- weak table storing references to all declared _classes and their included modules
+local _nilf = function() end -- empty function
 
-Object = { name = "Object" } -- The 'Object' class
+local _classes = setmetatable({}, {__mode = "kv"})   -- weak table storing references to all declared classes
 
-_classes[Object] = { modules={} } -- adds Object to the list of _classes
+local _metamethods = { -- all metamethods except __index
+  '__add', '__call', '__concat', '__div', '__le', '__lt', '__mod', '__mul', '__pow', '__sub', '__tostring', '__unm' 
+}
 
-  -- creates a new instance
-Object.new = function(theClass, ...)
-  assert(_classes[theClass]~=nil, "Use class:new instead of class.new")
+Object = { name = "Object", __modules = {} }
+
+Object.__classDict = {
+  initialize = _nilf, destroy = _nilf, subclassed = _nilf,
+  __tostring = function(instance) return ("instance of ".. instance.class.name) end -- root of __tostring method
+}
+Object.__classDict.__index = Object.__classDict -- instances of Object need this
+
+setmetatable(Object, { 
+  __index = Object.__classDict,    -- look up methods in the classDict
+  __newindex = Object.__classDict, -- any new Object methods will be defined in classDict
+  __call = Object.new,             -- allows instantiation via Object()
+  __tostring = function() return "class Object" end -- allows tostring(obj)
+})
+
+_classes[Object] = Object -- register Object on the list of classes.
+
+-- creates a new instance
+function Object.new(theClass, ...)
+  assert(_classes[theClass]~=nil, "Use Class:new instead of Class.new")
 
   local instance = setmetatable({ class = theClass }, theClass.__classDict)
   instance:initialize(...)
   return instance
 end
 
-local _metamethods = { '__add', '__sub', '__mul', '__div', '__mod', '__pow', '__unm', 
-                       '__eq', '__lt', '__le', '__call', '__gc', '__tostring', '__concat' }
-
 -- creates a subclass
-Object.subclass = function(theClass, name)
-  assert(_classes[theClass]~=nil, "Use class:subclass instead of class.subclass")
+function Object.subclass(theClass, name)
+  assert(_classes[theClass]~=nil, "Use Class:subclass instead of Class.subclass")
   assert( type(name)=="string", "You must provide a name(string) for your class")
 
-  local theSubclass = { name = name, superclass = theClass, __classDict = {} }
-  local classDict = theSubclass.__classDict
+  local theSubClass = { name = name, superclass = theClass, __classDict = {}, __modules={} }
+  
+  local dict = theSubClass.__classDict   -- classDict contains all the [meta]methods of the class
+  dict.__index = dict                    -- It "points to itself" so instances can use it as a metatable.
+  local superDict = theClass.__classDict -- The superclass' classDict
 
-  -- classDict is the instances' metatable. It "points to himself" so they start looking for methods there.
-  classDict.__index = classDict
+  setmetatable(dict, superDict) -- when a method isn't found on classDict, 'escalate upwards'.
 
-  -- metamethods & methods are "looked up" through implementation and __index
-  for _,m in ipairs(_metamethods) do
-    classDict[m]= function(...)
-      assert( type(theClass.__classDict[m])=='function', "Class " .. theSubclass.name .. " does not implement the " .. m .. " metamethod")
-      return theClass.__classDict[m](...)
+  for _,mmName in ipairs(_metamethods) do -- Creates the initial metamethods
+    dict[mmName]= function(...)           -- by default, they just 'look up' for an implememtation
+      local method = superDict[mmName]    -- and if none found, they throw an error
+      assert( type(method)=='function', tostring(theSubClass) .. " doesn't implement metamethod '" .. mmName .. "'" )
+      return method(...)
     end
   end
-  setmetatable(classDict, {__index = theClass.__classDict})
 
-  -- control how the new methods are inserted on the subclass, and how they are looked up
-  setmetatable(theSubclass, {
-    __index = function(_,methodName)
-        -- search first on the subclass's classdict, then on the superclass
-        return classDict[methodName]~= nil and classDict[methodName] or theClass[methodName]
+  setmetatable(theSubClass, {
+    __index = dict,                              -- look for stuff on the dict
+    __newindex = function(_, methodName, method) -- ensure that __index isn't modified by mistake
+        assert(methodName ~= '__index', "Can't modify __index. Include middleclass-extras.Indexable and use 'index' instead")
+        rawset(dict, methodName , method)
       end,
-    __newindex = function(_, methodName, method) -- when adding new methods, include a "super" function
-        if type(method) == 'function' then
-          local fenv = getfenv(method)
-          local newenv = setmetatable( {super = theClass.__classDict},  {__index = fenv, __newindex = fenv} )
-          setfenv( method, newenv )
-        end
-        rawset(classDict, methodName, method)
-      end,
-    __tostring = function() return ("class ".. name) end,
-    __call = function(_, ...) return theSubclass:new(...) end
+    __tostring = function() return ("class ".. name) end,      -- allows tostring(MyClass)
+    __call = function(_, ...) return theSubClass:new(...) end  -- allows MyClass(...) instead of MyClass:new(...)
   })
-  -- instance methods go after the setmetatable, so we can use "super"
-  theSubclass.initialize = function(instance,...) super.initialize(instance) end
 
-  _classes[theSubclass]={ modules={} } --registers the new class on the list of _classes
+  theSubClass.initialize = function(instance,...) theClass.initialize(instance, ...) end -- default initialize method
+  _classes[theSubClass]= theSubClass -- registers the new class on the list of _classes
+  theClass:subclassed(theSubClass)   -- hook method. By default it does nothing
 
-  theClass:subclassed(theSubclass) -- hook method. By default it does nothing
-
-  return theSubclass
+  return theSubClass
 end
 
--- Mixin extension function - simulates very basically ruby's include(module)
--- module is a lua table of functions. The functions will be copied to the class
--- if present in the module, the included() method will be called
-Object.include = function(theClass, module, ... )
-  assert(_classes[theClass]~=nil, "Use class:includes instead of class.includes")
+-- Mixin extension function - simulates very basically ruby's include. Receives a table table, probably with functions.
+-- Its contents are copied to theClass, with one exception: the included() method will be called instead of copied
+function Object.include(theClass, module, ... )
+  assert(_classes[theClass]~=nil, "Use class:include instead of class.include")
+  assert(type(module=='table'), "module must be a table")
   for methodName,method in pairs(module) do
     if methodName ~="included" then theClass[methodName] = method end
   end
   if type(module.included)=="function" then module:included(theClass, ... ) end
-  _classes[theClass].modules[module] = true
+  theClass.__modules[module] = module
+  return theClass
 end
-
--- built-in methods
-Object.__classDict = {
-  initialize = function(instance, ...) end, -- empty method
-  destroy = function(instance) end, -- empty method
-  __tostring = function(instance) return ("instance of ".. instance.class.name) end,
-  subclassed = function(theClass, other) end -- empty method
-}
-Object.__classDict.__index = Object.__classDict -- instances of Object need this
-
--- This allows doing tostring(obj) and Object() instead of Object:new()
-setmetatable(Object, { __index = Object.__classDict, __newindex = Object.__classDict,
-  __tostring = function() return ("class Object") end,
-  __call = Object.new
-})
 
 -- Returns true if aClass is a subclass of other, false otherwise
 function subclassOf(other, aClass)
@@ -112,8 +105,8 @@ end
 
 -- Returns true if the a module has already been included on a class (or a superclass of that class)
 function includes(module, aClass)
-  if _classes[aClass]==nil or _classes[aClass].modules==nil then return false end
-  if _classes[aClass].modules[module] then return true end
+  if _classes[aClass]==nil then return false end
+  if aClass.__modules[module]==module then return true end
   return includes(module, aClass.superclass)
 end
 

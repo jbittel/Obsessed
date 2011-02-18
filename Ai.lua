@@ -11,7 +11,7 @@
 AIPlayer = class('AIPlayer', Player)
 
 function AIPlayer:initialize(num)
-    super.initialize(self, num)
+    Player.initialize(self, num)
     self.face_weight = BASE_AI_FACE_WEIGHT
 end
 
