@@ -12,7 +12,7 @@ AIPlayer = class('AIPlayer', Player)
 
 function AIPlayer:initialize(num)
     Player.initialize(self, num)
-    self.face_weight = BASE_AI_FACE_WEIGHT
+    self.face_weight = table.copy(BASE_AI_FACE_WEIGHT)
 end
 
 function AIPlayer:display_hand()
@@ -65,8 +65,6 @@ function AIPlayer:select_card_face(cardpile)
     local freq = self:get_frequencies(cardpile.cards)
     local run = discard_pile:get_run_length()
 
-    -- TODO Adjust card weight table as necessary
- 
     -- Apply current card weights
     for _,card in ipairs(valid) do
         card.weight = self.face_weight[card.face]
@@ -91,8 +89,18 @@ function AIPlayer:get_frequencies(cards)
 end
 
 function AIPlayer:biased_rand(min, max)
+    if min == max then return min end
     local r = math.floor(min + (max - min) * math.random() ^ 10)
     if r > max then r = max end
     if r < min then r = min end
     return r
+end
+
+
+AIPlayerDev = class('AIPlayerDev', AIPlayer)
+
+function AIPlayerDev:select_card_face(cardpile)
+    -- TODO Modify card weights as necessary
+    self.face_weight['3'] = 0
+    return AIPlayer.select_card_face(self, cardpile)
 end

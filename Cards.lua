@@ -50,7 +50,7 @@ function Card:initialize(face, suit, rank)
     self.face = face
     self.suit = suit
     self.rank = rank
-    self.weight = BASE_AI_FACE_WEIGHT[self.face]
+    self.weight = BASE_AI_FACE_WEIGHT[face]
 end
 
 function Card:is_special_card()
@@ -190,10 +190,6 @@ end
 
 
 DiscardPile = class('DiscardPile', CardPile)
-
-function DiscardPile:initialize()
-    CardPile.initialize(self)
-end
 
 function DiscardPile:kill_pile()
     self.cards = {}

@@ -58,10 +58,6 @@ end
 
 HumanPlayer = class('HumanPlayer', Player)
 
-function HumanPlayer:initialize(num)
-    Player.initialize(self, num)
-end
-
 function HumanPlayer:swap_cards()
     local cards = {}
     for _,card in ipairs(self.hand.cards) do table.insert(cards, card) end
@@ -178,6 +174,8 @@ function PlayerList:initialize()
     for i = 1,NUM_PLAYERS do
         if i == 1 then
             player = HumanPlayer:new(i)
+        elseif i == 2 then
+            player = AIPlayerDev:new(i)
         else
             player = AIPlayer:new(i)
         end
