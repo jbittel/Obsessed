@@ -8,7 +8,7 @@
 
 --]]
 
-require 'MiddleClass'
+require 'middleclass'
 require 'Cards'
 require 'Players'
 require 'Ai'
