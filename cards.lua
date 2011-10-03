@@ -10,6 +10,8 @@
 
 Card = class('Card')
 
+Card.static.FACES = { '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A' }
+Card.static.SUITS = { 'C', 'D', 'H', 'S' }
 Card.static.SPECIAL_CARDS = { '2', '3', '7', '8', '10', 'R' }
 Card.static.NON_SPECIAL_CARDS = { '4', '5', '6', '9', 'J', 'Q', 'K', 'A' }
 Card.static.BASE_AI_FACE_WEIGHT = {
@@ -45,9 +47,6 @@ end
 
 
 CardPile = class('CardPile')
-
-CardPile.static.FACES = { '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A' }
-CardPile.static.SUITS = { 'C', 'D', 'H', 'S' }
 
 CardPile.static.INVALID_MOVES = {
     ['3'] = { '2', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A' },
@@ -158,8 +157,8 @@ function DrawPile:initialize()
     local num_decks = math.ceil(NUM_PLAYERS / 2)
 
     for deck = 1,num_decks do
-        for _,suit in ipairs(CardPile.SUITS) do
-            for rank,face in ipairs(CardPile.FACES) do
+        for _,suit in ipairs(Card.SUITS) do
+            for rank,face in ipairs(Card.FACES) do
                 local card = Card:new(face, suit, rank + 1)
                 table.insert(self.cards, card)
             end
@@ -167,7 +166,7 @@ function DrawPile:initialize()
 
         -- Add two Jokers to each deck
         for i=1,2 do
-            local card = Card:new('R', '', #CardPile.FACES + 2)
+            local card = Card:new('R', '', #Card.FACES + 2)
             table.insert(self.cards, card)
         end
     end
