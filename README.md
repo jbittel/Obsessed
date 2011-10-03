@@ -1,10 +1,12 @@
 Obsession is a card climbing game focusing on discarding cards according to a set of rules. For the purposes of this game, suits have no meaning and aces are high.
 
-@@@ SETTING UP THE GAME
+STARTING THE GAME
+-----------------
 
-Each player is dealt three cards that become their hand. Additionally, each player receives 6 cards that are placed in front of them, 3 of which are hidden face-down and three of which are face-up and visible to all other players. The remaining cards are placed in a central draw pile.
+Each player is dealt three cards that become their hand. Additionally, each player receives 6 cards that are placed in front of them, three of which are hidden face-down and three of which are face-up and visible to all other players. The remaining cards are placed in a central draw pile.
 
-@@@ PLAYING THE GAME
+PLAYING THE GAME
+----------------
 
 Play begins with the player who has the lowest available non-special card, which they play into a discard pile. After playing a card, the player draws the top card from the draw stack to ensure they maintain a minimum of 3 cards. If they have more than three cards, they do not draw any cards on their turn. Play continues clockwise to the next player, who either plays a non-special card equal to or greater in face value to the top card on the discard pile, or a special card which operate according to a set of rules listed below. If a player has a valid move they must take it, and if they do not have a valid move, then the current discard pile is picked up and becomes part of their hand. If a player has more than one identical face value card, they can choose to play the entire set as a stack on their turn. Any run of 4 or more cards on the discard pile kills it, and the current player's turn continues.
 
@@ -14,23 +16,27 @@ Play continues until the entire draw stack is gone. Once that occurs and the pla
 
 The first player to discard all of their cards is the winner.
 
-@@@ SPECIAL CARDS AND ADDITIONAL RULES
+SPECIAL CARDS AND ADDITIONAL RULES
+----------------------------------
 
 Non-special cards: 4 5 6 9 J Q K A
+
 Special cards: 2 3 7 8 10 R
 
 Special card rules:
-  2: Next player plays anything
-  3: Next player must play a 3 or R, or pick up the pile
-  7: Next player must play under a 7 or a special card (no 8)
-  8: Current player can play anything, turn continues
-  10: Kills the pile, turn continues
-  R: (Joker) Reverses the current direction of play
+
+* 2: Next player plays anything
+* 3: Next player must play a 3 or R, or pick up the pile
+* 7: Next player must play under a 7 or a special card (no 8)
+* 8: Current player can play anything, turn continues
+* 10: Kills the pile, turn continues
+* R: (Joker) Reverses the current direction of play
 
 Additional rules:
-  Any number of identical face value cards can be played simultaneously
-  Any run of 4 or more cards kills the pile
-  An 8 cannot be played on a 7
-  If a valid move is present, it must be played
-  If you have no valid moves, you pick up the pile
-  If the pile is empty, anything can be played
+
+* Any number of identical face value cards can be played simultaneously
+* Any run of 4 or more cards kills the discard pile
+* An 8 cannot be played on a 7
+* If a valid move is present, it must be played
+* If you have no valid moves, pick up the discard pile
+* If the pile is empty, anything can be played
