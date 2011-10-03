@@ -10,9 +10,26 @@
 
 AIPlayer = class('AIPlayer', Player)
 
+AIPlayer.static.BASE_AI_FACE_WEIGHT = {
+    ['2']  = 8,
+    ['3']  = 12,
+    ['4']  = 1,
+    ['5']  = 2,
+    ['6']  = 3,
+    ['7']  = 9,
+    ['8']  = 10,
+    ['9']  = 3,
+    ['10'] = 11,
+    ['J']  = 4,
+    ['Q']  = 5,
+    ['K']  = 6,
+    ['A']  = 7,
+    ['R']  = 12
+}
+
 function AIPlayer:initialize(num)
     Player.initialize(self, num)
-    self.face_weight = table.copy(Card.BASE_AI_FACE_WEIGHT)
+    self.ai_face_weight = table.copy(AIPlayer.BASE_AI_FACE_WEIGHT)
 end
 
 function AIPlayer:display_hand()
@@ -22,8 +39,14 @@ end
 function AIPlayer:swap_cards()
     local t = {}
 
-    for _,card in ipairs(self.visible.cards) do table.insert(t, card) end
-    for _,card in ipairs(self.hand.cards) do table.insert(t, card) end
+    for _,card in ipairs(self.visible.cards) do
+        card.weight = self.ai_face_weight[card.face]
+        table.insert(t, card)
+    end
+    for _,card in ipairs(self.hand.cards) do
+        card.weight = self.ai_face_weight[card.face]
+        table.insert(t, card)
+    end
 
     table.sort(t, function(a, b) return a.weight > b.weight end)
 
@@ -67,7 +90,7 @@ function AIPlayer:select_card_face(cardpile)
 
     -- Apply current card weights
     for _,card in ipairs(valid) do
-        card.weight = self.face_weight[card.face]
+        card.weight = self.ai_face_weight[card.face]
         -- Prioritize killing the pile when possible
         if not card:is_special_card() then
             if card.face == active_face and freq[card.face] + run >= KILL_RUN_LEN then
@@ -99,8 +122,10 @@ end
 
 AIPlayerDev = class('AIPlayerDev', AIPlayer)
 
-function AIPlayerDev:select_card_face(cardpile)
-    -- TODO Modify card weights as necessary
-    self.face_weight['3'] = 0
-    return AIPlayer.select_card_face(self, cardpile)
+function AIPlayerDev:initialize(num)
+    AIPlayer.initialize(self, num)
+    -- Try a more aggressive style of play
+    self.ai_face_weight['3'] = 8
+    self.ai_face_weight['R'] = 8
+    self.ai_face_weight['7'] = 8
 end

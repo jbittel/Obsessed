@@ -14,28 +14,11 @@ Card.static.FACES = { '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K
 Card.static.SUITS = { 'C', 'D', 'H', 'S' }
 Card.static.SPECIAL_CARDS = { '2', '3', '7', '8', '10', 'R' }
 Card.static.NON_SPECIAL_CARDS = { '4', '5', '6', '9', 'J', 'Q', 'K', 'A' }
-Card.static.BASE_AI_FACE_WEIGHT = {
-    ['2']  = 8,
-    ['3']  = 12,
-    ['4']  = 1,
-    ['5']  = 2,
-    ['6']  = 3,
-    ['7']  = 9,
-    ['8']  = 10,
-    ['9']  = 3,
-    ['10'] = 11,
-    ['J']  = 4,
-    ['Q']  = 5,
-    ['K']  = 6,
-    ['A']  = 7,
-    ['R']  = 12
-}
 
 function Card:initialize(face, suit, rank)
     self.face = face
     self.suit = suit
     self.rank = rank
-    self.weight = Card.BASE_AI_FACE_WEIGHT[face]
 end
 
 function Card:is_special_card()

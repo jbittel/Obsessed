@@ -15,7 +15,6 @@ function Player:initialize(num)
     self.hand = PlayerHand:new()
     self.visible = PlayerVisible:new()
     self.hidden = PlayerHidden:new()
-
     self:swap_cards()
 end
 
