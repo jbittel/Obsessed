@@ -12,7 +12,7 @@ AIPlayer = class('AIPlayer', Player)
 
 function AIPlayer:initialize(num)
     Player.initialize(self, num)
-    self.face_weight = table.copy(BASE_AI_FACE_WEIGHT)
+    self.face_weight = table.copy(Card.BASE_AI_FACE_WEIGHT)
 end
 
 function AIPlayer:display_hand()

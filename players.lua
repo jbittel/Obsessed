@@ -230,8 +230,8 @@ end
 function PlayerList:init_player_num()
     local start_order = {}
 
-    for _,face in ipairs(NON_SPECIAL_CARDS) do table.insert(start_order, face) end
-    for _,face in ipairs(SPECIAL_CARDS) do table.insert(start_order, face) end
+    for _,face in ipairs(Card.NON_SPECIAL_CARDS) do table.insert(start_order, face) end
+    for _,face in ipairs(Card.SPECIAL_CARDS) do table.insert(start_order, face) end
  
     for _,face in ipairs(start_order) do
         for _,player in ipairs(self.players) do

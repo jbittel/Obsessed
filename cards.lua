@@ -8,25 +8,11 @@
 
 --]]
 
-FACES = { '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A' }
-SUITS = { 'C', 'D', 'H', 'S' }
+Card = class('Card')
 
-SPECIAL_CARDS = { '2', '3', '7', '8', '10', 'R' }
-NON_SPECIAL_CARDS = { '4', '5', '6', '9', 'J', 'Q', 'K', 'A' }
-
-INVALID_MOVES = {
-    ['3'] = { '2', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A' },
-    ['5'] = { '4' },
-    ['6'] = { '4', '5' },
-    ['7'] = { '8', '9', 'J', 'Q', 'K', 'A' },
-    ['9'] = { '4', '5', '6' },
-    ['J'] = { '4', '5', '6', '9' },
-    ['Q'] = { '4', '5', '6', '9', 'J' },
-    ['K'] = { '4', '5', '6', '9', 'J', 'Q' },
-    ['A'] = { '4', '5', '6', '9', 'J', 'Q', 'K' },
-}
-
-BASE_AI_FACE_WEIGHT = {
+Card.static.SPECIAL_CARDS = { '2', '3', '7', '8', '10', 'R' }
+Card.static.NON_SPECIAL_CARDS = { '4', '5', '6', '9', 'J', 'Q', 'K', 'A' }
+Card.static.BASE_AI_FACE_WEIGHT = {
     ['2']  = 8,
     ['3']  = 12,
     ['4']  = 1,
@@ -43,18 +29,15 @@ BASE_AI_FACE_WEIGHT = {
     ['R']  = 12
 }
 
-
-Card = class('Card')
-
 function Card:initialize(face, suit, rank)
     self.face = face
     self.suit = suit
     self.rank = rank
-    self.weight = BASE_AI_FACE_WEIGHT[face]
+    self.weight = Card.BASE_AI_FACE_WEIGHT[face]
 end
 
 function Card:is_special_card()
-    for _,card in ipairs(SPECIAL_CARDS) do
+    for _,card in ipairs(Card.SPECIAL_CARDS) do
         if card == self.face then return true end
     end
     return false
@@ -62,6 +45,21 @@ end
 
 
 CardPile = class('CardPile')
+
+CardPile.static.FACES = { '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A' }
+CardPile.static.SUITS = { 'C', 'D', 'H', 'S' }
+
+CardPile.static.INVALID_MOVES = {
+    ['3'] = { '2', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A' },
+    ['5'] = { '4' },
+    ['6'] = { '4', '5' },
+    ['7'] = { '8', '9', 'J', 'Q', 'K', 'A' },
+    ['9'] = { '4', '5', '6' },
+    ['J'] = { '4', '5', '6', '9' },
+    ['Q'] = { '4', '5', '6', '9', 'J' },
+    ['K'] = { '4', '5', '6', '9', 'J', 'Q' },
+    ['A'] = { '4', '5', '6', '9', 'J', 'Q', 'K' },
+}
 
 function CardPile:initialize()
     self.cards = {}
@@ -124,8 +122,8 @@ function CardPile:is_valid_play(face)
     local active_face = discard_pile:get_active_face()
     if active_face == nil then return true end
     if active_face == face then return true end
-    if INVALID_MOVES[active_face] ~= nil then
-        for _,move in ipairs(INVALID_MOVES[active_face]) do
+    if CardPile.INVALID_MOVES[active_face] ~= nil then
+        for _,move in ipairs(CardPile.INVALID_MOVES[active_face]) do
             if move == face then return false end
         end
     end
@@ -160,8 +158,8 @@ function DrawPile:initialize()
     local num_decks = math.ceil(NUM_PLAYERS / 2)
 
     for deck = 1,num_decks do
-        for _,suit in ipairs(SUITS) do
-            for rank,face in ipairs(FACES) do
+        for _,suit in ipairs(CardPile.SUITS) do
+            for rank,face in ipairs(CardPile.FACES) do
                 local card = Card:new(face, suit, rank + 1)
                 table.insert(self.cards, card)
             end
@@ -169,7 +167,7 @@ function DrawPile:initialize()
 
         -- Add two Jokers to each deck
         for i=1,2 do
-            local card = Card:new('R', '', #FACES + 2)
+            local card = Card:new('R', '', #CardPile.FACES + 2)
             table.insert(self.cards, card)
         end
     end
