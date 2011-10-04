@@ -60,7 +60,7 @@ function AIPlayer:play_from_hand()
     for i,card in ipairs(self.hand.cards) do
         if face == card.face then
             table.insert(num, i)
-            if card:is_special_card() then break end
+            if card:is_special_card() and not self:is_late_game() then break end
         end
     end
     self.hand:play_cards(num)
@@ -91,8 +91,8 @@ function AIPlayer:select_card_face(cardpile)
     -- Apply current card weights
     for _,card in ipairs(valid) do
         card.weight = self.ai_face_weight[card.face]
-        -- Prioritize killing the pile when possible
-        if not card:is_special_card() then
+        -- Prioritize killing the pile when advisable
+        if not card:is_special_card() and self:is_late_game() then
             if card.face == active_face and freq[card.face] + run >= KILL_RUN_LEN then
                 card.weight = card.weight - 1
             elseif freq[card.face] >= KILL_RUN_LEN then
@@ -109,6 +109,11 @@ function AIPlayer:get_frequencies(cards)
     local freq = {}
     for _,card in ipairs(cards) do freq[card.face] = (freq[card.face] or 0) + 1 end
     return freq
+end
+
+function AIPlayer:is_late_game()
+    -- Consider it "late game" when there's roughly two turns left
+    return draw_pile:get_num_cards() < (NUM_PLAYERS * 2)
 end
 
 function AIPlayer:biased_rand(min, max)
