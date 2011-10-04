@@ -173,8 +173,6 @@ function PlayerList:initialize()
     for i = 1,NUM_PLAYERS do
         if i == 1 then
             player = HumanPlayer:new(i)
-        elseif i == 2 then
-            player = AIPlayerDev:new(i)
         else
             player = AIPlayer:new(i)
         end
