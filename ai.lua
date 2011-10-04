@@ -28,8 +28,8 @@ AIPlayer.static.BASE_AI_FACE_WEIGHT = {
 }
 
 function AIPlayer:initialize(num)
-    Player.initialize(self, num)
     self.ai_face_weight = table.copy(AIPlayer.BASE_AI_FACE_WEIGHT)
+    Player.initialize(self, num)
 end
 
 function AIPlayer:display_hand()
