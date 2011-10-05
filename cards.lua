@@ -28,6 +28,10 @@ function Card:is_special_card()
     return false
 end
 
+function Card:is_active_face()
+    return self.face == discard_pile:get_active_face()
+end
+
 
 CardPile = class('CardPile')
 
@@ -189,21 +193,15 @@ function DiscardPile:get_active_face()
 end
 
 function DiscardPile:get_run_length()
-    local active_face = self:get_active_face()
     local run = 0
-
-    if active_face == nil then return 0 end
-
+    if not self:get_active_face() then return 0 end
     for _,card in ipairs(self.cards) do
-        if card.face ~= 'R' then
-            if active_face == card.face then
-                run = run + 1
-            else
-                break
-            end
+        if card:is_active_face() and card.face ~= 'R' then
+            run = run + 1
+        else
+            break
         end
     end
-
     return run
 end
 

@@ -83,7 +83,6 @@ function AIPlayer:play_from_hidden()
 end
 
 function AIPlayer:select_card_face(cardpile)
-    local active_face = discard_pile:get_active_face()
     local valid = cardpile:get_valid_play()
     local freq = self:get_frequencies(cardpile.cards)
     local run = discard_pile:get_run_length()
@@ -92,8 +91,9 @@ function AIPlayer:select_card_face(cardpile)
     for _,card in ipairs(valid) do
         card.weight = self.ai_face_weight[card.face]
         -- Prioritize killing the pile when advisable
-        if not card:is_special_card() and self:is_late_game() then
-            if card.face == active_face and freq[card.face] + run >= KILL_RUN_LEN then
+        if card:is_active_face() and not card:is_special_card() and
+           self:is_late_game() then
+            if freq[card.face] + run >= KILL_RUN_LEN then
                 card.weight = card.weight - 1
             elseif freq[card.face] >= KILL_RUN_LEN then
                 card.weight = card.weight - 2
