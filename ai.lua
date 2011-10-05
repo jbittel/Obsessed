@@ -92,11 +92,10 @@ function AIPlayer:select_card_face(cardpile)
         card.weight = self.ai_face_weight[card.face]
         -- Prioritize killing the pile when advisable
         if card:is_active_face() and not card:is_special_card() and
-           self:is_late_game() then
-            if freq[card.face] + run >= KILL_RUN_LEN then
-                card.weight = card.weight - 1
-            elseif freq[card.face] >= KILL_RUN_LEN then
-                card.weight = card.weight - 2
+           (self:is_late_game() or self:is_behind()) then
+            if freq[card.face] + run >= KILL_RUN_LEN or
+               freq[card.face] >= KILL_RUN_LEN then
+                card.weight = 0
             end
         end
     end
@@ -112,8 +111,12 @@ function AIPlayer:get_frequencies(cards)
 end
 
 function AIPlayer:is_late_game()
-    -- Consider it "late game" when there's roughly two turns left
-    return draw_pile:get_num_cards() < (NUM_PLAYERS * 2)
+    -- Consider it "late game" when there's no cards to draw
+    return not draw_pile:get_num_cards()
+end
+
+function AIPlayer:is_behind()
+    return self.hand:get_num_cards() > draw_pile:get_num_cards()
 end
 
 function AIPlayer:biased_rand(min, max)
