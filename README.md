@@ -1,12 +1,45 @@
+Obsessed
+--------
+
+Obsessed is an implementation of the card game Obsession. For an explanation of the game's rules, see below. This is a command line application so to play the game, enter this at a command prompt:
+
+    $ lua game.lua
+
+During play, the game will look something like this:
+
+    === PLAYER 2
+    ### Draw:       63 cards
+    ### Discard:    4 cards 1:2S 2:R 3:KH 4:KC 
+    ### Hand:       3 cards
+    ### Visible:    3 cards 1:10D 2:8D 3:AC 
+    ### Hidden:     3 cards
+    *** Played a 9H
+    
+    === PLAYER 1
+    ### Draw:       62 cards
+    ### Discard:    5 cards 1:9H 2:2S 3:R 4:KH 5:KC 
+    ### Hand:       8 cards 1:6H 2:6H 3:6S 4:JH 5:JC 6:QS 7:QD 8:KS 
+    ### Visible:    3 cards 1:KS 2:KD 3:R 
+    ### Hidden:     3 cards
+    +++ Select cards from your hand
+    +++ Enter card number(s):
+
+When prompted to enter card numbers, it will tell you what stack to draw cards from (hand, visible or hidden). The selection numbers are printed next to each card in the stack. Multiple cards can be played at a time by separating the numbers with a delimiter, which can be any non-numeric character. For example:
+
+    +++ Enter card number(s): 4,5
+
+Play will continue until one of the players wins.
+
+Obsession
+---------
+
 Obsession is a card climbing game focusing on discarding cards according to a set of rules. For the purposes of this game, suits have no meaning and aces are high.
 
-STARTING THE GAME
------------------
+### STARTING THE GAME ###
 
 Each player is dealt three cards that become their hand. Additionally, each player receives 6 cards that are placed in front of them, three of which are hidden face-down and three of which are face-up and visible to all other players. The remaining cards are placed in a central draw pile.
 
-PLAYING THE GAME
-----------------
+### PLAYING THE GAME ###
 
 Play begins with the player who has the lowest available non-special card, which they play into a discard pile. After playing a card, the player draws the top card from the draw stack to ensure they maintain a minimum of 3 cards. If they have more than three cards, they do not draw any cards on their turn. Play continues clockwise to the next player, who either plays a non-special card equal to or greater in face value to the top card on the discard pile, or a special card which operate according to a set of rules listed below. If a player has a valid move they must take it, and if they do not have a valid move, then the current discard pile is picked up and becomes part of their hand. If a player has more than one identical face value card, they can choose to play the entire set as a stack on their turn. Any run of 4 or more cards on the discard pile kills it, and the current player's turn continues.
 
@@ -16,8 +49,7 @@ Play continues until the entire draw stack is gone. Once that occurs and the pla
 
 The first player to discard all of their cards is the winner.
 
-SPECIAL CARDS AND ADDITIONAL RULES
-----------------------------------
+### SPECIAL CARDS AND ADDITIONAL RULES ###
 
 Non-special cards: 4 5 6 9 J Q K A
 
