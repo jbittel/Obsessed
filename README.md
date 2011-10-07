@@ -1,7 +1,7 @@
 Obsessed
 --------
 
-Obsessed is an implementation of the card game Obsession. For an explanation of the game's rules, see below. This is a command line application so to play the game, enter this at a command prompt:
+Obsessed is an implementation of the card game Obsession. For an explanation of the game's rules, see below. This is a command line application so enter this at a command prompt to play:
 
     $ lua game.lua
 
@@ -33,19 +33,19 @@ Play will continue until one of the players wins.
 Obsession
 ---------
 
-Obsession is a card climbing game focusing on discarding cards according to a set of rules. For the purposes of this game, suits have no meaning and aces are high.
+Obsession is a card climbing game focusing on discarding cards according to a set of rules. The recommended setup is one full deck of cards (including both Jokers) for every two players, rounding the decks up as necessary (e.g. use two decks for four players and three decks for five). For the purposes of this game, suits have no meaning and aces are high.
 
 ### STARTING THE GAME ###
 
-Each player is dealt three cards that become their hand. Additionally, each player receives 6 cards that are placed in front of them, three of which are hidden face-down and three of which are face-up and visible to all other players. The remaining cards are placed in a central draw pile.
+Each player is dealt three cards that become their hand. Additionally, each player receives six cards that are placed in front of them, three of which are hidden face-down and three of which are face-up and visible to all other players. The remaining cards are placed in a central draw pile.
 
 ### PLAYING THE GAME ###
 
-Play begins with the player who has the lowest available non-special card, which they play into a discard pile. After playing a card, the player draws the top card from the draw stack to ensure they maintain a minimum of 3 cards. If they have more than three cards, they do not draw any cards on their turn. Play continues clockwise to the next player, who either plays a non-special card equal to or greater in face value to the top card on the discard pile, or a special card which operate according to a set of rules listed below. If a player has a valid move they must take it, and if they do not have a valid move, then the current discard pile is picked up and becomes part of their hand. If a player has more than one identical face value card, they can choose to play the entire set as a stack on their turn. Any run of 4 or more cards on the discard pile kills it, and the current player's turn continues.
+Play begins with the player who has the lowest available non-special card, which they play into a central discard pile. After playing a card, the player draws the top card from the draw stack to ensure they maintain a minimum of three cards. If they have more than three cards, they do not draw any cards on their turn. Play continues clockwise to the next player, who either plays a non-special card equal to or greater in face value to the top card on the discard pile, or a special card which operates according to unique rules listed below. If a player has a valid move they must take it, and if they do not have a valid move, then the current discard pile is picked up and becomes part of their hand. If a player has more than one identical face value card, they can choose to play any number of them as a set on their turn. Any run of four or more cards on the discard pile, including cards played by other players, kills it and the current player gets another turn.
 
-If the discard pile is killed, either through a run of 4+ cards or by playing a 10 special card, all cards in the discard pile are "killed" and removed entirely from play. The player who killed the pile continues their turn and can play anything on the now empty pile. A player can kill the pile multiple times on a single turn.
+If the discard pile is killed, either through a run of four or more cards or by playing a 10 special card, all cards in the discard pile are "killed" and removed entirely from play. The player who killed the pile gets another turn and can play anything on the now empty pile. A player can kill the pile multiple times in a row.
 
-Play continues until the entire draw stack is gone. Once that occurs and the player's hand is depleted, they begin drawing cards one at a time from their visible set and adding them to their hand. The next visible card cannot be added to one's hand or played until their hand is empty again. Once all three visible cards are played and their hand is empty, they can begin drawing cards from their hidden set following the same rules as the visible set, with the notable exception that they cannot look at the cards until drawn.
+Play continues until the entire draw stack is gone. Once that occurs and the player's hand is depleted, they begin drawing cards one at a time from their visible set and adding them to their hand. The next visible card cannot be added to one's hand or played until their hand is empty again. Once all three visible cards are played and their hand is empty, they can begin drawing cards from their hidden set following the same rules as the visible set, with the notable exception that they cannot look at each card until drawn.
 
 The first player to discard all of their cards is the winner.
 
@@ -59,16 +59,17 @@ Special card rules:
 
 * 2: Next player plays anything
 * 3: Next player must play a 3 or R, or pick up the pile
-* 7: Next player must play under a 7 or a special card (no 8)
-* 8: Current player can play anything, turn continues
-* 10: Kills the pile, turn continues
+* 7: Next player must play under a 7 or any special card except for an 8
+* 8: Current player gets another turn, can play anything
+* 10: Kills the pile, current player gets another turn
 * R: (Joker) Reverses the current direction of play
 
 Additional rules:
 
 * Any number of identical face value cards can be played simultaneously
-* Any run of 4 or more cards kills the discard pile
+* A run of four or more cards kills the discard pile
 * An 8 cannot be played on a 7
 * If a valid move is present, it must be played
-* If you have no valid moves, pick up the discard pile
+* If you have no valid moves, add the current discard pile to your hand
 * If the pile is empty, anything can be played
+* When the discard pile is picked up, any 3s in it are removed and killed
