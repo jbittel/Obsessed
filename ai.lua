@@ -116,7 +116,8 @@ function AIPlayer:modify_card_weights(cardpile, valid)
         end
     end
 
-    if self:is_late_game() and not next_player:get_num_hand_cards() then
+    if self:is_late_game() and next_player:get_num_hand_cards() == 0 then
+        -- Aggressively play if the next player is close to winning
         self.ai_face_weight['3'] = 0
         self.ai_face_weight['R'] = 0
         self.ai_face_weight['7'] = 0
@@ -125,7 +126,7 @@ end
 
 function AIPlayer:is_late_game()
     -- Consider it "late game" when there's no cards to draw
-    return not draw_pile:get_num_cards()
+    return draw_pile:get_num_cards() == 0
 end
 
 function AIPlayer:is_behind()
