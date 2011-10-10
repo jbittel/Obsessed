@@ -236,7 +236,10 @@ end
 function PlayerList:init_player_num()
     for _,face in ipairs(Card.START_ORDER) do
         for _,player in ipairs(self.players) do
-            if player.hand:has_card(face) then return player.num end
+            if player.hand:has_card(face) then
+                print('\n*** Starting with player '..player.num)
+                return player.num
+            end
         end
     end
     return 1
