@@ -139,14 +139,3 @@ function AIPlayer:biased_rand(min, max)
     if r < min then r = min end
     return r
 end
-
-
-AIPlayerDev = class('AIPlayerDev', AIPlayer)
-
-function AIPlayerDev:initialize(num)
-    AIPlayer.initialize(self, num)
-    -- Try a more aggressive style of play
-    self.ai_face_weight['3'] = 8
-    self.ai_face_weight['R'] = 8
-    self.ai_face_weight['7'] = 8
-end
