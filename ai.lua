@@ -72,8 +72,8 @@ function AIPlayer:play_from_visible()
     for i,card in ipairs(self.visible.cards) do
         if face == card.face then table.insert(num, i) end
     end
+    print('*** Drawing from visible cards ('..self:get_num_visible_cards() - #num..' left)')
     self.visible:play_cards(num)
-    print('*** Drawing from visible cards ('..self:get_num_visible_cards()..' left)')
 end
 
 function AIPlayer:play_from_hidden()
