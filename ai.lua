@@ -84,25 +84,11 @@ end
 
 function AIPlayer:select_card_face(cardpile)
     local valid = cardpile:get_valid_play()
-    local freq = self:get_frequencies(cardpile.cards)
-    local run = discard_pile:get_run_length()
 
-    self:modify_card_weights()
-
-    -- Apply current card weights
-    for _,card in ipairs(valid) do
-        card.weight = self.ai_face_weight[card.face]
-        -- Prioritize killing the pile when advisable
-        if card:is_active_face() and not card:is_special_card() and
-           (self:is_late_game() or self:is_behind()) then
-            if freq[card.face] + run >= KILL_RUN_LEN or
-               freq[card.face] >= KILL_RUN_LEN then
-                card.weight = 0
-            end
-        end
-    end
-
+    self:modify_card_weights(cardpile, valid)
+    for _,card in ipairs(valid) do card.weight = self.ai_face_weight[card.face] end
     table.sort(valid, function(a, b) return a.weight < b.weight end)
+
     return valid[self:biased_rand(1, #valid)].face
 end
 
@@ -112,13 +98,28 @@ function AIPlayer:get_frequencies(cards)
     return freq
 end
 
-function AIPlayer:modify_card_weights()
+function AIPlayer:modify_card_weights(cardpile, valid)
+    local freq = self:get_frequencies(cardpile.cards)
+    local run = discard_pile:get_run_length()
     local next_player = player_list:get_next_player()
+
     self.ai_face_weight = table.copy(AIPlayer.BASE_AI_FACE_WEIGHT)
+
+    for _,card in ipairs(valid) do
+        -- Prioritize killing the pile when advisable
+        if card:is_active_face() and not card:is_special_card() and
+           (self:is_late_game() or self:is_behind()) then
+            if freq[card.face] + run >= KILL_RUN_LEN or
+               freq[card.face] >= KILL_RUN_LEN then
+                self.ai_face_weight[card.face] = 0
+            end
+        end
+    end
+
     if self:is_late_game() and not next_player:get_num_hand_cards() then
         self.ai_face_weight['3'] = 0
         self.ai_face_weight['R'] = 0
-        self.ai_face_weight['7'] = 1
+        self.ai_face_weight['7'] = 0
     end
 end
 
