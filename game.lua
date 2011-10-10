@@ -47,46 +47,45 @@ function game_loop()
     local write_log = log_game_state()
 
     while true do
-        local player = player_list:get_next_player()
+        local player = player_list:advance_next_player()
+        print('\n=== PLAYER '..player:get_player_num())
 
         repeat
-            if turn ~= 1 then
-                -- Display game board
-                draw_pile:display_cards('Draw', 0)
-                discard_pile:display_cards('Discard', 5)
-                player:display_hand()
-                player.visible:display_cards('Visible')
-                player.hidden:display_cards('Hidden', 0)
+            -- Display game board
+            draw_pile:display_cards('Draw', 0)
+            discard_pile:display_cards('Discard', 5)
+            player:display_hand()
+            player.visible:display_cards('Visible')
+            player.hidden:display_cards('Hidden', 0)
 
-                write_log(turn, player)
+            write_log(turn, player)
 
-                if player:get_num_hand_cards() == 0 and player:get_num_visible_cards() > 0 then
-                    -- Play cards from visible set
-                    if player.visible:has_valid_play() then
-                        player:play_from_visible()
-                    else
-                        discard_pile:pick_up_pile(player)
-                        break
-                    end
-                elseif player:get_num_hand_cards() == 0 and player:get_num_hidden_cards() > 0 then
-                    -- Play cards from hidden set
-                    player:play_from_hidden()
-                    -- If the hand isn't empty, the drawn card couldn't be played
-                    if player:get_num_hand_cards() ~= 0 then
-                        discard_pile:pick_up_pile(player)
-                        break
-                    end
+            if turn == 1 then
+                player:play_initial_card()
+            elseif player:get_num_hand_cards() == 0 and player:get_num_visible_cards() > 0 then
+                -- Play cards from visible set
+                if player.visible:has_valid_play() then
+                    player:play_from_visible()
                 else
-                    -- Play cards from hand
-                    if player.hand:has_valid_play() then
-                        player:play_from_hand()
-                    else
-                        discard_pile:pick_up_pile(player)
-                        break
-                    end
+                    discard_pile:pick_up_pile(player)
+                    break
+                end
+            elseif player:get_num_hand_cards() == 0 and player:get_num_hidden_cards() > 0 then
+                -- Play cards from hidden set
+                player:play_from_hidden()
+                -- If the hand isn't empty, the drawn card couldn't be played
+                if player:get_num_hand_cards() ~= 0 then
+                    discard_pile:pick_up_pile(player)
+                    break
                 end
             else
-                write_log(turn, player)
+                -- Play cards from hand
+                if player.hand:has_valid_play() then
+                    player:play_from_hand()
+                else
+                    discard_pile:pick_up_pile(player)
+                    break
+                end
             end
             
             -- Test for game over condition

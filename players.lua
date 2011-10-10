@@ -43,12 +43,18 @@ function Player:add_to_hand(cards, num)
     if card ~= nil then self.hand:add_card(card) end
 end
 
-function Player:play_initial_card(face)
+function Player:play_initial_card()
+    local initial_face = nil
     local num = {}
-    for i,card in ipairs(self.hand.cards) do
-        if face == card.face then
-            table.insert(num, i)
+    for _,face in ipairs(Card.START_ORDER) do
+        if self.hand:has_card(face) then
+            initial_face = face
             break
+        end
+    end
+    for i,card in ipairs(self.hand.cards) do
+        if initial_face == card.face then
+            table.insert(num, i)
         end
     end
     self.hand:play_cards(num)
@@ -182,6 +188,10 @@ function PlayerList:initialize()
 end
 
 function PlayerList:get_next_player()
+    return self.players[self:next_player_num()]
+end
+
+function PlayerList:advance_next_player()
     self.curr_player = self:next_player_num()
     return self.players[self.curr_player]
 end
@@ -218,25 +228,16 @@ function PlayerList:next_player_num()
     if curr_player > num_players then curr_player = 1 end
     if curr_player < 1 then curr_player = num_players end
 
-    print('\n=== PLAYER '..curr_player)
     return curr_player
 end
 
 -- Pick starting player by matching the first instance of
 -- a non-special face with a card in a player's hand
 function PlayerList:init_player_num()
-    local start_order = {}
-
-    for _,face in ipairs(Card.NON_SPECIAL_CARDS) do table.insert(start_order, face) end
-    for _,face in ipairs(Card.SPECIAL_CARDS) do table.insert(start_order, face) end
- 
-    for _,face in ipairs(start_order) do
+    for _,face in ipairs(Card.START_ORDER) do
         for _,player in ipairs(self.players) do
-            if player.hand:has_card(face) then
-                print('\n=== PLAYER '..player.num)
-                player:play_initial_card(face)
-                return player.num
-            end
+            if player.hand:has_card(face) then return player.num end
         end
     end
+    return 1
 end

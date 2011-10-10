@@ -14,6 +14,7 @@ Card.static.FACES = { '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K
 Card.static.SUITS = { 'C', 'D', 'H', 'S' }
 Card.static.SPECIAL_CARDS = { '2', '3', '7', '8', '10', 'R' }
 Card.static.NON_SPECIAL_CARDS = { '4', '5', '6', '9', 'J', 'Q', 'K', 'A' }
+Card.static.START_ORDER = { '4', '5', '6', '9', 'J', 'Q', 'K', 'A', '2', '3', '7', '8', '10', 'R' }
 
 function Card:initialize(face, suit, rank)
     self.face = face
