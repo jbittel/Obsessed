@@ -114,6 +114,7 @@ end
 
 function AIPlayer:modify_card_weights()
     local next_player = player_list:get_next_player()
+    self.ai_face_weight = table.copy(AIPlayer.BASE_AI_FACE_WEIGHT)
     if self:is_late_game() and not next_player:get_num_hand_cards() then
         self.ai_face_weight['3'] = 0
         self.ai_face_weight['R'] = 0
