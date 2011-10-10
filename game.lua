@@ -25,6 +25,7 @@ end
 
 draw_pile = nil
 discard_pile = nil
+player_list = nil
 
 function game_init()
     print('   ____  _                      _             ')
@@ -41,10 +42,10 @@ function game_init()
 end
 
 function game_loop()
-    local player_list = PlayerList:new()
-
     local turn = 1
     local write_log = log_game_state()
+
+    player_list = PlayerList:new()
 
     while true do
         local player = player_list:advance_next_player()

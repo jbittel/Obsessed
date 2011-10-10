@@ -87,6 +87,8 @@ function AIPlayer:select_card_face(cardpile)
     local freq = self:get_frequencies(cardpile.cards)
     local run = discard_pile:get_run_length()
 
+    self:modify_card_weights()
+
     -- Apply current card weights
     for _,card in ipairs(valid) do
         card.weight = self.ai_face_weight[card.face]
@@ -108,6 +110,15 @@ function AIPlayer:get_frequencies(cards)
     local freq = {}
     for _,card in ipairs(cards) do freq[card.face] = (freq[card.face] or 0) + 1 end
     return freq
+end
+
+function AIPlayer:modify_card_weights()
+    local next_player = player_list:get_next_player()
+    if self:is_late_game() and not next_player:get_num_hand_cards() then
+        self.ai_face_weight['3'] = 0
+        self.ai_face_weight['R'] = 0
+        self.ai_face_weight['7'] = 1
+    end
 end
 
 function AIPlayer:is_late_game()
