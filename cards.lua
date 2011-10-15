@@ -195,9 +195,10 @@ end
 
 function DiscardPile:get_run_length()
     local run = 0
-    if not self:get_active_face() then return 0 end
+    local top_face = self:get_top_face()
+    if not top_face then return 0 end
     for _,card in ipairs(self.cards) do
-        if card:is_active_face() and card.face ~= 'R' then
+        if card.face == top_face then
             run = run + 1
         else
             break
