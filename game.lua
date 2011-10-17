@@ -88,12 +88,6 @@ function game_loop()
                     break
                 end
             end
-            
-            -- Test for game over condition
-            if draw_pile:get_num_cards() == 0 and player:get_num_cards() == 0 then
-                print('*** Player '..player.num..' wins!')
-                return
-            end
 
             -- Apply card face rules
             local top_face = discard_pile:get_top_face()
@@ -119,6 +113,17 @@ function game_loop()
             while player:get_num_hand_cards() < HAND_SIZE and draw_pile:get_num_cards() > 0 do
                 player:add_to_hand(draw_pile)
             end
+
+            -- Test for win conditions
+            if draw_pile:get_num_cards() == 0 and player:get_num_cards() == 0 then
+                print('*** Player '..player:get_player_num()..' wins!')
+                player_list:add_winner()
+                -- Test for game over condition
+                if player_list:get_num_players() == 1 then
+                    player_list:add_winner(player_list:next_player_num())
+                    return
+                end
+            end
         until player_list:is_turn_over()
 
         turn = turn + 1
@@ -127,6 +132,8 @@ end
 
 function game_end()
     print('')
+    print('=================')
+    player_list:display_winners()
     print('=================')
     print('=== Game Over ===')
     print('=================')

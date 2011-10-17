@@ -172,6 +172,7 @@ PlayerList = class('PlayerList')
 
 function PlayerList:initialize()
     self.players = {}
+    self.winners = {}
     self.curr_player = 0
     self.reverse = false
     self.turn_over = true
@@ -237,10 +238,23 @@ function PlayerList:init_player_num()
     for _,face in ipairs(Card.START_ORDER) do
         for _,player in ipairs(self.players) do
             if player.hand:has_card(face) then
-                print('\n*** Starting with player '..player.num)
+                print('\n*** Starting with player '..player:get_player_num())
                 return player.num
             end
         end
     end
     return 1
+end
+
+function PlayerList:add_winner(num)
+    local player_num = num or self.curr_player
+    local player = table.remove(self.players, player_num)
+    table.insert(self.winners, player)
+    self:end_turn(true)
+end
+
+function PlayerList:display_winners()
+    for i,player in ipairs(self.winners) do
+        print(i..'. Player '..player:get_player_num())
+    end
 end
