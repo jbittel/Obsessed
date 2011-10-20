@@ -64,27 +64,14 @@ end
 HumanPlayer = class('HumanPlayer', Player)
 
 function HumanPlayer:swap_cards()
-    local cards = {}
-    for _,card in ipairs(self.hand.cards) do table.insert(cards, card) end
-    for _,card in ipairs(self.visible.cards) do table.insert(cards, card) end
-    table.sort(cards, function(a, b) return a.rank < b.rank end)
+    local cards = CardPile:new(self.hand, self.visible)
+    cards:sort_by_rank()
 
     print('\n+++ Select your '..VISIBLE_SIZE..' VISIBLE cards')
-    io.write('### Starting cards:\t')
-    for i,card in ipairs(cards) do io.write(i..':'..card.face..card.suit..' ') end
-    io.write('\n')
+    cards:display_cards('Starting cards')
 
-    self.hand.cards = {}
-    self.visible.cards = {}
-    local num = self:get_card_input(1, #cards, VISIBLE_SIZE) 
-    local set = table.set(num)
-    for i,card in ipairs(cards) do
-        if set[i] then
-            table.insert(self.visible.cards, card)
-        else
-            table.insert(self.hand.cards, card)
-        end
-    end
+    local input = self:get_card_input(1, cards:get_num_cards(), VISIBLE_SIZE)
+    cards:split_pile(self.visible, self.hand, input)
 end
 
 function HumanPlayer:play_from_hand()

@@ -48,8 +48,15 @@ CardPile.static.INVALID_MOVES = {
     ['A'] = { '4', '5', '6', '9', 'J', 'Q', 'K' },
 }
 
-function CardPile:initialize()
+function CardPile:initialize(...)
     self.cards = {}
+    local arg = {n = select('#', ...), ...}
+    for i = 1,arg.n do
+        local pile = arg[i]
+        for _,card in ipairs(pile.cards) do
+            table.insert(self.cards, card)
+        end
+    end
 end
 
 function CardPile:get_num_cards()
@@ -85,6 +92,23 @@ function CardPile:show_card(num)
     return self.cards[num]
 end
 
+function CardPile:remove_cards()
+    self.cards = {}
+end
+
+function CardPile:split_pile(a, b, idx)
+    local set = table.set(idx)
+    a:remove_cards()
+    b:remove_cards()
+    for i,card in ipairs(self.cards) do
+        if set[i] then
+            a:add_card(card)
+        else
+            b:add_card(card)
+        end
+    end
+end
+
 function CardPile:has_valid_play()
     for _,card in ipairs(self.cards) do
         if self:is_valid_play(card.face) then return true end
@@ -95,7 +119,7 @@ end
 function CardPile:get_valid_play()
     local valid = {}
     local face = nil
-    table.sort(self.cards, function(a, b) return a.rank < b.rank end)
+    self:sort_by_rank()
     for _,card in ipairs(self.cards) do
         if face ~= card.face and self:is_valid_play(card.face) then
             face = card.face
@@ -177,7 +201,7 @@ end
 DiscardPile = class('DiscardPile', CardPile)
 
 function DiscardPile:kill_pile()
-    self.cards = {}
+    self:remove_cards()
     print('*** Killed pile')
 end
 
