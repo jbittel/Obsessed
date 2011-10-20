@@ -67,14 +67,15 @@ function HumanPlayer:swap_cards()
     local cards = {}
     for _,card in ipairs(self.hand.cards) do table.insert(cards, card) end
     for _,card in ipairs(self.visible.cards) do table.insert(cards, card) end
-    self.hand.cards = {}
-    self.visible.cards = {}
- 
+    table.sort(cards, function(a, b) return a.rank < b.rank end)
+
     print('\n+++ Select your '..VISIBLE_SIZE..' VISIBLE cards')
     io.write('### Starting cards:\t')
     for i,card in ipairs(cards) do io.write(i..':'..card.face..card.suit..' ') end
     io.write('\n')
 
+    self.hand.cards = {}
+    self.visible.cards = {}
     local num = self:get_card_input(1, #cards, VISIBLE_SIZE) 
     local set = table.set(num)
     for i,card in ipairs(cards) do
