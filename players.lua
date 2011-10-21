@@ -145,7 +145,7 @@ function HumanPlayer:validate_card_input(cards, num)
         local card = cards:get_card(i)
         if face == nil then face = card.face end
         -- Ensure all selected cards are valid plays and are the same face
-        if not cards:is_valid_play(card.face) or face ~= card.face then return false end
+        if not card:is_valid_play() or face ~= card.face then return false end
     end
     return true
 end

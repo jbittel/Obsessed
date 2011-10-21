@@ -15,6 +15,17 @@ Card.static.SUITS = { 'C', 'D', 'H', 'S' }
 Card.static.SPECIAL_CARDS = { '2', '3', '7', '8', '10', 'R' }
 Card.static.NON_SPECIAL_CARDS = { '4', '5', '6', '9', 'J', 'Q', 'K', 'A' }
 Card.static.START_ORDER = { '4', '5', '6', '9', 'J', 'Q', 'K', 'A', '2', '3', '7', '8', '10', 'R' }
+Card.static.INVALID_MOVES = {
+    ['3'] = { '2', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A' },
+    ['5'] = { '4' },
+    ['6'] = { '4', '5' },
+    ['7'] = { '8', '9', 'J', 'Q', 'K', 'A' },
+    ['9'] = { '4', '5', '6' },
+    ['J'] = { '4', '5', '6', '9' },
+    ['Q'] = { '4', '5', '6', '9', 'J' },
+    ['K'] = { '4', '5', '6', '9', 'J', 'Q' },
+    ['A'] = { '4', '5', '6', '9', 'J', 'Q', 'K' },
+}
 
 function Card:initialize(face, suit, rank)
     self.face = face
@@ -33,20 +44,20 @@ function Card:is_active_face()
     return self.face == discard_pile:get_active_face()
 end
 
+function Card:is_valid_play()
+    local active_face = discard_pile:get_active_face()
+    if active_face == nil then return true end
+    if active_face == self.face then return true end
+    if Card.INVALID_MOVES[active_face] ~= nil then
+        for _,move in ipairs(Card.INVALID_MOVES[active_face]) do
+            if move == self.face then return false end
+        end
+    end
+    return true
+end
+
 
 CardPile = class('CardPile')
-
-CardPile.static.INVALID_MOVES = {
-    ['3'] = { '2', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A' },
-    ['5'] = { '4' },
-    ['6'] = { '4', '5' },
-    ['7'] = { '8', '9', 'J', 'Q', 'K', 'A' },
-    ['9'] = { '4', '5', '6' },
-    ['J'] = { '4', '5', '6', '9' },
-    ['Q'] = { '4', '5', '6', '9', 'J' },
-    ['K'] = { '4', '5', '6', '9', 'J', 'Q' },
-    ['A'] = { '4', '5', '6', '9', 'J', 'Q', 'K' },
-}
 
 function CardPile:initialize(...)
     self.cards = {}
@@ -112,7 +123,7 @@ end
 
 function CardPile:has_valid_play()
     for _,card in ipairs(self.cards) do
-        if self:is_valid_play(card.face) then return true end
+        if card:is_valid_play() then return true end
     end
     return false
 end
@@ -122,24 +133,12 @@ function CardPile:get_valid_play()
     local face = nil
     self:sort_by_rank()
     for _,card in ipairs(self.cards) do
-        if face ~= card.face and self:is_valid_play(card.face) then
+        if face ~= card.face and card:is_valid_play() then
             face = card.face
             table.insert(valid, card)
         end
     end
     return valid
-end
-
-function CardPile:is_valid_play(face)
-    local active_face = discard_pile:get_active_face()
-    if active_face == nil then return true end
-    if active_face == face then return true end
-    if CardPile.INVALID_MOVES[active_face] ~= nil then
-        for _,move in ipairs(CardPile.INVALID_MOVES[active_face]) do
-            if move == face then return false end
-        end
-    end
-    return true
 end
 
 function CardPile:has_card(face)
