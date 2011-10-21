@@ -81,19 +81,20 @@ function CardPile:add_card(card)
     table.insert(self.cards, 1, card)
 end
 
-function CardPile:get_card(num)
+function CardPile:remove_card(num)
     if #self.cards == 0 then return nil end
     local num = num or 1
     return table.remove(self.cards, num)
 end
 
-function CardPile:show_card(num)
-    local num = num or 1
-    return self.cards[num]
-end
-
 function CardPile:remove_cards()
     self.cards = {}
+end
+
+function CardPile:get_card(num)
+    if #self.cards == 0 then return nil end
+    local num = num or 1
+    return self.cards[num]
 end
 
 function CardPile:split_pile(a, b, idx)
@@ -162,6 +163,7 @@ function CardPile:play_cards(num)
     self.cards = cards
 end
 
+
 DrawPile = class('DrawPile', CardPile)
 
 function DrawPile:initialize()
@@ -206,8 +208,9 @@ function DiscardPile:kill_pile()
 end
 
 function DiscardPile:get_top_face()
-    if #self.cards == 0 then return nil end
-    return self.cards[1].face
+    local card = self:get_card()
+    if not card then return nil end
+    return card.face
 end
 
 function DiscardPile:get_active_face()
@@ -248,7 +251,7 @@ PlayerHand = class('PlayerHand', CardPile)
 
 function PlayerHand:initialize()
     CardPile.initialize(self)
-    for i = 1,HAND_SIZE do self:add_card(draw_pile:get_card()) end
+    for i = 1,HAND_SIZE do self:add_card(draw_pile:remove_card()) end
 end
 
 
@@ -256,7 +259,7 @@ PlayerVisible = class('PlayerVisible', CardPile)
 
 function PlayerVisible:initialize()
     CardPile.initialize(self)
-    for i = 1,VISIBLE_SIZE do self:add_card(draw_pile:get_card()) end
+    for i = 1,VISIBLE_SIZE do self:add_card(draw_pile:remove_card()) end
 end
 
 
@@ -264,5 +267,5 @@ PlayerHidden = class('PlayerHidden', CardPile)
 
 function PlayerHidden:initialize()
     CardPile.initialize(self)
-    for i = 1,HIDDEN_SIZE do self:add_card(draw_pile:get_card()) end
+    for i = 1,HIDDEN_SIZE do self:add_card(draw_pile:remove_card()) end
 end

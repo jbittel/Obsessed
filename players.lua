@@ -39,7 +39,7 @@ function Player:get_num_hidden_cards()
 end
 
 function Player:add_to_hand(cards, num)
-    local card = cards:get_card(num)
+    local card = cards:remove_card(num)
     if card ~= nil then self.hand:add_card(card) end
 end
 
@@ -142,7 +142,7 @@ end
 function HumanPlayer:validate_card_input(cards, num)
     local face = nil
     for _,i in ipairs(num) do
-        local card = cards:show_card(i)
+        local card = cards:get_card(i)
         if face == nil then face = card.face end
         -- Ensure all selected cards are valid plays and are the same face
         if not cards:is_valid_play(card.face) or face ~= card.face then return false end
