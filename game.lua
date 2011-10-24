@@ -49,7 +49,7 @@ function game_loop()
 
     while true do
         local player = player_list:advance_next_player()
-        print('\n=== PLAYER '..player:get_player_num())
+        print('\n=== PLAYER '..player:get_num())
 
         repeat
             -- Display game board
@@ -116,7 +116,7 @@ function game_loop()
 
             -- Test for win conditions
             if draw_pile:get_num_cards() == 0 and player:get_num_cards() == 0 then
-                print('*** Player '..player:get_player_num()..' wins!')
+                print('*** Player '..player:get_num()..' wins!')
                 player_list:add_winner()
                 -- Test for game over condition
                 if player_list:get_num_players() == 1 then

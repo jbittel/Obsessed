@@ -18,7 +18,7 @@ function Player:initialize(num)
     self:swap_cards()
 end
 
-function Player:get_player_num()
+function Player:get_num()
     return self.num
 end
 
@@ -226,7 +226,7 @@ function PlayerList:init_player_num()
     for _,face in ipairs(Card.START_ORDER) do
         for _,player in ipairs(self.players) do
             if player.hand:has_card(face) then
-                print('\n*** Starting with player '..player:get_player_num())
+                print('\n*** Starting with player '..player:get_num())
                 return player.num
             end
         end
@@ -243,6 +243,6 @@ end
 
 function PlayerList:display_winners()
     for i,player in ipairs(self.winners) do
-        print(i..'. Player '..player:get_player_num())
+        print(i..'. Player '..player:get_num())
     end
 end

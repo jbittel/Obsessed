@@ -33,7 +33,7 @@ function Card:initialize(face, suit, rank)
     self.rank = rank
 end
 
-function Card:is_special_card()
+function Card:is_special()
     for _,card in ipairs(Card.SPECIAL_CARDS) do
         if card == self.face then return true end
     end
@@ -241,7 +241,7 @@ function DiscardPile:pick_up_pile(player)
             count = count + 1
         end
     end
-    self.cards = {}
+    self:remove_cards()
     print('*** No valid moves, picked up '..count..' cards')
 end
 
