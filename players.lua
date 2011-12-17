@@ -41,6 +41,7 @@ end
 function Player:add_to_hand(cards, num)
     local card = cards:remove_card(num)
     if card ~= nil then self.hand:add_card(card) end
+    return card
 end
 
 function Player:play_initial_card()
@@ -107,6 +108,11 @@ function HumanPlayer:play_from_hidden()
     local num = self:get_card_input(1, self.hidden:get_num_cards(), 1)
     for _,n in ipairs(num) do self:add_to_hand(self.hidden, n) end
     if self.hand:has_valid_play() then self.hand:play_cards({1}) end
+end
+
+function HumanPlayer:add_to_hand(cards, num)
+    local card = Player.add_to_hand(self, cards, num)
+    print('*** Drew a '..card.face..card.suit)
 end
 
 function HumanPlayer:get_card_input(min, max, total)
