@@ -37,8 +37,8 @@ function game_init()
     print('')
     print('@@@ Starting a new game with '..NUM_PLAYERS..' players')
 
-    draw_pile = DrawPile:new()
-    discard_pile = DiscardPile:new()
+    draw_pile = DrawPile:new('Draw')
+    discard_pile = DiscardPile:new('Discard')
 end
 
 function game_loop()
@@ -53,11 +53,11 @@ function game_loop()
 
         repeat
             -- Display game board
-            draw_pile:display_cards('Draw', 0)
-            discard_pile:display_cards('Discard', 5)
+            draw_pile:display_cards(0)
+            discard_pile:display_cards(5)
             player:display_hand()
-            player.visible:display_cards('Visible')
-            player.hidden:display_cards('Hidden', 0)
+            player.visible:display_cards()
+            player.hidden:display_cards(0)
 
             write_log(turn, player)
 

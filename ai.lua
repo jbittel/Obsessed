@@ -33,7 +33,7 @@ function AIPlayer:initialize(num)
 end
 
 function AIPlayer:display_hand()
-    self.hand:display_cards('Hand', 0)
+    self.hand:display_cards(0)
 end
 
 function AIPlayer:swap_cards()

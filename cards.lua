@@ -63,7 +63,8 @@ end
 
 CardPile = class('CardPile')
 
-function CardPile:initialize(...)
+function CardPile:initialize(name, ...)
+    self.name = name
     self.cards = {}
     local arg = {n = select('#', ...), ...}
     for i = 1,arg.n do
@@ -74,13 +75,17 @@ function CardPile:initialize(...)
     end
 end
 
+function CardPile:__tostring()
+    return 'the '..string.lower(self.name)..' pile'
+end
+
 function CardPile:get_num_cards()
     return #self.cards
 end
 
-function CardPile:display_cards(prefix, limit)
+function CardPile:display_cards(limit)
     local limit = limit or -1
-    io.write('### '..prefix..':\t'..#self.cards..' cards\t')
+    io.write('### '..self.name..':\t'..#self.cards..' cards\t')
     for i,card in ipairs(self.cards) do
         if limit ~= -1 and i > limit then break end
         io.write(i..':'..tostring(card)..' ')
@@ -169,8 +174,8 @@ end
 
 DrawPile = class('DrawPile', CardPile)
 
-function DrawPile:initialize()
-    CardPile.initialize(self)
+function DrawPile:initialize(name)
+    CardPile.initialize(self, name)
     local num_decks = math.ceil(NUM_PLAYERS / 2)
 
     for deck = 1,num_decks do
@@ -252,23 +257,35 @@ end
 
 PlayerHand = class('PlayerHand', CardPile)
 
-function PlayerHand:initialize()
-    CardPile.initialize(self)
+function PlayerHand:initialize(name)
+    CardPile.initialize(self, name)
     for i = 1,HAND_SIZE do self:add_card(draw_pile:remove_card()) end
+end
+
+function PlayerHand:__tostring()
+    return 'your '..string.lower(self.name)
 end
 
 
 PlayerVisible = class('PlayerVisible', CardPile)
 
-function PlayerVisible:initialize()
-    CardPile.initialize(self)
+function PlayerVisible:initialize(name)
+    CardPile.initialize(self, name)
     for i = 1,VISIBLE_SIZE do self:add_card(draw_pile:remove_card()) end
+end
+
+function PlayerVisible:__tostring()
+    return 'your '..string.lower(self.name)..' cards'
 end
 
 
 PlayerHidden = class('PlayerHidden', CardPile)
 
-function PlayerHidden:initialize()
-    CardPile.initialize(self)
+function PlayerHidden:initialize(name)
+    CardPile.initialize(self, name)
     for i = 1,HIDDEN_SIZE do self:add_card(draw_pile:remove_card()) end
+end
+
+function PlayerHidden:__tostring()
+    return 'your '..string.lower(self.name)..' cards'
 end

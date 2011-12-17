@@ -12,9 +12,9 @@ Player = class('Player')
 
 function Player:initialize(num)
     self.num = num
-    self.hand = PlayerHand:new()
-    self.visible = PlayerVisible:new()
-    self.hidden = PlayerHidden:new()
+    self.hand = PlayerHand:new('Hand')
+    self.visible = PlayerVisible:new('Visible')
+    self.hidden = PlayerHidden:new('Hidden')
     self:swap_cards()
 end
 
@@ -65,11 +65,11 @@ end
 HumanPlayer = class('HumanPlayer', Player)
 
 function HumanPlayer:swap_cards()
-    local cards = CardPile:new(self.hand, self.visible)
+    local cards = CardPile:new('Cards', self.hand, self.visible)
     cards:sort_by_rank()
 
     print('\n+++ Select your '..VISIBLE_SIZE..' VISIBLE cards')
-    cards:display_cards('Starting cards')
+    cards:display_cards()
 
     local input = self:get_card_input(1, cards:get_num_cards(), VISIBLE_SIZE)
     cards:split_pile(self.visible, self.hand, input)
@@ -77,7 +77,7 @@ end
 
 function HumanPlayer:play_from_hand()
     local num = {}
-    print('+++ Select cards from your hand')
+    print('+++ Select cards from '..tostring(self.hand))
     while true do
         num = self:get_card_input(1, self.hand:get_num_cards())
         if self:validate_card_input(self.hand, num) then
@@ -91,7 +91,7 @@ end
 
 function HumanPlayer:play_from_visible()
     local num = {}
-    print('+++ Select cards from your visible set')
+    print('+++ Select cards from '..tostring(self.visible))
     while true do
         num = self:get_card_input(1, self.visible:get_num_cards())
         if self:validate_card_input(self.visible, num) then
@@ -104,7 +104,7 @@ function HumanPlayer:play_from_visible()
 end
 
 function HumanPlayer:play_from_hidden()
-    print('+++ Select a card from your hidden set')
+    print('+++ Select a card from '..tostring(self.hidden))
     local num = self:get_card_input(1, self.hidden:get_num_cards(), 1)
     for _,n in ipairs(num) do self:add_to_hand(self.hidden, n) end
     if self.hand:has_valid_play() then self.hand:play_cards({1}) end
@@ -112,7 +112,7 @@ end
 
 function HumanPlayer:add_to_hand(cards, num)
     local card = Player.add_to_hand(self, cards, num)
-    print('*** Drew a '..tostring(card))
+    print('*** Drew a '..tostring(card)..' from '..tostring(cards))
 end
 
 function HumanPlayer:get_card_input(min, max, total)
@@ -158,7 +158,7 @@ end
 
 function HumanPlayer:display_hand()
     self.hand:sort_by_rank()
-    self.hand:display_cards('Hand')
+    self.hand:display_cards()
 end
 
 
