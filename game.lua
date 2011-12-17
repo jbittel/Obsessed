@@ -49,7 +49,7 @@ function game_loop()
 
     while true do
         local player = player_list:advance_next_player()
-        print('\n=== PLAYER '..player:get_num())
+        print('\n=== '..string.upper(tostring(player)))
 
         repeat
             -- Display game board
@@ -116,7 +116,7 @@ function game_loop()
 
             -- Test for win conditions
             if draw_pile:get_num_cards() == 0 and player:get_num_cards() == 0 then
-                print('*** Player '..player:get_num()..' wins!')
+                print('*** '..tostring(player)..' wins!')
                 player_list:add_winner()
                 -- Test for game over condition
                 if player_list:get_num_players() == 1 then
@@ -146,15 +146,15 @@ function log_game_state()
 
     return function (turn, player)
         log:write(turn..'\tdiscard\t')
-        for _,card in ipairs(discard_pile.cards) do log:write(card.face..card.suit..' ') end
+        for _,card in ipairs(discard_pile.cards) do log:write(tostring(card)..' ') end
         log:write('\n')
 
         log:write(turn..'\tplayer\t'..player.num..'\t')
-        for _,card in ipairs(player.hand.cards) do log:write(card.face..card.suit..' ') end
+        for _,card in ipairs(player.hand.cards) do log:write(tostring(card)..' ') end
         log:write('\t')
-        for _,card in ipairs(player.visible.cards) do log:write(card.face..card.suit..' ') end
+        for _,card in ipairs(player.visible.cards) do log:write(tostring(card)..' ') end
         log:write('\t')
-        for _,card in ipairs(player.hidden.cards) do log:write(card.face..card.suit..' ') end
+        for _,card in ipairs(player.hidden.cards) do log:write(tostring(card)..' ') end
         log:write('\n')
 
         log:flush()

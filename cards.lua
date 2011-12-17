@@ -33,6 +33,10 @@ function Card:initialize(face, suit, rank)
     self.rank = rank
 end
 
+function Card:__tostring()
+    return tostring(self.face)..tostring(self.suit)
+end
+
 function Card:is_special()
     for _,card in ipairs(Card.SPECIAL_CARDS) do
         if card == self.face then return true end
@@ -79,7 +83,7 @@ function CardPile:display_cards(prefix, limit)
     io.write('### '..prefix..':\t'..#self.cards..' cards\t')
     for i,card in ipairs(self.cards) do
         if limit ~= -1 and i > limit then break end
-        io.write(i..':'..card.face..card.suit..' ')
+        io.write(i..':'..tostring(card)..' ')
     end
     io.write('\n')
 end
@@ -153,7 +157,7 @@ function CardPile:play_cards(num)
     local set = table.set(num)
     for i,card in ipairs(self.cards) do
         if set[i] then
-            print('*** Played a '..card.face..card.suit)
+            print('*** Played a '..tostring(card))
             discard_pile:add_card(card)
         else
             table.insert(cards, card)

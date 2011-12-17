@@ -18,8 +18,8 @@ function Player:initialize(num)
     self:swap_cards()
 end
 
-function Player:get_num()
-    return self.num
+function Player:__tostring()
+    return 'Player '..tostring(self.num)
 end
 
 function Player:get_num_cards()
@@ -112,7 +112,7 @@ end
 
 function HumanPlayer:add_to_hand(cards, num)
     local card = Player.add_to_hand(self, cards, num)
-    print('*** Drew a '..card.face..card.suit)
+    print('*** Drew a '..tostring(card))
 end
 
 function HumanPlayer:get_card_input(min, max, total)
@@ -232,7 +232,7 @@ function PlayerList:init_player_num()
     for _,face in ipairs(Card.START_ORDER) do
         for _,player in ipairs(self.players) do
             if player.hand:has_card(face) then
-                print('\n*** Starting with player '..player:get_num())
+                print('\n*** Starting with '..tostring(player))
                 return player.num
             end
         end
@@ -249,6 +249,6 @@ end
 
 function PlayerList:display_winners()
     for i,player in ipairs(self.winners) do
-        print(i..'. Player '..player:get_num())
+        print(i..'. '..tostring(player))
     end
 end
