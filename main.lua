@@ -8,13 +8,16 @@
 
 --]]
 
-function love.draw()
+function love.load()
     love.graphics.setCaption('Obsessed')
     love.graphics.setBackgroundColor(0, 79, 0)
     love.graphics.setColor(255, 255, 255)
 
-    local f = love.graphics.newFont(love._vera_ttf, 24)
+    local f = love.graphics.newFont(24)
     love.graphics.setFont(f)
+end
+
+function love.draw()
     love.graphics.print('Obsessed', 100, 100)
 end
 
