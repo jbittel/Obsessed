@@ -8,6 +8,8 @@
 
 --]]
 
+require 'middleclass'
+
 function love.load()
     love.graphics.setCaption('Obsessed')
     love.graphics.setBackgroundColor(0, 79, 0)
@@ -15,14 +17,27 @@ function love.load()
 
     local f = love.graphics.newFont(24)
     love.graphics.setFont(f)
+
+    require 'game'
+    scene = Game:new()
+end
+
+function love.update(dt)
+    scene:update(dt)
 end
 
 function love.draw()
-    love.graphics.print('Obsessed', 100, 100)
+    scene:draw()
 end
 
+function love.keypressed(key, unicode)
+    scene:keypressed(key, unicode)
+end
+
+--[[
 function love.keyreleased(key)
     if key == 'q' or key == 'escape' then
         os.exit()
     end
 end
+--]]

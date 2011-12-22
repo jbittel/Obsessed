@@ -8,10 +8,7 @@
 
 --]]
 
-require 'middleclass'
-require 'cards'
-require 'players'
-require 'ai'
+Game = class('Game')
 
 NUM_PLAYERS = 4
 HAND_SIZE = 3
@@ -23,11 +20,11 @@ if NUM_PLAYERS == 2 then
     KILL_RUN_LEN = 3
 end
 
-draw_pile = nil
-discard_pile = nil
-player_list = nil
+function Game:initialize()
+    require 'cards'
+    require 'players'
+    require 'ai'
 
-function game_init()
     print('   ____  _                      _             ')
     print('  / __ \\| |                    (_)            ')
     print(' | |  | | |__  ___  ___ ___ ___ _  ___  _ __  ')
@@ -39,28 +36,19 @@ function game_init()
 
     draw_pile = DrawPile:new('Draw')
     discard_pile = DiscardPile:new('Discard')
+    player_list = PlayerList:new()
 end
 
-function game_loop()
+function Game:update()
     local turn = 1
-    local write_log = log_game_state()
 
-    player_list = PlayerList:new()
+    self:draw()
 
-    while true do
+--    while true do
         local player = player_list:advance_next_player()
         print('\n=== '..string.upper(tostring(player)))
 
-        repeat
-            -- Display game board
-            draw_pile:display_cards(0)
-            discard_pile:display_cards(5)
-            player:display_hand()
-            player.visible:display_cards()
-            player.hidden:display_cards(0)
-
-            write_log(turn, player)
-
+--        repeat
             if turn == 1 then
                 player:play_initial_card()
             elseif player:get_num_hand_cards() == 0 and player:get_num_visible_cards() > 0 then
@@ -124,13 +112,30 @@ function game_loop()
                     return
                 end
             end
-        until player_list:is_turn_over()
+--        until player_list:is_turn_over()
 
         turn = turn + 1
+--    end
+end
+
+function Game:draw()
+    love.graphics.print('Obsessed', 100, 100)
+    -- Display game board
+--    draw_pile:display_cards(0)
+--    discard_pile:display_cards(5)
+--    player:display_hand()
+--    player.visible:display_cards()
+--    player.hidden:display_cards(0)
+end
+
+function Game:keypressed(key, unicode)
+    if key == 'q' or key == 'escape' then
+        love.event.push('q')
     end
 end
 
-function game_end()
+--[[
+function love.quit()
     print('')
     print('=================')
     player_list:display_winners()
@@ -138,7 +143,7 @@ function game_end()
     print('=== Game Over ===')
     print('=================')
 end
-
+--]]
 function log_game_state()
     local log = io.open('game.log', 'a+')
 
@@ -183,6 +188,6 @@ end
 
 -- main
 
-game_init()
-game_loop()
-game_end()
+--game_init()
+--game_loop()
+--game_end()
