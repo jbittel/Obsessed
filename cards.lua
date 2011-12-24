@@ -31,6 +31,8 @@ function Card:initialize(face, suit, rank)
     self.face = face
     self.suit = suit
     self.rank = rank
+    self.front = love.graphics.newImage('images/'..tostring(self)..'.png')
+    self.back = love.graphics.newImage('images/b1fv.png')
 end
 
 function Card:__tostring()
@@ -158,6 +160,7 @@ function CardPile:has_card(face)
 end
 
 function CardPile:play_cards(num)
+    -- Move cards to discard pile
     local cards = {}
     local set = table.set(num)
     for i,card in ipairs(self.cards) do
@@ -169,6 +172,26 @@ function CardPile:play_cards(num)
         end
     end
     self.cards = cards
+
+    -- Apply card face rules
+    local top_face = discard_pile:get_top_face()
+    if top_face == '8' then
+        player_list:end_turn(false)
+    elseif top_face == '10' then
+        discard_pile:kill_pile()
+        player_list:end_turn(false)
+    elseif top_face == 'R' then
+        player_list:reverse_order()
+        player_list:end_turn(true)
+    else
+        player_list:end_turn(true)
+    end
+
+    -- Kill pile if 4+ top cards match
+    if discard_pile:get_run_length() >= KILL_RUN_LEN then
+        discard_pile:kill_pile()
+        player_list:end_turn(false)
+    end
 end
 
 
@@ -178,7 +201,7 @@ function DrawPile:initialize(name)
     CardPile.initialize(self, name)
     local num_decks = math.ceil(NUM_PLAYERS / 2)
 
-    for deck = 1,num_decks do
+    for deck = 1, num_decks do
         for _,suit in ipairs(Card.SUITS) do
             for rank,face in ipairs(Card.FACES) do
                 local card = Card:new(face, suit, rank + 1)
@@ -187,13 +210,23 @@ function DrawPile:initialize(name)
         end
 
         -- Add two Jokers to each deck
-        for i=1,2 do
+        for i = 1, 2 do
             local card = Card:new('R', '', #Card.FACES + 2)
             table.insert(self.cards, card)
         end
     end
 
     self:shuffle()
+end
+
+function DrawPile:display()
+    local n = #self.cards
+    -- TODO why does n always print the same card?
+    if n > 0 then
+        local img = self.cards[1].front
+        love.graphics.draw(img, 300, 200)
+    end
+    love.graphics.print(n, 300, 300)
 end
 
 -- Implementation of the Fisher-Yates shuffle
@@ -209,6 +242,15 @@ end
 
 
 DiscardPile = class('DiscardPile', CardPile)
+
+function DiscardPile:display()
+    local n = #self.cards
+    if n > 0 then
+        local img = self.cards[n].front
+        love.graphics.draw(img, 400, 200)
+    end
+    love.graphics.print(n, 400, 300)
+end
 
 function DiscardPile:kill_pile()
     self:remove_cards()
@@ -246,6 +288,7 @@ function DiscardPile:pick_up_pile(player)
     local count = 0
     for _,card in ipairs(self.cards) do
         if card.face ~= '3' then
+            card.visible = true
             player.hand:add_card(card)
             count = count + 1
         end
@@ -266,6 +309,26 @@ function PlayerHand:__tostring()
     return 'your '..string.lower(self.name)
 end
 
+function PlayerHand:play_cards(num)
+    CardPile.play_cards(self, num)
+
+    -- Keep player's hand at a minimum of HAND_SIZE cards
+    -- as long as there's cards to draw
+    while player:get_num_hand_cards() < HAND_SIZE and
+          draw_pile:get_num_cards() > 0 do
+        player:add_to_hand(draw_pile)
+    end
+end
+
+
+function PlayerHand:display()
+    local hpos = 300
+    for i = 1, #self.cards do
+        love.graphics.draw(self.cards[i].front, hpos, 350)
+        hpos = hpos + 100
+    end
+end
+
 
 PlayerVisible = class('PlayerVisible', CardPile)
 
@@ -278,6 +341,14 @@ function PlayerVisible:__tostring()
     return 'your '..string.lower(self.name)..' cards'
 end
 
+function PlayerVisible:display()
+    local hpos = 310
+    for i = 1, #self.cards do
+        love.graphics.draw(self.cards[i].front, hpos, 490)
+        hpos = hpos + 100
+    end
+end
+
 
 PlayerHidden = class('PlayerHidden', CardPile)
 
@@ -288,4 +359,12 @@ end
 
 function PlayerHidden:__tostring()
     return 'your '..string.lower(self.name)..' cards'
+end
+
+function PlayerHidden:display()
+    local hpos = 300
+    for i = 1, #self.cards do
+        love.graphics.draw(self.cards[i].back, hpos, 500)
+        hpos = hpos + 100
+    end
 end

@@ -15,11 +15,19 @@ function Player:initialize(num)
     self.hand = PlayerHand:new('Hand')
     self.visible = PlayerVisible:new('Visible')
     self.hidden = PlayerHidden:new('Hidden')
-    self:swap_cards()
+--    self:swap_cards()
 end
 
 function Player:__tostring()
     return 'Player '..tostring(self.num)
+end
+
+function Player:is_ai()
+    if self.class.name == 'AIPlayer' then
+        return true
+    else
+        return false
+    end
 end
 
 function Player:get_num_cards()
@@ -76,7 +84,7 @@ function HumanPlayer:swap_cards()
 end
 
 function HumanPlayer:play_from_hand()
-    local num = {}
+--[[    local num = {}
     print('+++ Select cards from '..tostring(self.hand))
     while true do
         num = self:get_card_input(1, self.hand:get_num_cards())
@@ -87,6 +95,7 @@ function HumanPlayer:play_from_hand()
         end
     end
     self.hand:play_cards(num)
+    --]]
 end
 
 function HumanPlayer:play_from_visible()
@@ -186,6 +195,10 @@ function PlayerList:get_next_player()
     return self.players[self:next_player_num()]
 end
 
+function PlayerList:get_human()
+    return self.players[1]
+end
+
 function PlayerList:advance_next_player()
     self.curr_player = self:next_player_num()
     return self.players[self.curr_player]
@@ -245,10 +258,4 @@ function PlayerList:add_winner(num)
     local player = table.remove(self.players, player_num)
     table.insert(self.winners, player)
     self:end_turn(true)
-end
-
-function PlayerList:display_winners()
-    for i,player in ipairs(self.winners) do
-        print(i..'. '..tostring(player))
-    end
 end

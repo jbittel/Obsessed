@@ -33,11 +33,3 @@ end
 function love.keypressed(key, unicode)
     scene:keypressed(key, unicode)
 end
-
---[[
-function love.keyreleased(key)
-    if key == 'q' or key == 'escape' then
-        os.exit()
-    end
-end
---]]
