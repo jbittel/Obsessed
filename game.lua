@@ -99,7 +99,7 @@ function Game:update()
 end
 
 function Game:draw()
-    love.graphics.print('Obsessed', 50, 50)
+    love.graphics.printf('Obsessed', 0, 50, screen.width, "center")
     if player:is_ai() == true then
         love.graphics.print(tostring(player)..' (AI)', 50, 75)
     else
@@ -111,54 +111,42 @@ function Game:draw()
     draw_pile:display()
     discard_pile:display()
 
+    -- TODO if human, display Play button
+
     -- TODO blows up when the human has won and
     -- is pulled out of the active player list
-    local human = player_list:get_human()
+    human = player_list:get_human()
     human.hand:display()
     human.hidden:display()
     human.visible:display()
-end
 
-function Game:keypressed(key, unicode) end
-
-function log_game_state()
-    local log = io.open('game.log', 'a+')
-
-    log:write('0\tgame\t'..os.date()..' '..NUM_PLAYERS..'\n')
-
-    return function (turn, player)
-        log:write(turn..'\tdiscard\t')
-        for _,card in ipairs(discard_pile.cards) do log:write(tostring(card)..' ') end
-        log:write('\n')
-
-        log:write(turn..'\tplayer\t'..player.num..'\t')
-        for _,card in ipairs(player.hand.cards) do log:write(tostring(card)..' ') end
-        log:write('\t')
-        for _,card in ipairs(player.visible.cards) do log:write(tostring(card)..' ') end
-        log:write('\t')
-        for _,card in ipairs(player.hidden.cards) do log:write(tostring(card)..' ') end
-        log:write('\n')
-
-        log:flush()
+    -- TODO check intersection of mouse and cards
+    local mx, my = love.mouse.getPosition()
+    local r, g, b, a = love.graphics.getColor()
+    for _,card in ipairs(human.hand.cards) do
+        if card.selected then
+            love.graphics.setColor(0, 0, 255, 190)
+            love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
+            love.graphics.setColor(r, g, b, a)
+        end
+        if card:mouse_intersects(mx, my) then
+            love.graphics.setColor(255, 255, 255, 190)
+            love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
+            love.graphics.setColor(r, g, b, a)
+        end
     end
 end
 
-function table.slice(list, start, len)
-    local s = {}
-    local len = len or (#list - start + 1)
-    local stop = start + len - 1
-    for i = start,stop do table.insert(s, list[i]) end
-    return s
-end
-
-function table.set(list)
-    local s = {}
-    for _,v in ipairs(list) do s[v] = true end
-    return s
-end
-
-function table.copy(t)
-    local t2 = {}
-    for k,v in pairs(t) do t2[k] = v end
-    return t2
+function Game:mousepressed(x, y, button)
+    local mx, my = love.mouse.getPosition()
+    for _,card in ipairs(human.hand.cards) do
+        if card:mouse_intersects(mx, my) then
+            if card.selected then
+                card.selected = false
+            else
+                card.selected = true
+            end
+            return
+        end
+    end
 end

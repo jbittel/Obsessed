@@ -9,6 +9,14 @@
 --]]
 
 require 'middleclass'
+require 'util'
+
+screen = {
+    width = love.graphics.getWidth(),
+    height = love.graphics.getHeight(),
+    halfWidth = love.graphics.getWidth() / 2,
+    halfHeight = love.graphics.getHeight() / 2,
+}
 
 function love.load()
     love.graphics.setCaption('Obsessed')
@@ -31,5 +39,13 @@ function love.draw()
 end
 
 function love.keypressed(key, unicode)
-    scene:keypressed(key, unicode)
+    if scene.keypressed then
+        scene:keypressed(key, unicode)
+    end
+end
+
+function love.mousepressed(x, y, button)
+    if scene.mousepressed then
+        scene:mousepressed(x, y, button)
+    end
 end

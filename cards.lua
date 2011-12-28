@@ -33,10 +33,23 @@ function Card:initialize(face, suit, rank)
     self.rank = rank
     self.front = love.graphics.newImage('images/'..tostring(self)..'.png')
     self.back = love.graphics.newImage('images/b1fv.png')
+    self.height = self.front:getHeight()
+    self.width = self.front:getWidth()
+    self.x = 0
+    self.y = 0
+    self.selected = false
 end
 
 function Card:__tostring()
     return tostring(self.face)..tostring(self.suit)
+end
+
+function Card:mouse_intersects(mx, my)
+    if mx > self.x and mx < self.x + self.width and
+       my > self.y and my < self.y + self.height then
+        return true
+    end
+    return false
 end
 
 function Card:is_special()
@@ -325,6 +338,8 @@ function PlayerHand:display()
     local hpos = 300
     for i = 1, #self.cards do
         love.graphics.draw(self.cards[i].front, hpos, 350)
+        self.cards[i].x = hpos
+        self.cards[i].y = 350
         hpos = hpos + 100
     end
 end
