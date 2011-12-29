@@ -120,7 +120,7 @@ function Game:draw()
     human.hidden:display()
     human.visible:display()
 
-    -- TODO check intersection of mouse and cards
+    -- TODO check intersection of appropriate card pile
     local mx, my = love.mouse.getPosition()
     local r, g, b, a = love.graphics.getColor()
     for _,card in ipairs(human.hand.cards) do
@@ -147,6 +147,17 @@ function Game:mousepressed(x, y, button)
                 card.selected = true
             end
             return
+        end
+    end
+    -- TODO check for click on Play button
+end
+
+function Game:keypressed(key, unicode)
+    if key == 'p' and not player:is_ai() then
+        -- Play cards
+        player.hand:play_cards()
+        if player_list:is_turn_over() then
+            player = player_list:advance_next_player()
         end
     end
 end

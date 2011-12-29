@@ -32,10 +32,6 @@ function AIPlayer:initialize(num)
     Player.initialize(self, num)
 end
 
-function AIPlayer:display_hand()
-    self.hand:display_cards(0)
-end
-
 function AIPlayer:swap_cards()
     local t = {}
 
@@ -56,30 +52,33 @@ end
 
 function AIPlayer:play_from_hand()
     local face = self:select_card_face(self.hand)
-    local num = {}
-    for i,card in ipairs(self.hand.cards) do
+    for _, card in ipairs(self.hand.cards) do
         if face == card.face then
-            table.insert(num, i)
+            card:setSelected(true)
             if card:is_special() and not self:is_late_game() then break end
         end
     end
-    self.hand:play_cards(num)
+    self.hand:play_cards()
 end
 
 function AIPlayer:play_from_visible()
     local face = self:select_card_face(self.visible)
-    local num = {}
-    for i,card in ipairs(self.visible.cards) do
-        if face == card.face then table.insert(num, i) end
+    for _, card in ipairs(self.visible.cards) do
+        if face == card.face then
+            card:setSelected(true)
+        end
     end
     print('*** Drawing from visible cards ('..self:get_num_visible_cards() - #num..' left)')
-    self.visible:play_cards(num)
+    self.visible:play_cards()
 end
 
 function AIPlayer:play_from_hidden()
     self:add_to_hand(self.hidden)
     print('*** Drawing from hidden cards ('..self:get_num_hidden_cards()..' left)')
-    if self.hand:has_valid_play() then self.hand:play_cards({1}) end
+    if self.hand:has_valid_play() then
+        self.hand[1]:setSelected(true)
+        self.hand:play_cards()
+    end
 end
 
 function AIPlayer:select_card_face(cardpile)

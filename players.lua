@@ -54,24 +54,23 @@ end
 
 function Player:play_initial_card()
     local initial_face = nil
-    local num = {}
     for _,face in ipairs(Card.START_ORDER) do
         if self.hand:has_card(face) then
             initial_face = face
             break
         end
     end
-    for i,card in ipairs(self.hand.cards) do
+    for _, card in ipairs(self.hand.cards) do
         if initial_face == card.face then
-            table.insert(num, i)
+            card:setSelected(true)
         end
     end
-    self.hand:play_cards(num)
+    self.hand:play_cards()
 end
 
 
 HumanPlayer = class('HumanPlayer', Player)
-
+--[[
 function HumanPlayer:swap_cards()
     local cards = CardPile:new('Cards', self.hand, self.visible)
     cards:sort_by_rank()
@@ -84,7 +83,7 @@ function HumanPlayer:swap_cards()
 end
 
 function HumanPlayer:play_from_hand()
---[[    local num = {}
+    local num = {}
     print('+++ Select cards from '..tostring(self.hand))
     while true do
         num = self:get_card_input(1, self.hand:get_num_cards())
@@ -95,7 +94,6 @@ function HumanPlayer:play_from_hand()
         end
     end
     self.hand:play_cards(num)
-    --]]
 end
 
 function HumanPlayer:play_from_visible()
@@ -118,7 +116,6 @@ function HumanPlayer:play_from_hidden()
     for _,n in ipairs(num) do self:add_to_hand(self.hidden, n) end
     if self.hand:has_valid_play() then self.hand:play_cards({1}) end
 end
-
 function HumanPlayer:add_to_hand(cards, num)
     local card = Player.add_to_hand(self, cards, num)
     print('*** Drew a '..tostring(card)..' from '..tostring(cards))
@@ -170,6 +167,7 @@ function HumanPlayer:display_hand()
     self.hand:display_cards()
 end
 
+--]]
 
 PlayerList = class('PlayerList')
 

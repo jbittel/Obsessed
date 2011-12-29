@@ -59,6 +59,14 @@ function Card:is_special()
     return false
 end
 
+function Card:is_selected()
+    return self.selected
+end
+
+function Card:setSelected(b)
+    self.selected = b
+end
+
 function Card:is_active_face()
     return self.face == discard_pile:get_active_face()
 end
@@ -98,16 +106,6 @@ function CardPile:get_num_cards()
     return #self.cards
 end
 
-function CardPile:display_cards(limit)
-    local limit = limit or -1
-    io.write('### '..self.name..':\t'..#self.cards..' cards\t')
-    for i,card in ipairs(self.cards) do
-        if limit ~= -1 and i > limit then break end
-        io.write(i..':'..tostring(card)..' ')
-    end
-    io.write('\n')
-end
-
 function CardPile:sort_by_rank()
     table.sort(self.cards, function(a, b) return a.rank < b.rank end)
 end
@@ -136,7 +134,7 @@ function CardPile:split_pile(a, b, idx)
     local set = table.set(idx)
     a:remove_cards()
     b:remove_cards()
-    for i,card in ipairs(self.cards) do
+    for i, card in ipairs(self.cards) do
         if set[i] then
             a:add_card(card)
         else
@@ -172,19 +170,14 @@ function CardPile:has_card(face)
     return nil
 end
 
-function CardPile:play_cards(num)
+function CardPile:play_cards()
     -- Move cards to discard pile
-    local cards = {}
-    local set = table.set(num)
-    for i,card in ipairs(self.cards) do
-        if set[i] then
-            print('*** Played a '..tostring(card))
+    for i, card in ipairs(self.cards) do
+        if card:is_selected() then
+            self:remove_card(i)
             discard_pile:add_card(card)
-        else
-            table.insert(cards, card)
         end
     end
-    self.cards = cards
 
     -- Apply card face rules
     local top_face = discard_pile:get_top_face()
@@ -259,7 +252,7 @@ DiscardPile = class('DiscardPile', CardPile)
 function DiscardPile:display()
     local n = #self.cards
     if n > 0 then
-        local img = self.cards[n].front
+        local img = self.cards[1].front
         love.graphics.draw(img, 400, 200)
     end
     love.graphics.print(n, 400, 300)
@@ -322,8 +315,8 @@ function PlayerHand:__tostring()
     return 'your '..string.lower(self.name)
 end
 
-function PlayerHand:play_cards(num)
-    CardPile.play_cards(self, num)
+function PlayerHand:play_cards()
+    CardPile.play_cards(self)
 
     -- Keep player's hand at a minimum of HAND_SIZE cards
     -- as long as there's cards to draw
