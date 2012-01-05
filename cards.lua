@@ -170,11 +170,21 @@ function CardPile:has_card(face)
     return nil
 end
 
+function CardPile:has_selected()
+    for _, card in ipairs(self.cards) do
+        if card.selected then
+            return true
+        end
+    end
+    return false
+end
+
 function CardPile:play_cards()
-    -- Move cards to discard pile
+    -- Move selected cards to discard pile
     for i, card in ipairs(self.cards) do
         if card:is_selected() then
             self:remove_card(i)
+            card:setSelected(false)
             discard_pile:add_card(card)
         end
     end
@@ -197,6 +207,14 @@ function CardPile:play_cards()
     if discard_pile:get_run_length() >= KILL_RUN_LEN then
         discard_pile:kill_pile()
         player_list:end_turn(false)
+    end
+
+    -- TODO refactor 'turn' nomenclature:
+    -- a turn is technically one play, so it's
+    -- really more about getting another turn,
+    -- not continuing the same one
+    if player_list:is_turn_over() then
+        player = player_list:advance_next_player()
     end
 end
 
@@ -227,18 +245,23 @@ end
 
 function DrawPile:display()
     local n = #self.cards
-    -- TODO why does n always print the same card?
     if n > 0 then
-        local img = self.cards[1].front
-        love.graphics.draw(img, 300, 200)
+        local img = self.cards[n].front
+        love.graphics.draw(img, 50, 200)
     end
-    love.graphics.print(n, 300, 300)
+    love.graphics.print(n, 50, 300)
 end
 
 -- Implementation of the Fisher-Yates shuffle
 function DrawPile:shuffle()
     local n = #self.cards
-    math.randomseed(os.time())
+    -- TODO switch to lrandom for better random numbers
+    -- http://lua-users.org/lists/lua-l/2007-03/msg00564.html 
+    math.randomseed(tonumber(tostring(os.time()):reverse():sub(1,6)))
+    -- math.randomseed(os.time())
+    -- math.random()
+    -- math.random()
+    -- math.random()
     while n > 1 do
         local k = math.random(n)
         self.cards[n], self.cards[k] = self.cards[k], self.cards[n]
@@ -250,12 +273,15 @@ end
 DiscardPile = class('DiscardPile', CardPile)
 
 function DiscardPile:display()
-    local n = #self.cards
-    if n > 0 then
-        local img = self.cards[1].front
-        love.graphics.draw(img, 400, 200)
+    for _, card in ipairs(self.cards) do
+        if card.face == 'R' then
+            love.graphics.draw(card.front, 175, 200)
+        else
+            love.graphics.draw(card.front, 150, 200)
+            break
+        end
     end
-    love.graphics.print(n, 400, 300)
+    love.graphics.print(#self.cards, 150, 300)
 end
 
 function DiscardPile:kill_pile()
@@ -301,6 +327,10 @@ function DiscardPile:pick_up_pile(player)
     end
     self:remove_cards()
     print('*** No valid moves, picked up '..count..' cards')
+
+    if player_list:is_turn_over() then
+        player = player_list:advance_next_player()
+    end
 end
 
 
@@ -328,12 +358,12 @@ end
 
 
 function PlayerHand:display()
-    local hpos = 300
+    local hpos = 50
     for i = 1, #self.cards do
         love.graphics.draw(self.cards[i].front, hpos, 350)
         self.cards[i].x = hpos
         self.cards[i].y = 350
-        hpos = hpos + 100
+        hpos = hpos + 75
     end
 end
 
@@ -350,9 +380,11 @@ function PlayerVisible:__tostring()
 end
 
 function PlayerVisible:display()
-    local hpos = 310
+    local hpos = 60
     for i = 1, #self.cards do
-        love.graphics.draw(self.cards[i].front, hpos, 490)
+        love.graphics.draw(self.cards[i].front, hpos, 480)
+        self.cards[i].x = hpos
+        self.cards[i].y = 480
         hpos = hpos + 100
     end
 end
@@ -370,9 +402,11 @@ function PlayerHidden:__tostring()
 end
 
 function PlayerHidden:display()
-    local hpos = 300
+    local hpos = 50
     for i = 1, #self.cards do
-        love.graphics.draw(self.cards[i].back, hpos, 500)
+        love.graphics.draw(self.cards[i].back, hpos, 480)
+        self.cards[i].x = hpos
+        self.cards[i].y = 480
         hpos = hpos + 100
     end
 end

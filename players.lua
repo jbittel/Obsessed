@@ -68,6 +68,27 @@ function Player:play_initial_card()
     self.hand:play_cards()
 end
 
+function Player:getActivePile()
+    local active_pile = nil
+
+    if self:get_num_hand_cards() > 0 then
+        active_pile = self.hand
+    else
+        if self:get_num_visible_cards() > 0 then
+            -- Play cards from visible set
+            active_pile = self.visible
+        elseif self:get_num_hidden_cards() > 0 then
+            -- Play cards from hidden set
+            active_pile = self.hidden
+        end
+    end
+    return active_pile
+end
+
+function Player:getActiveCards()
+    return self:getActivePile().cards
+end
+
 
 HumanPlayer = class('HumanPlayer', Player)
 --[[

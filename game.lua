@@ -30,18 +30,19 @@ function Game:initialize()
     draw_pile = DrawPile:new('Draw')
     discard_pile = DiscardPile:new('Discard')
     player_list = PlayerList:new()
+    -- TODO handle as part of PlayerList init?
     player = player_list:advance_next_player()
 end
 
 function Game:update()
---    print('=== '..tostring(player))
-
+    -- TODO is there a better way to increment turn numbers?
     if self.turn == 1 then
         player:play_initial_card()
         self.turn = self.turn + 1
         return
     end
 
+    -- TODO stuck when player has no valid plays
     if not player:is_ai() then
         return
     end
@@ -88,13 +89,6 @@ function Game:update()
         end
     end
 
-    -- TODO refactor 'turn' nomenclature:
-    -- a turn is technically one play, so it's
-    -- really more about getting another turn,
-    -- not continuing the same one
-    if player_list:is_turn_over() then
-        player = player_list:advance_next_player()
-    end
     self.turn = self.turn + 1
 end
 
@@ -120,16 +114,18 @@ function Game:draw()
     human.hidden:display()
     human.visible:display()
 
-    -- TODO check intersection of appropriate card pile
+    -- TODO deselect cards each play
+
     local mx, my = love.mouse.getPosition()
     local r, g, b, a = love.graphics.getColor()
-    for _,card in ipairs(human.hand.cards) do
+    for _, card in ipairs(human:getActiveCards()) do
         if card.selected then
-            love.graphics.setColor(0, 0, 255, 190)
+            love.graphics.setColor(255, 0, 255, 190)
             love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
             love.graphics.setColor(r, g, b, a)
         end
-        if card:mouse_intersects(mx, my) then
+        if card:mouse_intersects(mx, my) and
+           card:is_valid_play() then
             love.graphics.setColor(255, 255, 255, 190)
             love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
             love.graphics.setColor(r, g, b, a)
@@ -139,8 +135,10 @@ end
 
 function Game:mousepressed(x, y, button)
     local mx, my = love.mouse.getPosition()
-    for _,card in ipairs(human.hand.cards) do
-        if card:mouse_intersects(mx, my) then
+    -- TODO don't allow invalid plays
+    for _, card in ipairs(human:getActiveCards()) do
+        if card:mouse_intersects(mx, my) and
+           card:is_valid_play() then
             if card.selected then
                 card.selected = false
             else
@@ -149,15 +147,17 @@ function Game:mousepressed(x, y, button)
             return
         end
     end
-    -- TODO check for click on Play button
 end
 
 function Game:keypressed(key, unicode)
-    if key == 'p' and not player:is_ai() then
-        -- Play cards
-        player.hand:play_cards()
-        if player_list:is_turn_over() then
-            player = player_list:advance_next_player()
+    local active_pile = human:getActivePile()
+    if not player:is_ai() then
+        if key == 'p' and active_pile:has_selected() then
+            active_pile:play_cards()
+        elseif key == 'u' then
+            discard_pile:pick_up_pile(human)
+        elseif key == 'q' or key == 'escape' then
+            love.event.push('q')
         end
     end
 end

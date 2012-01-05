@@ -68,13 +68,12 @@ function AIPlayer:play_from_visible()
             card:setSelected(true)
         end
     end
-    print('*** Drawing from visible cards ('..self:get_num_visible_cards() - #num..' left)')
     self.visible:play_cards()
 end
 
 function AIPlayer:play_from_hidden()
     self:add_to_hand(self.hidden)
-    print('*** Drawing from hidden cards ('..self:get_num_hidden_cards()..' left)')
+--    print('*** Drawing from hidden cards ('..self:get_num_hidden_cards()..' left)')
     if self.hand:has_valid_play() then
         self.hand[1]:setSelected(true)
         self.hand:play_cards()
