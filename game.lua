@@ -30,66 +30,20 @@ function Game:initialize()
     draw_pile = DrawPile:new('Draw')
     discard_pile = DiscardPile:new('Discard')
     player_list = PlayerList:new()
-    -- TODO handle as part of PlayerList init?
-    player = player_list:advance_next_player()
 end
 
 function Game:update()
-    -- TODO is there a better way to increment turn numbers?
-    if self.turn == 1 then
-        player:play_initial_card()
-        self.turn = self.turn + 1
+    local player = player_list:getCurrentPlayer()
+
+    if player_list:getTurn() == 1 then
+        player:playInitialCard()
         return
     end
 
-    -- TODO stuck when player has no valid plays
-    if not player:is_ai() then
-        return
+    -- TODO check has_valid_play
+    if player:is_ai() then
+        player:executeTurn()
     end
-
-    if player:get_num_hand_cards() == 0 and
-           player:get_num_visible_cards() > 0 then
-        -- Play cards from visible set
-        if player.visible:has_valid_play() then
-            player:play_from_visible()
-        else
-            discard_pile:pick_up_pile(player)
-            player_list:end_turn(true)
-        end
-    elseif player:get_num_hand_cards() == 0 and
-           player:get_num_hidden_cards() > 0 then
-        -- Play cards from hidden set
-        player:play_from_hidden()
-        -- If the hand isn't empty, the drawn card couldn't be played
-        if player:get_num_hand_cards() ~= 0 then
-            discard_pile:pick_up_pile(player)
-            player_list:end_turn(true)
-        end
-    else
-        -- Play cards from hand
-        if player.hand:has_valid_play() then
-            player:play_from_hand()
-        else
-            discard_pile:pick_up_pile(player)
-            player_list:end_turn(true)
-        end
-    end
-
-    -- TODO do we want to stop when a player wins,
-    -- make it a binary win/loss condition?
-    -- Test for win condition
-    if player:get_num_cards() == 0 then
-        print('*** '..tostring(player)..' wins!')
-        player_list:add_winner()
-        -- Test for game over condition
-        if player_list:get_num_players() == 1 then
-            require 'game_over'
-            player_list:add_winner(player_list:next_player_num())
-            scene = GameOver:new(player_list.winners)
-        end
-    end
-
-    self.turn = self.turn + 1
 end
 
 function Game:draw()
@@ -99,7 +53,7 @@ function Game:draw()
     else
         love.graphics.print(tostring(player)..' (Human)', 50, 75)
     end
-    love.graphics.print(self.turn, 50, 100)
+    love.graphics.print(player_list:getTurn(), 50, 100)
 
     -- Display game board
     draw_pile:display()
@@ -134,28 +88,31 @@ function Game:draw()
 end
 
 function Game:mousepressed(x, y, button)
-    local mx, my = love.mouse.getPosition()
-    -- TODO don't allow invalid plays
-    for _, card in ipairs(human:getActiveCards()) do
-        if card:mouse_intersects(mx, my) and
-           card:is_valid_play() then
-            if card.selected then
-                card.selected = false
-            else
-                card.selected = true
+    local player = player_list:getCurrentPlayer()
+    if not player:is_ai() then
+        local mx, my = love.mouse.getPosition()
+        for _, card in ipairs(player:getActiveCards()) do
+            if card:mouse_intersects(mx, my) and
+               card:is_valid_play() then
+                if card.selected then
+                    card.selected = false
+                else
+                    card.selected = true
+                end
+                return
             end
-            return
         end
     end
 end
 
 function Game:keypressed(key, unicode)
-    local active_pile = human:getActivePile()
+    local player = player_list:getCurrentPlayer()
     if not player:is_ai() then
+        local active_pile = player:getActivePile()
         if key == 'p' and active_pile:has_selected() then
-            active_pile:play_cards()
-        elseif key == 'u' then
-            discard_pile:pick_up_pile(human)
+            player:executeTurn()
+        elseif key == 'u' and not active_pile:has_valid_play() then
+            discard_pile:pick_up_pile(player)
         elseif key == 'q' or key == 'escape' then
             love.event.push('q')
         end

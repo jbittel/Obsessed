@@ -63,8 +63,12 @@ function Card:is_selected()
     return self.selected
 end
 
-function Card:setSelected(b)
-    self.selected = b
+function Card:setSelected()
+    self.selected = true
+end
+
+function Card:clearSelected()
+    self.selected = false
 end
 
 function Card:is_active_face()
@@ -130,6 +134,21 @@ function CardPile:get_card(num)
     return self.cards[num]
 end
 
+function CardPile:getCards()
+    return self.cards
+end
+
+function CardPile:getSelectedSet()
+    local idx = {}
+    for i, card in ipairs(self.cards) do
+        if card:is_selected() then
+            card:clearSelected()
+            table.insert(idx, i)
+        end
+    end
+    return table.set(idx)
+end
+
 function CardPile:split_pile(a, b, idx)
     local set = table.set(idx)
     a:remove_cards()
@@ -180,42 +199,18 @@ function CardPile:has_selected()
 end
 
 function CardPile:play_cards()
+    local cards = {}
+    local set = self:getSelectedSet()
     -- Move selected cards to discard pile
     for i, card in ipairs(self.cards) do
-        if card:is_selected() then
-            self:remove_card(i)
-            card:setSelected(false)
+        if set[i] then
+            print("playing "..tostring(card))
             discard_pile:add_card(card)
+        else
+            table.insert(cards, card)
         end
     end
-
-    -- Apply card face rules
-    local top_face = discard_pile:get_top_face()
-    if top_face == '8' then
-        player_list:end_turn(false)
-    elseif top_face == '10' then
-        discard_pile:kill_pile()
-        player_list:end_turn(false)
-    elseif top_face == 'R' then
-        player_list:reverse_order()
-        player_list:end_turn(true)
-    else
-        player_list:end_turn(true)
-    end
-
-    -- Kill pile if 4+ top cards match
-    if discard_pile:get_run_length() >= KILL_RUN_LEN then
-        discard_pile:kill_pile()
-        player_list:end_turn(false)
-    end
-
-    -- TODO refactor 'turn' nomenclature:
-    -- a turn is technically one play, so it's
-    -- really more about getting another turn,
-    -- not continuing the same one
-    if player_list:is_turn_over() then
-        player = player_list:advance_next_player()
-    end
+    self.cards = cards
 end
 
 
@@ -327,10 +322,8 @@ function DiscardPile:pick_up_pile(player)
     end
     self:remove_cards()
     print('*** No valid moves, picked up '..count..' cards')
-
-    if player_list:is_turn_over() then
-        player = player_list:advance_next_player()
-    end
+    player_list:endTurn()
+    player_list:advanceNextPlayer()
 end
 
 
@@ -344,18 +337,6 @@ end
 function PlayerHand:__tostring()
     return 'your '..string.lower(self.name)
 end
-
-function PlayerHand:play_cards()
-    CardPile.play_cards(self)
-
-    -- Keep player's hand at a minimum of HAND_SIZE cards
-    -- as long as there's cards to draw
-    while player:get_num_hand_cards() < HAND_SIZE and
-          draw_pile:get_num_cards() > 0 do
-        player:add_to_hand(draw_pile)
-    end
-end
-
 
 function PlayerHand:display()
     local hpos = 50

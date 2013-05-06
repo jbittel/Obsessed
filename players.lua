@@ -52,7 +52,7 @@ function Player:add_to_hand(cards, num)
     return card
 end
 
-function Player:play_initial_card()
+function Player:playInitialCard()
     local initial_face = nil
     for _,face in ipairs(Card.START_ORDER) do
         if self.hand:has_card(face) then
@@ -62,10 +62,11 @@ function Player:play_initial_card()
     end
     for _, card in ipairs(self.hand.cards) do
         if initial_face == card.face then
-            card:setSelected(true)
+            card:setSelected()
         end
     end
     self.hand:play_cards()
+    self:executeTurn()
 end
 
 function Player:getActivePile()
@@ -86,109 +87,70 @@ function Player:getActivePile()
 end
 
 function Player:getActiveCards()
-    return self:getActivePile().cards
+    return self:getActivePile():getCards()
+end
+
+function Player:executeTurn()
+    print("player:executeturn")
+    -- Apply card face rules
+    local top_face = discard_pile:get_top_face()
+    if top_face == '8' then
+        player_list:continueTurn()
+    elseif top_face == '10' then
+        discard_pile:kill_pile()
+        player_list:continueTurn()
+    elseif top_face == 'R' then
+        player_list:reverseDirection()
+        player_list:endTurn()
+    else
+        player_list:endTurn()
+    end
+
+    -- Kill pile if 4+ top cards match
+    if discard_pile:get_run_length() >= KILL_RUN_LEN then
+        discard_pile:kill_pile()
+        player_list:continueTurn()
+    end
+
+    -- Keep player's hand at a minimum of HAND_SIZE cards
+    -- as long as there's cards to draw
+    local player = player_list:getCurrentPlayer()
+    while player:get_num_hand_cards() < HAND_SIZE and
+          draw_pile:get_num_cards() > 0 do
+        player:add_to_hand(draw_pile)
+    end
+
+    -- TODO do we want to stop when a player wins,
+    -- make it a binary win/loss condition?
+    -- Test for win condition
+    if player:get_num_cards() == 0 then
+        print('*** '..tostring(player)..' wins!')
+        player_list:add_winner()
+        -- Test for game over condition
+        if player_list:get_num_players() == 1 then
+            require 'game_over'
+            player_list:add_winner(player_list:next_player_num())
+            scene = GameOver:new(player_list.winners)
+        end
+    end
+
+--    player_list:advanceNextPlayer()
 end
 
 
 HumanPlayer = class('HumanPlayer', Player)
---[[
-function HumanPlayer:swap_cards()
-    local cards = CardPile:new('Cards', self.hand, self.visible)
-    cards:sort_by_rank()
 
-    print('\n+++ Select your '..VISIBLE_SIZE..' VISIBLE cards')
-    cards:display_cards()
+function HumanPlayer:executeTurn()
+    -- TODO check for valid play
 
-    local input = self:get_card_input(1, cards:get_num_cards(), VISIBLE_SIZE)
-    cards:split_pile(self.visible, self.hand, input)
+    print("humanplayer:executeturn")
+    local active_pile = player:getActivePile()
+    active_pile:play_cards()
+
+    Player:executeTurn()
+    player_list:advanceNextPlayer()
 end
 
-function HumanPlayer:play_from_hand()
-    local num = {}
-    print('+++ Select cards from '..tostring(self.hand))
-    while true do
-        num = self:get_card_input(1, self.hand:get_num_cards())
-        if self:validate_card_input(self.hand, num) then
-            break
-        else
-            print('!!! Invalid selection')
-        end
-    end
-    self.hand:play_cards(num)
-end
-
-function HumanPlayer:play_from_visible()
-    local num = {}
-    print('+++ Select cards from '..tostring(self.visible))
-    while true do
-        num = self:get_card_input(1, self.visible:get_num_cards())
-        if self:validate_card_input(self.visible, num) then
-            break
-        else
-            print('!!! Invalid selection')
-        end
-    end
-    self.visible:play_cards(num)
-end
-
-function HumanPlayer:play_from_hidden()
-    print('+++ Select a card from '..tostring(self.hidden))
-    local num = self:get_card_input(1, self.hidden:get_num_cards(), 1)
-    for _,n in ipairs(num) do self:add_to_hand(self.hidden, n) end
-    if self.hand:has_valid_play() then self.hand:play_cards({1}) end
-end
-function HumanPlayer:add_to_hand(cards, num)
-    local card = Player.add_to_hand(self, cards, num)
-    print('*** Drew a '..tostring(card)..' from '..tostring(cards))
-end
-
-function HumanPlayer:get_card_input(min, max, total)
-    local total = total or 0
-    local num = {}
-    local get_input = true
-
-    while get_input do
-        num = {}
-        io.write('+++ Enter card number(s): ')
-        local str = io.stdin:read'*l'
-        for n in string.gmatch(str, "%d+") do table.insert(num, tonumber(n)) end
-
-        -- Ensure the numbers provided are valid indexes
-        get_input = false
-        for _,n in ipairs(num) do
-            if n < min or n > max then
-                print('!!! Invalid card selection')
-                get_input = true
-                break
-            elseif total ~= 0 and #num ~= total then
-                print('!!! You must select '..total..' cards')
-                get_input = true
-                break
-            end
-        end
-        if #num == 0 then get_input = true end
-    end
-
-    return num
-end
-
-function HumanPlayer:validate_card_input(cards, num)
-    local face = nil
-    for _,i in ipairs(num) do
-        local card = cards:get_card(i)
-        if face == nil then face = card.face end
-        -- Ensure all selected cards are valid plays and are the same face
-        if not card:is_valid_play() or face ~= card.face then return false end
-    end
-    return true
-end
-
-function HumanPlayer:display_hand()
-    self.hand:sort_by_rank()
-    self.hand:display_cards()
-end
-
---]]
 
 PlayerList = class('PlayerList')
 
@@ -198,6 +160,7 @@ function PlayerList:initialize()
     self.curr_player = 0
     self.reverse = false
     self.turn_over = true
+    self.turn = 1
 
     for i = 1,NUM_PLAYERS do
         if i == 1 then
@@ -208,6 +171,12 @@ function PlayerList:initialize()
 
         table.insert(self.players, player)
     end
+
+    self.curr_player = self:init_player_num()
+end
+
+function PlayerList:getCurrentPlayer()
+    return self.players[self.curr_player]
 end
 
 function PlayerList:get_next_player()
@@ -215,36 +184,41 @@ function PlayerList:get_next_player()
 end
 
 function PlayerList:get_human()
+    -- TODO make this less brittle
     return self.players[1]
 end
 
-function PlayerList:advance_next_player()
-    self.curr_player = self:next_player_num()
-    return self.players[self.curr_player]
+function PlayerList:advanceNextPlayer()
+    if self.turn_over == true then
+        self.curr_player = self:next_player_num()
+        self.turn = self.turn + 1
+    end
 end
 
 function PlayerList:get_num_players()
     return #self.players
 end
 
-function PlayerList:reverse_order()
+function PlayerList:reverseDirection()
     print('*** Direction reversed!')
     self.reverse = not self.reverse
 end
 
-function PlayerList:end_turn(b)
-    self.turn_over = b
+function PlayerList:continueTurn()
+    self.turn_over = false
 end
 
-function PlayerList:is_turn_over()
-    return self.turn_over
+function PlayerList:endTurn()
+    self.turn_over = true
+end
+
+function PlayerList:getTurn()
+    return self.turn
 end
 
 function PlayerList:next_player_num()
     local num_players = #self.players
     local curr_player = self.curr_player
-
-    if curr_player == 0 then return self:init_player_num() end
 
     if not self.reverse then
         curr_player = curr_player + 1
@@ -276,5 +250,5 @@ function PlayerList:add_winner(num)
     local player_num = num or self.curr_player
     local player = table.remove(self.players, player_num)
     table.insert(self.winners, player)
-    self:end_turn(true)
+    self:endTurn()
 end
