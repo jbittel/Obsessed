@@ -114,7 +114,7 @@ function Game:keypressed(key, unicode)
         elseif key == 'u' and not active_pile:has_valid_play() then
             discard_pile:pick_up_pile(player)
         elseif key == 'q' or key == 'escape' then
-            love.event.push('q')
+            love.event.push('quit')
         end
     end
 end
