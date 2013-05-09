@@ -66,7 +66,7 @@ function Player:playInitialCard()
         end
     end
     self.hand:play_cards()
-    self:executeTurn()
+    Player:executeTurn()
 end
 
 function Player:getActivePile()
@@ -91,25 +91,25 @@ function Player:getActiveCards()
 end
 
 function Player:executeTurn()
-    print("player:executeturn")
+    local next_player = false
     -- Apply card face rules
     local top_face = discard_pile:get_top_face()
     if top_face == '8' then
-        player_list:continueTurn()
+        next_player = false
     elseif top_face == '10' then
         discard_pile:kill_pile()
-        player_list:continueTurn()
+        next_player = false
     elseif top_face == 'R' then
         player_list:reverseDirection()
-        player_list:endTurn()
+        next_player = true
     else
-        player_list:endTurn()
+        next_player = true
     end
 
     -- Kill pile if 4+ top cards match
     if discard_pile:get_run_length() >= KILL_RUN_LEN then
         discard_pile:kill_pile()
-        player_list:continueTurn()
+        next_player = false
     end
 
     -- Keep player's hand at a minimum of HAND_SIZE cards
@@ -126,6 +126,7 @@ function Player:executeTurn()
     if player:get_num_cards() == 0 then
         print('*** '..tostring(player)..' wins!')
         player_list:add_winner()
+        next_player = true
         -- Test for game over condition
         if player_list:get_num_players() == 1 then
             require 'game_over'
@@ -134,7 +135,11 @@ function Player:executeTurn()
         end
     end
 
---    player_list:advanceNextPlayer()
+    if next_player == true then
+        player_list:advancePlayer()
+    else
+        player_list:advanceTurn()
+    end
 end
 
 
@@ -148,7 +153,6 @@ function HumanPlayer:executeTurn()
     active_pile:play_cards()
 
     Player:executeTurn()
-    player_list:advanceNextPlayer()
 end
 
 
@@ -159,7 +163,6 @@ function PlayerList:initialize()
     self.winners = {}
     self.curr_player = 0
     self.reverse = false
-    self.turn_over = true
     self.turn = 1
 
     for i = 1,NUM_PLAYERS do
@@ -188,11 +191,13 @@ function PlayerList:get_human()
     return self.players[1]
 end
 
-function PlayerList:advanceNextPlayer()
-    if self.turn_over == true then
-        self.curr_player = self:next_player_num()
-        self.turn = self.turn + 1
-    end
+function PlayerList:advancePlayer()
+    self:advanceTurn()
+    self.curr_player = self:next_player_num()
+end
+
+function PlayerList:advanceTurn()
+    self.turn = self.turn + 1
 end
 
 function PlayerList:get_num_players()
@@ -202,14 +207,6 @@ end
 function PlayerList:reverseDirection()
     print('*** Direction reversed!')
     self.reverse = not self.reverse
-end
-
-function PlayerList:continueTurn()
-    self.turn_over = false
-end
-
-function PlayerList:endTurn()
-    self.turn_over = true
 end
 
 function PlayerList:getTurn()
@@ -250,5 +247,4 @@ function PlayerList:add_winner(num)
     local player_num = num or self.curr_player
     local player = table.remove(self.players, player_num)
     table.insert(self.winners, player)
-    self:endTurn()
 end

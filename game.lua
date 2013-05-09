@@ -34,6 +34,8 @@ end
 
 function Game:update()
     local player = player_list:getCurrentPlayer()
+--    print("Current player: "..tostring(player))
+--    print("Current turn: "..tostring(player_list:getTurn()))
 
     if player_list:getTurn() == 1 then
         player:playInitialCard()

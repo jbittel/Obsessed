@@ -57,31 +57,26 @@ function AIPlayer:executeTurn()
         if self.visible:has_valid_play() then
             self:play_from_visible()
             Player:executeTurn()
-            player_list:advanceNextPlayer()
         else
             discard_pile:pick_up_pile(player)
-            player_list:endTurn()
         end
     elseif self:get_num_hand_cards() == 0 and
            self:get_num_hidden_cards() > 0 then
         -- Play cards from hidden set
         self:play_from_hidden()
         Player:executeTurn()
-        player_list:advanceNextPlayer()
+        -- TODO test is_valid_play to determine if card can be played
         -- If the hand isn't empty, the drawn card couldn't be played
         if self:get_num_hand_cards() ~= 0 then
             discard_pile:pick_up_pile(player)
-            player_list:endTurn()
         end
     else
         -- Play cards from hand
         if self.hand:has_valid_play() then
             self:play_from_hand()
             Player:executeTurn()
-            player_list:advanceNextPlayer()
         else
             discard_pile:pick_up_pile(player)
-            player_list:endTurn()
         end
     end
 end

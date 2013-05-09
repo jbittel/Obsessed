@@ -201,10 +201,11 @@ end
 function CardPile:play_cards()
     local cards = {}
     local set = self:getSelectedSet()
+    local player = player_list:getCurrentPlayer()
     -- Move selected cards to discard pile
     for i, card in ipairs(self.cards) do
         if set[i] then
-            print("playing "..tostring(card))
+            print(tostring(player).." plays a "..tostring(card))
             discard_pile:add_card(card)
         else
             table.insert(cards, card)
@@ -322,8 +323,7 @@ function DiscardPile:pick_up_pile(player)
     end
     self:remove_cards()
     print('*** No valid moves, picked up '..count..' cards')
-    player_list:endTurn()
-    player_list:advanceNextPlayer()
+    player_list:advancePlayer()
 end
 
 
