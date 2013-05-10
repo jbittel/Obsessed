@@ -42,7 +42,6 @@ function Game:update()
         return
     end
 
-    -- TODO check has_valid_play
     if player:is_ai() then
         player:executeTurn()
     end
@@ -69,8 +68,6 @@ function Game:draw()
     human.hand:display()
     human.hidden:display()
     human.visible:display()
-
-    -- TODO deselect cards each play
 
     local mx, my = love.mouse.getPosition()
     local r, g, b, a = love.graphics.getColor()
@@ -110,13 +107,19 @@ end
 function Game:keypressed(key, unicode)
     local player = player_list:getCurrentPlayer()
     if not player:is_ai() then
+        -- TODO the only active pile should be your hand;
+        --      cards from visible and hidden should be
+        --      transferred to it
         local active_pile = player:getActivePile()
         if key == 'p' and active_pile:has_selected() then
             player:executeTurn()
+            active_pile:clearSelected()
         elseif key == 'u' and not active_pile:has_valid_play() then
             discard_pile:pick_up_pile(player)
         elseif key == 'q' or key == 'escape' then
             love.event.push('quit')
+        elseif key == '1' or key == '2' or key == '3' then
+            active_pile:toggleSelected(tonumber(key))
         end
     end
 end

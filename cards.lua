@@ -138,6 +138,21 @@ function CardPile:getCards()
     return self.cards
 end
 
+function CardPile:setSelected(num)
+    if #self.cards < num then return end
+    self.cards[num]:setSelected()
+end
+
+function CardPile:toggleSelected(num)
+    if #self.cards < num then return end
+    card = self.cards[num]
+    if card:is_selected() then
+        card:clearSelected()
+    else
+        card:setSelected()
+    end
+end
+
 function CardPile:getSelectedSet()
     local idx = {}
     for i, card in ipairs(self.cards) do
@@ -147,6 +162,12 @@ function CardPile:getSelectedSet()
         end
     end
     return table.set(idx)
+end
+
+function CardPile:clearSelected()
+    for _, card in ipairs(self.cards) do
+        card:clearSelected()
+    end
 end
 
 function CardPile:split_pile(a, b, idx)
@@ -191,7 +212,7 @@ end
 
 function CardPile:has_selected()
     for _, card in ipairs(self.cards) do
-        if card.selected then
+        if card:is_selected() then
             return true
         end
     end
