@@ -146,13 +146,11 @@ end
 HumanPlayer = class('HumanPlayer', Player)
 
 function HumanPlayer:executeTurn()
-    -- TODO check for valid play
-
-    print("humanplayer:executeturn")
-    local active_pile = player:getActivePile()
-    active_pile:play_cards()
-
-    Player:executeTurn()
+    local active_pile = self:getActivePile()
+    if active_pile:has_selected() and active_pile:isValidPlay() then
+        active_pile:play_cards()
+        Player:executeTurn()
+    end
 end
 
 
