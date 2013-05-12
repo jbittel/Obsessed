@@ -90,8 +90,7 @@ end
 
 CardPile = class('CardPile')
 
-function CardPile:initialize(name, ...)
-    self.name = name
+function CardPile:initialize(...)
     self.cards = {}
     local arg = {n = select('#', ...), ...}
     for i = 1,arg.n do
@@ -100,10 +99,6 @@ function CardPile:initialize(name, ...)
             table.insert(self.cards, card)
         end
     end
-end
-
-function CardPile:__tostring()
-    return 'the '..string.lower(self.name)..' pile'
 end
 
 function CardPile:get_num_cards()
@@ -248,8 +243,8 @@ end
 
 DrawPile = class('DrawPile', CardPile)
 
-function DrawPile:initialize(name)
-    CardPile.initialize(self, name)
+function DrawPile:initialize()
+    CardPile.initialize(self)
     local num_decks = math.ceil(NUM_PLAYERS / 2)
 
     for deck = 1, num_decks do
@@ -360,13 +355,9 @@ end
 
 PlayerHand = class('PlayerHand', CardPile)
 
-function PlayerHand:initialize(name)
-    CardPile.initialize(self, name)
+function PlayerHand:initialize()
+    CardPile.initialize(self)
     for i = 1,HAND_SIZE do self:add_card(draw_pile:remove_card()) end
-end
-
-function PlayerHand:__tostring()
-    return 'your '..string.lower(self.name)
 end
 
 function PlayerHand:display()
@@ -382,13 +373,9 @@ end
 
 PlayerVisible = class('PlayerVisible', CardPile)
 
-function PlayerVisible:initialize(name)
-    CardPile.initialize(self, name)
+function PlayerVisible:initialize()
+    CardPile.initialize(self)
     for i = 1,VISIBLE_SIZE do self:add_card(draw_pile:remove_card()) end
-end
-
-function PlayerVisible:__tostring()
-    return 'your '..string.lower(self.name)..' cards'
 end
 
 function PlayerVisible:display()
@@ -404,13 +391,9 @@ end
 
 PlayerHidden = class('PlayerHidden', CardPile)
 
-function PlayerHidden:initialize(name)
-    CardPile.initialize(self, name)
+function PlayerHidden:initialize()
+    CardPile.initialize(self)
     for i = 1,HIDDEN_SIZE do self:add_card(draw_pile:remove_card()) end
-end
-
-function PlayerHidden:__tostring()
-    return 'your '..string.lower(self.name)..' cards'
 end
 
 function PlayerHidden:display()

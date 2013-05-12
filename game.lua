@@ -25,10 +25,8 @@ function Game:initialize()
     require 'players'
     require 'ai'
 
-    self.turn = 1
-
-    draw_pile = DrawPile:new('Draw')
-    discard_pile = DiscardPile:new('Discard')
+    draw_pile = DrawPile:new()
+    discard_pile = DiscardPile:new()
     player_list = PlayerList:new()
 end
 
