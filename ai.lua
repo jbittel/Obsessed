@@ -51,26 +51,21 @@ function AIPlayer:swap_cards()
 end
 
 function AIPlayer:selectCards()
-    if self:get_num_hand_cards() == 0 and
-       self:get_num_visible_cards() > 0 then
+    if self:get_num_hand_cards() > 0 then
+        -- Select cards from hand
+        self:selectHand()
+    elseif self:get_num_visible_cards() > 0 then
         -- Select cards from visible set
-        if self.visible:has_valid_play() then
-            self:selectVisible()
-        end
-    elseif self:get_num_hand_cards() == 0 and
-           self:get_num_hidden_cards() > 0 then
+         self:selectVisible()
+    elseif self:get_num_hidden_cards() > 0 then
         -- Select cards from hidden set
         self:selectHidden()
-    elseif self:get_num_hand_cards() > 0 then
-        -- Select cards from hand
-        if self.hand:has_valid_play() then
-            self:selectHand()
-        end
     end
 end
 
 function AIPlayer:selectHand()
-    local face = self:select_card_face(self.hand)
+    if not self.hand:has_valid_play() then return end
+    local face = self:selectCardFace(self.hand)
     for _, card in ipairs(self.hand.cards) do
         if face == card.face then
             card:setSelected()
@@ -80,7 +75,8 @@ function AIPlayer:selectHand()
 end
 
 function AIPlayer:selectVisible()
-    local face = self:select_card_face(self.visible)
+    if not self.visible:has_valid_play() then return end
+    local face = self:selectCardFace(self.visible)
     for _, card in ipairs(self.visible.cards) do
         if face == card.face then
             card:setSelected()
@@ -89,6 +85,7 @@ function AIPlayer:selectVisible()
 end
 
 function AIPlayer:selectHidden()
+    if not self.hidden:has_valid_play() then return end
     self:add_to_hand(self.hidden)
     print('*** Drawing from hidden cards ('..self:get_num_hidden_cards()..' left)')
     if self.hand:has_valid_play() then
@@ -96,11 +93,11 @@ function AIPlayer:selectHidden()
     end
 end
 
-function AIPlayer:select_card_face(cardpile)
+function AIPlayer:selectCardFace(cardpile)
     local valid = cardpile:get_valid_play()
 
     self:modify_card_weights(cardpile, valid)
-    for _,card in ipairs(valid) do card.weight = self.ai_face_weight[card.face] end
+    for _, card in ipairs(valid) do card.weight = self.ai_face_weight[card.face] end
     table.sort(valid, function(a, b) return a.weight < b.weight end)
 
     return valid[self:biased_rand(1, #valid)].face
