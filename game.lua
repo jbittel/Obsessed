@@ -32,8 +32,6 @@ end
 
 function Game:update()
     local player = player_list:getCurrentPlayer()
---    print("Current player: "..tostring(player))
---    print("Current turn: "..tostring(player_list:getTurn()))
 
     if player_list:getTurn() == 1 then
         player:selectInitialCard()
@@ -60,8 +58,6 @@ function Game:draw()
     draw_pile:display()
     discard_pile:display()
 
-    -- TODO if human, display a Play button
-
     human = player_list:get_human()
     human.hand:display()
     human.hidden:display()
@@ -86,37 +82,34 @@ end
 
 function Game:mousepressed(x, y, button)
     local player = player_list:getCurrentPlayer()
-    if not player:is_ai() then
-        local mx, my = love.mouse.getPosition()
-        for _, card in ipairs(player:getActiveCards()) do
-            if card:mouse_intersects(mx, my) and
-               card:is_valid_play() then
-                if card.selected then
-                    card.selected = false
-                else
-                    card.selected = true
-                end
-                return
+    if player:is_ai() then return end
+
+    local mx, my = love.mouse.getPosition()
+    for _, card in ipairs(player:getActiveCards()) do
+        if card:mouse_intersects(mx, my) and
+           card:is_valid_play() then
+            if card.selected then
+                card.selected = false
+            else
+                card.selected = true
             end
+            return
         end
     end
 end
 
 function Game:keypressed(key, unicode)
     local player = player_list:getCurrentPlayer()
-    if not player:is_ai() then
-        -- TODO the only active pile should be your hand;
-        --      cards from visible and hidden should be
-        --      transferred to it
-        local active_pile = player:getActivePile()
-        if key == 'p' and active_pile:has_selected() then
-            player:executeTurn()
-        elseif key == 'u' and not active_pile:has_valid_play() then
-            discard_pile:pick_up_pile(player)
-        elseif key == 'q' or key == 'escape' then
-            love.event.push('quit')
-        elseif key == '1' or key == '2' or key == '3' then
-            active_pile:toggleSelected(tonumber(key))
-        end
+    if player:is_ai() then return end
+
+    local active_pile = player:getActivePile()
+    if key == 'p' and active_pile:has_selected() then
+        player:executeTurn()
+    elseif key == 'u' and not active_pile:has_valid_play() then
+        discard_pile:pick_up_pile(player)
+    elseif key == 'q' or key == 'escape' then
+        love.event.push('quit')
+    elseif key == '1' or key == '2' or key == '3' then
+        active_pile:toggleSelected(tonumber(key))
     end
 end
