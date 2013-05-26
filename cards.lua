@@ -224,7 +224,7 @@ function CardPile:has_selected()
     return false
 end
 
-function CardPile:play_cards()
+function CardPile:playCards()
     local cards = {}
     local set = self:getSelectedSet()
     local player = player_list:getCurrentPlayer()

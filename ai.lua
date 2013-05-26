@@ -50,38 +50,26 @@ function AIPlayer:swap_cards()
     self.hand.cards = table.slice(t, VISIBLE_SIZE + 1, HAND_SIZE)
 end
 
-function AIPlayer:executeTurn()
+function AIPlayer:selectCards()
     if self:get_num_hand_cards() == 0 and
        self:get_num_visible_cards() > 0 then
-        -- Play cards from visible set
+        -- Select cards from visible set
         if self.visible:has_valid_play() then
-            self:play_from_visible()
-            Player:executeTurn()
-        else
-            discard_pile:pick_up_pile(player)
+            self:selectVisible()
         end
     elseif self:get_num_hand_cards() == 0 and
            self:get_num_hidden_cards() > 0 then
-        -- Play cards from hidden set
-        self:play_from_hidden()
-        Player:executeTurn()
-        -- TODO test is_valid_play to determine if card can be played
-        -- If the hand isn't empty, the drawn card couldn't be played
-        if self:get_num_hand_cards() ~= 0 then
-            discard_pile:pick_up_pile(player)
-        end
-    else
-        -- Play cards from hand
+        -- Select cards from hidden set
+        self:selectHidden()
+    elseif self:get_num_hand_cards() > 0 then
+        -- Select cards from hand
         if self.hand:has_valid_play() then
-            self:play_from_hand()
-            Player:executeTurn()
-        else
-            discard_pile:pick_up_pile(player)
+            self:selectHand()
         end
     end
 end
 
-function AIPlayer:play_from_hand()
+function AIPlayer:selectHand()
     local face = self:select_card_face(self.hand)
     for _, card in ipairs(self.hand.cards) do
         if face == card.face then
@@ -89,25 +77,22 @@ function AIPlayer:play_from_hand()
             if card:is_special() and not self:is_late_game() then break end
         end
     end
-    self.hand:play_cards()
 end
 
-function AIPlayer:play_from_visible()
+function AIPlayer:selectVisible()
     local face = self:select_card_face(self.visible)
     for _, card in ipairs(self.visible.cards) do
         if face == card.face then
             card:setSelected()
         end
     end
-    self.visible:play_cards()
 end
 
-function AIPlayer:play_from_hidden()
+function AIPlayer:selectHidden()
     self:add_to_hand(self.hidden)
     print('*** Drawing from hidden cards ('..self:get_num_hidden_cards()..' left)')
     if self.hand:has_valid_play() then
         self.hand.cards[1]:setSelected()
-        self.hand:play_cards()
     end
 end
 

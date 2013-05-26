@@ -36,11 +36,13 @@ function Game:update()
 --    print("Current turn: "..tostring(player_list:getTurn()))
 
     if player_list:getTurn() == 1 then
-        player:playInitialCard()
+        player:selectInitialCard()
+        player:executeTurn()
         return
     end
 
     if player:is_ai() then
+        player:selectCards()
         player:executeTurn()
     end
 end
@@ -58,10 +60,8 @@ function Game:draw()
     draw_pile:display()
     discard_pile:display()
 
-    -- TODO if human, display Play button
+    -- TODO if human, display a Play button
 
-    -- TODO blows up when the human has won and
-    -- is pulled out of the active player list
     human = player_list:get_human()
     human.hand:display()
     human.hidden:display()
@@ -111,7 +111,6 @@ function Game:keypressed(key, unicode)
         local active_pile = player:getActivePile()
         if key == 'p' and active_pile:has_selected() then
             player:executeTurn()
-            active_pile:clearSelected()
         elseif key == 'u' and not active_pile:has_valid_play() then
             discard_pile:pick_up_pile(player)
         elseif key == 'q' or key == 'escape' then

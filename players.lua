@@ -52,7 +52,7 @@ function Player:add_to_hand(cards, num)
     return card
 end
 
-function Player:playInitialCard()
+function Player:selectInitialCard()
     local initial_face = nil
     for _,face in ipairs(Card.START_ORDER) do
         if self.hand:has_card(face) then
@@ -65,8 +65,6 @@ function Player:playInitialCard()
             card:setSelected()
         end
     end
-    self.hand:play_cards()
-    Player:executeTurn()
 end
 
 function Player:getActivePile()
@@ -92,6 +90,16 @@ end
 
 function Player:executeTurn()
     local next_player = false
+    local active_pile = self:getActivePile()
+    local player = player_list:getCurrentPlayer()
+
+    if active_pile:has_selected() and
+       active_pile:isValidPlay() then
+        active_pile:playCards()
+    else
+        discard_pile:pick_up_pile(player)
+    end
+
     -- Apply card face rules
     local top_face = discard_pile:get_top_face()
     if top_face == '8' then
@@ -114,7 +122,6 @@ function Player:executeTurn()
 
     -- Keep player's hand at a minimum of HAND_SIZE cards
     -- as long as there's cards to draw
-    local player = player_list:getCurrentPlayer()
     while player:get_num_hand_cards() < HAND_SIZE and
           draw_pile:get_num_cards() > 0 do
         player:add_to_hand(draw_pile)
@@ -144,14 +151,6 @@ end
 
 
 HumanPlayer = class('HumanPlayer', Player)
-
-function HumanPlayer:executeTurn()
-    local active_pile = self:getActivePile()
-    if active_pile:has_selected() and active_pile:isValidPlay() then
-        active_pile:play_cards()
-        Player:executeTurn()
-    end
-end
 
 
 PlayerList = class('PlayerList')
