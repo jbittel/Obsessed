@@ -59,12 +59,14 @@ function Card:is_special()
     return false
 end
 
-function Card:is_selected()
+function Card:isSelected()
     return self.selected
 end
 
 function Card:setSelected()
-    self.selected = true
+    if self:is_valid_play() then
+        self.selected = true
+    end
 end
 
 function Card:clearSelected()
@@ -141,7 +143,7 @@ end
 function CardPile:toggleSelected(num)
     if #self.cards < num then return end
     card = self.cards[num]
-    if card:is_selected() then
+    if card:isSelected() then
         card:clearSelected()
     else
         card:setSelected()
@@ -151,7 +153,7 @@ end
 function CardPile:getSelectedSet()
     local idx = {}
     for i, card in ipairs(self.cards) do
-        if card:is_selected() then
+        if card:isSelected() then
             card:clearSelected()
             table.insert(idx, i)
         end
@@ -193,7 +195,7 @@ function CardPile:isValidPlay()
     end
 
     for _, card in ipairs(self.cards) do
-        if card:is_selected() then
+        if card:isSelected() then
             if not card:is_valid_play() then
                 return false
             else
@@ -230,7 +232,7 @@ end
 
 function CardPile:hasSelected()
     for _, card in ipairs(self.cards) do
-        if card:is_selected() then
+        if card:isSelected() then
             return true
         end
     end
