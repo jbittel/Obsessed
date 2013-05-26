@@ -103,7 +103,7 @@ function Game:keypressed(key, unicode)
     if player:is_ai() then return end
 
     local active_pile = player:getActivePile()
-    if key == 'p' and active_pile:has_selected() then
+    if key == 'p' and active_pile:isValidPlay() then
         player:executeTurn()
     elseif key == 'u' and not active_pile:has_valid_play() then
         discard_pile:pick_up_pile(player)

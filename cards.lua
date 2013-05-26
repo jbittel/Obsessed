@@ -186,11 +186,24 @@ function CardPile:has_valid_play()
 end
 
 function CardPile:isValidPlay()
+    local face = nil
+
+    if self:hasSelected() == false then
+        return false
+    end
+
     for _, card in ipairs(self.cards) do
-        if card:is_selected() and not card:is_valid_play() then
-            return false
+        if card:is_selected() then
+            if not card:is_valid_play() then
+                return false
+            else
+                if face == nil then
+                    face = card.face
+                elseif face ~= card.face then
+                    return false
+                end
+            end
         end
-        -- TODO ensure all card faces match
     end
     return true
 end
@@ -215,7 +228,7 @@ function CardPile:has_card(face)
     return nil
 end
 
-function CardPile:has_selected()
+function CardPile:hasSelected()
     for _, card in ipairs(self.cards) do
         if card:is_selected() then
             return true

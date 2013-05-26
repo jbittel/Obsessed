@@ -73,10 +73,8 @@ function Player:getActivePile()
     if self:get_num_hand_cards() > 0 then
         active_pile = self.hand
     elseif self:get_num_visible_cards() > 0 then
-        -- Play cards from visible set
         active_pile = self.visible
     elseif self:get_num_hidden_cards() > 0 then
-        -- Play cards from hidden set
         active_pile = self.hidden
     end
     return active_pile
@@ -91,8 +89,7 @@ function Player:executeTurn()
     local active_pile = self:getActivePile()
     local player = player_list:getCurrentPlayer()
 
-    if active_pile:has_selected() and
-       active_pile:isValidPlay() then
+    if active_pile:isValidPlay() then
         active_pile:playCards()
     else
         discard_pile:pick_up_pile(player)
