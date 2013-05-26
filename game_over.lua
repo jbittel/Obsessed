@@ -34,6 +34,6 @@ end
 
 function GameOver:keypressed(key, unicode)
     if key == 'q' or key == 'escape' then
-        love.event.push('q')
+        love.event.push('quit')
     end
 end
