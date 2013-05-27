@@ -46,10 +46,17 @@ function Player:get_num_hidden_cards()
     return self.hidden:get_num_cards()
 end
 
-function Player:add_to_hand(cards, num)
+function Player:addToHand(cards, num)
     local card = cards:remove_card(num)
     if card ~= nil then self.hand:add_card(card) end
-    return card
+end
+
+function Player:addToHandFromHidden(num)
+    local card = self.hidden:remove_card(num)
+    if card ~= nil then
+        card:setSelected()
+        self.hand:add_card(card)
+    end
 end
 
 function Player:selectInitialCard()
@@ -119,7 +126,7 @@ function Player:executeTurn()
     -- as long as there's cards to draw
     while player:get_num_hand_cards() < HAND_SIZE and
           draw_pile:get_num_cards() > 0 do
-        player:add_to_hand(draw_pile)
+        player:addToHand(draw_pile)
     end
 
     -- TODO do we want to stop when a player wins,

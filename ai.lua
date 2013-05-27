@@ -85,12 +85,8 @@ function AIPlayer:selectVisible()
 end
 
 function AIPlayer:selectHidden()
-    if not self.hidden:has_valid_play() then return end
-    self:add_to_hand(self.hidden)
+    self:addToHandFromHidden(1)
     print('*** Drawing from hidden cards ('..self:get_num_hidden_cards()..' left)')
-    if self.hand:has_valid_play() then
-        self.hand.cards[1]:setSelected()
-    end
 end
 
 function AIPlayer:selectCardFace(cardpile)

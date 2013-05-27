@@ -88,9 +88,12 @@ function Game:mousepressed(x, y, button)
     local active_pile = player:getActivePile()
     local mx, my = love.mouse.getPosition()
     for i, card in ipairs(player:getActiveCards()) do
-        if card:mouse_intersects(mx, my) and
-           card:is_valid_play() then
-            active_pile:toggleSelected(i)
+        if card:mouse_intersects(mx, my) then
+            if active_pile == player.hidden then
+                player:addToHandFromHidden(i)
+            else
+                active_pile:toggleSelected(i)
+            end
             return
         end
     end
