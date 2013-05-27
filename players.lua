@@ -15,11 +15,11 @@ function Player:initialize(num)
     self.hand = PlayerHand:new('Hand')
     self.visible = PlayerVisible:new('Visible')
     self.hidden = PlayerHidden:new('Hidden')
---    self:swap_cards()
+--  TODO self:swap_cards()
 end
 
 function Player:__tostring()
-    return 'Player '..tostring(self.num)
+    return 'P'..tostring(self.num)
 end
 
 function Player:is_ai()
@@ -130,7 +130,7 @@ function Player:executeTurn()
     -- make it a binary win/loss condition?
     -- Test for win condition
     if player:get_num_cards() == 0 then
-        print('*** '..tostring(player)..' wins!')
+        logger('wins!')
         player_list:add_winner()
         next_player = true
         -- Test for game over condition
@@ -201,7 +201,7 @@ function PlayerList:get_num_players()
 end
 
 function PlayerList:reverseDirection()
-    print('*** Direction reversed!')
+    logger('reversed the direction')
     self.reverse = not self.reverse
 end
 
@@ -231,7 +231,6 @@ function PlayerList:init_player_num()
     for _,face in ipairs(Card.START_ORDER) do
         for _,player in ipairs(self.players) do
             if player.hand:has_card(face) then
-                print('\n*** Starting with '..tostring(player))
                 return player.num
             end
         end

@@ -86,7 +86,7 @@ end
 
 function AIPlayer:selectHidden()
     self:addToHandFromHidden(1)
-    print('*** Drawing from hidden cards ('..self:get_num_hidden_cards()..' left)')
+    logger('drew from hidden cards, '..self:get_num_hidden_cards()..' left')
 end
 
 function AIPlayer:selectCardFace(cardpile)

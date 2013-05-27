@@ -8,6 +8,12 @@
 
 --]]
 
+function logger(msg)
+    local turn = player_list:getTurn()
+    local player = player_list:getCurrentPlayer()
+    print(tostring(turn)..': '..tostring(player)..' '..msg)
+end
+
 -- Table manipulation methods
 
 function table.slice(list, start, len)

@@ -246,7 +246,7 @@ function CardPile:playCards()
     -- Move selected cards to discard pile
     for i, card in ipairs(self.cards) do
         if set[i] then
-            print(tostring(player).." plays a "..tostring(card))
+            logger("plays a "..tostring(card))
             discard_pile:add_card(card)
         else
             table.insert(cards, card)
@@ -323,7 +323,7 @@ end
 
 function DiscardPile:kill_pile()
     self:remove_cards()
-    print('*** Killed pile')
+    logger('killed the discard pile')
 end
 
 function DiscardPile:get_top_face()
@@ -362,7 +362,7 @@ function DiscardPile:pick_up_pile(player)
         end
     end
     self:remove_cards()
-    print('*** No valid moves, picked up '..count..' cards')
+    logger('picked up '..count..' cards')
 end
 
 
