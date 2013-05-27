@@ -107,7 +107,7 @@ function Game:keypressed(key, unicode)
     if key == 'p' and active_pile:isValidPlay() then
         player:executeTurn()
     elseif key == 'u' and not active_pile:has_valid_play() then
-        discard_pile:pick_up_pile(player)
+        player:executeTurn()
     elseif key == 'q' or key == 'escape' then
         love.event.push('quit')
     elseif key == '1' or key == '2' or key == '3' then

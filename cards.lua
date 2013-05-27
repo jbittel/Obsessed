@@ -357,14 +357,12 @@ function DiscardPile:pick_up_pile(player)
     local count = 0
     for _,card in ipairs(self.cards) do
         if card.face ~= '3' then
-            card.visible = true
             player.hand:add_card(card)
             count = count + 1
         end
     end
     self:remove_cards()
     print('*** No valid moves, picked up '..count..' cards')
-    player_list:advancePlayer()
 end
 
 

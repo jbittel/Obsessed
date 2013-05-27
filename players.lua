@@ -92,7 +92,7 @@ function Player:getActiveCards()
 end
 
 function Player:executeTurn()
-    local next_player = false
+    local next_player = true
     local active_pile = self:getActivePile()
     local player = player_list:getCurrentPlayer()
 
@@ -111,9 +111,6 @@ function Player:executeTurn()
         next_player = false
     elseif top_face == 'R' then
         player_list:reverseDirection()
-        next_player = true
-    else
-        next_player = true
     end
 
     -- Kill pile if 4+ top cards match
