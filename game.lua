@@ -71,6 +71,7 @@ function Game:draw()
             love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
             love.graphics.setColor(r, g, b, a)
         end
+        -- TODO don't highlight valid plays in hidden cards
         if card:mouse_intersects(mx, my) and
            card:is_valid_play() then
             love.graphics.setColor(255, 255, 255, 190)
@@ -84,15 +85,12 @@ function Game:mousepressed(x, y, button)
     local player = player_list:getCurrentPlayer()
     if player:is_ai() then return end
 
+    local active_pile = player:getActivePile()
     local mx, my = love.mouse.getPosition()
-    for _, card in ipairs(player:getActiveCards()) do
+    for i, card in ipairs(player:getActiveCards()) do
         if card:mouse_intersects(mx, my) and
            card:is_valid_play() then
-            if card.selected then
-                card.selected = false
-            else
-                card.selected = true
-            end
+            active_pile:toggleSelected(i)
             return
         end
     end
