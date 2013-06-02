@@ -69,16 +69,15 @@ function Game:draw()
         if card.selected then
             love.graphics.setColor(255, 0, 255, 190)
             love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
-            love.graphics.setColor(r, g, b, a)
         end
         -- TODO don't highlight valid plays in hidden cards
         if card:mouse_intersects(mx, my) and
            card:is_valid_play() then
             love.graphics.setColor(255, 255, 255, 190)
             love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
-            love.graphics.setColor(r, g, b, a)
         end
     end
+    love.graphics.setColor(r, g, b, a)
 end
 
 function Game:mousepressed(x, y, button)
