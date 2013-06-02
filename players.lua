@@ -151,6 +151,21 @@ end
 
 HumanPlayer = class('HumanPlayer', Player)
 
+function HumanPlayer:initialize(num)
+    Player.initialize(self, num)
+    self.hand:sortByRank()
+end
+
+function HumanPlayer:addToHand(cards, num)
+    Player.addToHand(self, cards, num)
+    self.hand:sortByRank()
+end
+
+function HumanPlayer:addToHandFromHidden(num)
+    Player.addToHandFromHidden(self, num)
+    self.hand:sortByRank()
+end
+
 
 PlayerList = class('PlayerList')
 

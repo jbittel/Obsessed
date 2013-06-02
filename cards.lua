@@ -107,7 +107,7 @@ function CardPile:get_num_cards()
     return #self.cards
 end
 
-function CardPile:sort_by_rank()
+function CardPile:sortByRank()
     table.sort(self.cards, function(a, b) return a.rank < b.rank end)
 end
 
@@ -213,7 +213,7 @@ end
 function CardPile:get_valid_play()
     local valid = {}
     local face = nil
-    self:sort_by_rank()
+    self:sortByRank()
     for _,card in ipairs(self.cards) do
         if face ~= card.face and card:is_valid_play() then
             face = card.face
