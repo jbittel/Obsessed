@@ -375,12 +375,19 @@ end
 
 function PlayerHand:display()
     local hpos = 50
-    for i = 1, #self.cards do
-        love.graphics.draw(self.cards[i].front, hpos, 350)
-        self.cards[i].x = hpos
-        self.cards[i].y = 350
+    local r, g, b, a = love.graphics.getColor()
+    for _, card in ipairs(self:getCards()) do
+        love.graphics.setColor(255, 255, 255, 255)
+        love.graphics.draw(card.front, hpos, 350)
+        card.x = hpos
+        card.y = 350
+        if card.selected then
+            love.graphics.setColor(255, 0, 255, 190)
+            love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
+        end
         hpos = hpos + 75
     end
+    love.graphics.setColor(r, g, b, a)
 end
 
 
@@ -393,12 +400,19 @@ end
 
 function PlayerVisible:display()
     local hpos = 60
-    for i = 1, #self.cards do
-        love.graphics.draw(self.cards[i].front, hpos, 480)
-        self.cards[i].x = hpos
-        self.cards[i].y = 480
+    local r, g, b, a = love.graphics.getColor()
+    for _, card in ipairs(self:getCards()) do
+        love.graphics.setColor(255, 255, 255, 255)
+        love.graphics.draw(card.front, hpos, 480)
+        card.x = hpos
+        card.y = 480
+        if card.selected then
+            love.graphics.setColor(255, 0, 255, 190)
+            love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
+        end
         hpos = hpos + 100
     end
+    love.graphics.setColor(r, g, b, a)
 end
 
 
@@ -411,10 +425,10 @@ end
 
 function PlayerHidden:display()
     local hpos = 50
-    for i = 1, #self.cards do
-        love.graphics.draw(self.cards[i].back, hpos, 480)
-        self.cards[i].x = hpos
-        self.cards[i].y = 480
+    for _, card in ipairs(self:getCards()) do
+        love.graphics.draw(card.back, hpos, 480)
+        card.x = hpos
+        card.y = 480
         hpos = hpos + 100
     end
 end

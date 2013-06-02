@@ -67,10 +67,7 @@ function Game:draw()
     local mx, my = love.mouse.getPosition()
     local r, g, b, a = love.graphics.getColor()
     for _, card in ipairs(human:getActiveCards()) do
-        if card.selected then
-            love.graphics.setColor(255, 0, 255, 190)
-            love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
-        elseif active_pile ~= human.hidden and
+        if active_pile ~= human.hidden and
                card:mouse_intersects(mx, my) and
                card:is_valid_play() then
             love.graphics.setColor(255, 255, 255, 190)
