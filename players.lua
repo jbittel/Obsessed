@@ -59,6 +59,18 @@ function Player:addToHandFromHidden(num)
     end
 end
 
+function Player:pickUpPile()
+    local count = 0
+    for _, card in ipairs(discard_pile:getCards()) do
+        if card.face ~= '3' then
+            self.hand:add_card(card)
+            count = count + 1
+        end
+    end
+    discard_pile:remove_cards()
+    logger('picked up '..count..' cards')
+end
+
 function Player:selectInitialCard()
     local initial_face = nil
     for _,face in ipairs(Card.START_ORDER) do
@@ -99,7 +111,7 @@ function Player:executeTurn()
     if active_pile:isValidPlay() then
         active_pile:playCards()
     else
-        discard_pile:pick_up_pile(player)
+        player:pickUpPile()
     end
 
     -- Apply card face rules
@@ -163,6 +175,11 @@ end
 
 function HumanPlayer:addToHandFromHidden(num)
     Player.addToHandFromHidden(self, num)
+    self.hand:sortByRank()
+end
+
+function HumanPlayer:pickUpPile()
+    Player.pickUpPile(self)
     self.hand:sortByRank()
 end
 

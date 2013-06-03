@@ -353,18 +353,6 @@ function DiscardPile:get_run_length()
     return run
 end
 
-function DiscardPile:pick_up_pile(player)
-    local count = 0
-    for _,card in ipairs(self.cards) do
-        if card.face ~= '3' then
-            player.hand:add_card(card)
-            count = count + 1
-        end
-    end
-    self:remove_cards()
-    logger('picked up '..count..' cards')
-end
-
 
 PlayerHand = class('PlayerHand', CardPile)
 
