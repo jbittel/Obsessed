@@ -35,5 +35,7 @@ end
 function GameOver:keypressed(key, unicode)
     if key == 'q' or key == 'escape' then
         love.event.push('quit')
+    elseif key == 'r' then
+        scene = Game:new()
     end
 end
