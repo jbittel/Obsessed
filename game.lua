@@ -55,26 +55,13 @@ function Game:draw()
     love.graphics.print('Turn '..player_list:getTurn(), 50, 100)
 
     -- Display game board
-    draw_pile:display()
-    discard_pile:display()
+    draw_pile:draw()
+    discard_pile:draw()
 
     human = player_list:get_human()
-    human.hand:display()
-    human.hidden:display()
-    human.visible:display()
-
-    local active_pile = human:getActivePile()
-    local mx, my = love.mouse.getPosition()
-    local r, g, b, a = love.graphics.getColor()
-    for _, card in ipairs(human:getActiveCards()) do
-        if active_pile ~= human.hidden and
-               card:mouse_intersects(mx, my) and
-               card:is_valid_play() then
-            love.graphics.setColor(255, 255, 255, 190)
-            love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
-        end
-    end
-    love.graphics.setColor(r, g, b, a)
+    human.hand:draw()
+    human.hidden:draw()
+    human.visible:draw()
 end
 
 function Game:mousepressed(x, y, button)
@@ -82,9 +69,8 @@ function Game:mousepressed(x, y, button)
     if player:is_ai() then return end
 
     local active_pile = player:getActivePile()
-    local mx, my = love.mouse.getPosition()
     for i, card in ipairs(player:getActiveCards()) do
-        if card:mouse_intersects(mx, my) then
+        if card:mousepressed() then
             if active_pile == player.hidden then
                 player:addToHandFromHidden(i)
             else
