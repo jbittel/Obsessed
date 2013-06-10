@@ -141,6 +141,11 @@ function CardPile:getCards()
     return self.cards
 end
 
+function CardPile:isActivePile()
+    local player = player_list:getCurrentPlayer()
+    return self == player:getActivePile()
+end
+
 function CardPile:setSelected(num)
     if #self.cards < num then return end
     self.cards[num]:setSelected()
@@ -406,7 +411,7 @@ function PlayerVisible:draw()
         if card:isSelected() then
             love.graphics.setColor(255, 0, 255, 190)
             love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
-        elseif card:hover() and card:is_valid_play() then
+        elseif self:isActivePile() and card:hover() and card:is_valid_play() then
             love.graphics.setColor(255, 255, 255, 190)
             love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
         end
