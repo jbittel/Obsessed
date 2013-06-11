@@ -367,9 +367,11 @@ end
 
 PlayerHand = class('PlayerHand', CardPile)
 
+PlayerHand.static.SIZE = 3
+
 function PlayerHand:initialize()
     CardPile.initialize(self)
-    for i = 1,HAND_SIZE do self:add_card(draw_pile:remove_card()) end
+    for i = 1, PlayerHand.SIZE do self:add_card(draw_pile:remove_card()) end
 end
 
 function PlayerHand:draw()
@@ -395,9 +397,11 @@ end
 
 PlayerVisible = class('PlayerVisible', CardPile)
 
+PlayerVisible.static.SIZE = 3
+
 function PlayerVisible:initialize()
     CardPile.initialize(self)
-    for i = 1,VISIBLE_SIZE do self:add_card(draw_pile:remove_card()) end
+    for i = 1, PlayerVisible.SIZE do self:add_card(draw_pile:remove_card()) end
 end
 
 function PlayerVisible:draw()
@@ -423,9 +427,11 @@ end
 
 PlayerHidden = class('PlayerHidden', CardPile)
 
+PlayerHidden.static.SIZE = 3
+
 function PlayerHidden:initialize()
     CardPile.initialize(self)
-    for i = 1,HIDDEN_SIZE do self:add_card(draw_pile:remove_card()) end
+    for i = 1, PlayerHidden.SIZE do self:add_card(draw_pile:remove_card()) end
 end
 
 function PlayerHidden:draw()

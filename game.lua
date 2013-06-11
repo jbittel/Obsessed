@@ -11,9 +11,6 @@
 Game = class('Game')
 
 NUM_PLAYERS = 4
-HAND_SIZE = 3
-VISIBLE_SIZE = 3
-HIDDEN_SIZE = 3
 
 KILL_RUN_LEN = 4
 if NUM_PLAYERS == 2 then

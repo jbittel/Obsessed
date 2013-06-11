@@ -46,8 +46,8 @@ function AIPlayer:swap_cards()
 
     table.sort(t, function(a, b) return a.weight > b.weight end)
 
-    self.visible.cards = table.slice(t, 1, VISIBLE_SIZE)
-    self.hand.cards = table.slice(t, VISIBLE_SIZE + 1, HAND_SIZE)
+    self.visible.cards = table.slice(t, 1, PlayerVisible.SIZE)
+    self.hand.cards = table.slice(t, PlayerVisible.SIZE + 1, PlayerHand.SIZE)
 end
 
 function AIPlayer:selectCards()

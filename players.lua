@@ -131,9 +131,9 @@ function Player:executeTurn()
         next_player = false
     end
 
-    -- Keep player's hand at a minimum of HAND_SIZE cards
+    -- Keep player's hand at the minimum number of cards,
     -- as long as there's cards to draw
-    while player:get_num_hand_cards() < HAND_SIZE and
+    while player:get_num_hand_cards() < PlayerHand.SIZE and
           draw_pile:get_num_cards() > 0 do
         player:addToHand(draw_pile)
     end
