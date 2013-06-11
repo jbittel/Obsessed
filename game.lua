@@ -44,6 +44,8 @@ end
 
 function Game:draw()
     love.graphics.printf('Obsessed', 0, 50, screen.width, "center")
+
+    local player = player_list:getCurrentPlayer()
     if player:is_ai() == true then
         love.graphics.print(tostring(player)..' (AI)', 50, 75)
     else
