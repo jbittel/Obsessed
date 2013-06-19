@@ -13,14 +13,14 @@ package.path = 'lib/?.lua;' .. package.path
 require 'middleclass'
 require 'util'
 
-screen = {
-    width = love.graphics.getWidth(),
-    height = love.graphics.getHeight(),
-    halfWidth = love.graphics.getWidth() / 2,
-    halfHeight = love.graphics.getHeight() / 2,
-}
-
 function love.load()
+    screen = {
+        width = love.graphics.getWidth(),
+        height = love.graphics.getHeight(),
+        halfWidth = love.graphics.getWidth() / 2,
+        halfHeight = love.graphics.getHeight() / 2,
+    }
+
     love.graphics.setCaption('Obsessed')
     love.graphics.setBackgroundColor(0, 79, 0)
     love.graphics.setColor(255, 255, 255)
