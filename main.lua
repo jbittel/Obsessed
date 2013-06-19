@@ -8,9 +8,7 @@
 
 --]]
 
-package.path = 'lib/?.lua;' .. package.path
-
-require 'middleclass'
+require 'lib.middleclass'
 require 'util'
 
 function love.load()
