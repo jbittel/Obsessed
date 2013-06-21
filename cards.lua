@@ -53,7 +53,7 @@ function Card:hover()
     return false
 end
 
-function Card:mousepressed()
+function Card:mousepressed(x, y, button)
     if self:hover() then return true end
     return false
 end
