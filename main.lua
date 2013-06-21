@@ -19,12 +19,15 @@ function love.load()
         halfHeight = love.graphics.getHeight() / 2,
     }
 
+    font = {
+        default = love.graphics.newFont(18)
+    }
+
     love.graphics.setCaption('Obsessed')
     love.graphics.setBackgroundColor(0, 79, 0)
     love.graphics.setColor(255, 255, 255)
 
-    local f = love.graphics.newFont(24)
-    love.graphics.setFont(f)
+    love.graphics.setFont(font.default)
 
     require 'game'
     scene = Game:new()

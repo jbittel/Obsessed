@@ -11,13 +11,6 @@
 GameOver = class('GameOver')
 
 function GameOver:initialize(winners)
-    love.graphics.setCaption('Obsessed')
-    love.graphics.setBackgroundColor(0, 79, 0)
-    love.graphics.setColor(255, 255, 255)
-
-    local f = love.graphics.newFont(24)
-    love.graphics.setFont(f)
-
     self.winners = winners
 end
 
