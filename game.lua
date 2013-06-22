@@ -22,6 +22,12 @@ function Game:initialize()
     require 'players'
     require 'ai'
 
+    self.buttons = {
+        play = Button:new('Play', screen.height - 100, screen.width - 200),
+        pickup = Button:new('Pick Up Pile', 100, 100),
+        quit = Button:new('Quit', 100, 100)
+    }
+
     draw_pile = DrawPile:new()
     discard_pile = DiscardPile:new()
     player_list = PlayerList:new()
@@ -53,6 +59,10 @@ function Game:draw()
     end
     love.graphics.print('Turn '..player_list:getTurn(), 50, 100)
 
+    for _, button in pairs(self.buttons) do
+        button:draw()
+    end
+
     -- Display game board
     draw_pile:draw()
     discard_pile:draw()
@@ -66,6 +76,16 @@ end
 function Game:mousepressed(x, y, button)
     local player = player_list:getCurrentPlayer()
     if player:is_ai() then return end
+
+    for name, button in pairs(self.buttons) do
+        if button:mousepressed(x, y, button) then
+            if n == 'play' then
+                player:executeTurn()
+            elseif n == 'quit' then
+                love.event.push('quit')
+            end
+        end
+    end
 
     local active_pile = player:getActivePile()
     for i, card in ipairs(player:getActiveCards()) do
