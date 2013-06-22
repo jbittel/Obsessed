@@ -13,7 +13,7 @@ Button = class('Button')
 function Button:initialize(text, x, y)
     self.text = text
     self.width = font.default:getWidth(text)
-    self.height = font.default:getHeight(text)
+    self.height = font.default:getHeight()
     self.x = x - (self.width / 2)
     self.y = y
 end
