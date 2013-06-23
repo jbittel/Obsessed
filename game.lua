@@ -83,18 +83,20 @@ end
 function Game:mousepressed(x, y, button)
     local player = player_list:getCurrentPlayer()
     if player:is_ai() then return end
+    local active_pile = player:getActivePile()
 
     for name, button in pairs(self.buttons) do
         if button:mousepressed(x, y, button) then
-            if name == 'play' or name == 'pickup' then
-                player:executeTurn()
+            if name == 'play' then
+                if active_pile:hasValidPlay() then player:executeTurn() end
+            elseif  name == 'pickup' then
+                if not active_pile:hasValidPlay() then player:executeTurn() end
             elseif name == 'quit' then
                 love.event.push('quit')
             end
         end
     end
 
-    local active_pile = player:getActivePile()
     for i, card in ipairs(player:getActiveCards()) do
         if card:mousepressed(x, y, button) then
             if active_pile == player.hidden then
