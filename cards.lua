@@ -191,7 +191,7 @@ function CardPile:split_pile(a, b, idx)
     end
 end
 
-function CardPile:has_valid_play()
+function CardPile:hasValidPlay()
     for _,card in ipairs(self.cards) do
         if card:is_valid_play() then return true end
     end

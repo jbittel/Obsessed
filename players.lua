@@ -214,7 +214,7 @@ function PlayerList:get_next_player()
     return self.players[self:next_player_num()]
 end
 
-function PlayerList:get_human()
+function PlayerList:getHumanPlayer()
     -- TODO make this less brittle
     return self.players[1]
 end

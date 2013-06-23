@@ -9,6 +9,7 @@
 --]]
 
 require 'lib.middleclass'
+require 'button'
 require 'util'
 
 function love.load()

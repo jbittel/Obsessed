@@ -23,9 +23,9 @@ function Game:initialize()
     require 'ai'
 
     self.buttons = {
-        play = Button:new('Play', screen.height - 100, screen.width - 200),
-        pickup = Button:new('Pick Up Pile', 100, 100),
-        quit = Button:new('Quit', 100, 100)
+        play = Button:new('Play', screen.width - 50, screen.height - 30),
+        pickup = Button:new('Pick Up Pile', screen.width - 120, screen.height - 30),
+        quit = Button:new('Quit', screen.width - 50, 10)
     }
 
     draw_pile = DrawPile:new()
@@ -59,15 +59,22 @@ function Game:draw()
     end
     love.graphics.print('Turn '..player_list:getTurn(), 50, 100)
 
-    for _, button in pairs(self.buttons) do
-        button:draw()
+    local human = player_list:getHumanPlayer()
+    local active_pile = human:getActivePile()
+    for name, button in pairs(self.buttons) do
+        if name == 'play' then
+            if active_pile:hasValidPlay() then button:draw() end
+        elseif name == 'pickup' then
+            if not active_pile:hasValidPlay() then button:draw() end
+        else
+            button:draw()
+        end
     end
 
     -- Display game board
     draw_pile:draw()
     discard_pile:draw()
 
-    human = player_list:get_human()
     human.hand:draw()
     human.hidden:draw()
     human.visible:draw()
@@ -79,9 +86,9 @@ function Game:mousepressed(x, y, button)
 
     for name, button in pairs(self.buttons) do
         if button:mousepressed(x, y, button) then
-            if n == 'play' then
+            if name == 'play' or name == 'pickup' then
                 player:executeTurn()
-            elseif n == 'quit' then
+            elseif name == 'quit' then
                 love.event.push('quit')
             end
         end
@@ -107,7 +114,7 @@ function Game:keypressed(key, unicode)
     local active_pile = player:getActivePile()
     if key == 'p' and active_pile:isValidPlay() then
         player:executeTurn()
-    elseif key == 'u' and not active_pile:has_valid_play() then
+    elseif key == 'u' and not active_pile:hasValidPlay() then
         player:executeTurn()
     elseif key == 'q' or key == 'escape' then
         love.event.push('quit')

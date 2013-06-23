@@ -64,7 +64,7 @@ function AIPlayer:selectCards()
 end
 
 function AIPlayer:selectHand()
-    if not self.hand:has_valid_play() then return end
+    if not self.hand:hasValidPlay() then return end
     local face = self:selectCardFace(self.hand)
     for _, card in ipairs(self.hand.cards) do
         if face == card.face then
@@ -75,7 +75,7 @@ function AIPlayer:selectHand()
 end
 
 function AIPlayer:selectVisible()
-    if not self.visible:has_valid_play() then return end
+    if not self.visible:hasValidPlay() then return end
     local face = self:selectCardFace(self.visible)
     for _, card in ipairs(self.visible.cards) do
         if face == card.face then
