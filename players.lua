@@ -100,7 +100,11 @@ function Player:getActivePile()
 end
 
 function Player:getActiveCards()
-    return self:getActivePile():getCards()
+    local active_pile = self:getActivePile()
+    if active_pile then
+        return active_pile:getCards()
+    end
+    return {}
 end
 
 function Player:executeTurn()
