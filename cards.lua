@@ -201,7 +201,7 @@ end
 function CardPile:isValidPlay()
     local face = nil
 
-    if not self:hasValidPlay() then
+    if not self:hasValidPlay() or not self:hasSelected() then
         return false
     end
 
