@@ -58,7 +58,7 @@ function Card:mousepressed(x, y, button)
     return false
 end
 
-function Card:is_special()
+function Card:isSpecial()
     for _,card in ipairs(Card.SPECIAL_CARDS) do
         if card == self.face then return true end
     end
@@ -70,7 +70,7 @@ function Card:isSelected()
 end
 
 function Card:setSelected()
-    if self:is_valid_play() then
+    if self:isValidPlay() then
         self.selected = true
     end
 end
@@ -79,11 +79,11 @@ function Card:clearSelected()
     self.selected = false
 end
 
-function Card:is_active_face()
+function Card:isActiveFace()
     return self.face == discard_pile:get_active_face()
 end
 
-function Card:is_valid_play()
+function Card:isValidPlay()
     local active_face = discard_pile:get_active_face()
     if active_face == nil then return true end
     if active_face == self.face then return true end
@@ -193,7 +193,7 @@ end
 
 function CardPile:hasValidPlay()
     for _,card in ipairs(self.cards) do
-        if card:is_valid_play() then return true end
+        if card:isValidPlay() then return true end
     end
     return false
 end
@@ -207,7 +207,7 @@ function CardPile:isValidPlay()
 
     for _, card in ipairs(self.cards) do
         if card:isSelected() then
-            if not card:is_valid_play() then
+            if not card:isValidPlay() then
                 return false
             else
                 if face == nil then
@@ -226,7 +226,7 @@ function CardPile:get_valid_play()
     local face = nil
     self:sortByRank()
     for _,card in ipairs(self.cards) do
-        if face ~= card.face and card:is_valid_play() then
+        if face ~= card.face and card:isValidPlay() then
             face = card.face
             table.insert(valid, card)
         end
@@ -385,7 +385,7 @@ function PlayerHand:draw()
         if card:isSelected() then
             love.graphics.setColor(255, 0, 255, 190)
             love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
-        elseif card:hover() and card:is_valid_play() then
+        elseif card:hover() and card:isValidPlay() then
             love.graphics.setColor(255, 255, 255, 190)
             love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
         end
@@ -415,7 +415,7 @@ function PlayerVisible:draw()
         if card:isSelected() then
             love.graphics.setColor(255, 0, 255, 190)
             love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
-        elseif self:isActivePile() and card:hover() and card:is_valid_play() then
+        elseif self:isActivePile() and card:hover() and card:isValidPlay() then
             love.graphics.setColor(255, 255, 255, 190)
             love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
         end

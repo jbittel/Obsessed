@@ -69,7 +69,7 @@ function AIPlayer:selectHand()
     for _, card in ipairs(self.hand.cards) do
         if face == card.face then
             card:setSelected()
-            if card:is_special() and not self:is_late_game() then break end
+            if card:isSpecial() and not self:is_late_game() then break end
         end
     end
 end
@@ -114,7 +114,7 @@ function AIPlayer:modify_card_weights(cardpile, valid)
 
     for _,card in ipairs(valid) do
         -- Prioritize killing the pile when advisable
-        if card:is_active_face() and not card:is_special() and
+        if card:isActiveFace() and not card:isSpecial() and
            (self:is_late_game() or self:is_behind()) then
             if freq[card.face] + run >= KILL_RUN_LEN or
                freq[card.face] >= KILL_RUN_LEN then
