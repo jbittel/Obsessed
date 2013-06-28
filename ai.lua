@@ -90,7 +90,7 @@ function AIPlayer:selectHidden()
 end
 
 function AIPlayer:selectCardFace(cardpile)
-    local valid = cardpile:get_valid_play()
+    local valid = cardpile:getValidPlay()
 
     self:modify_card_weights(cardpile, valid)
     for _, card in ipairs(valid) do card.weight = self.ai_face_weight[card.face] end
@@ -133,11 +133,11 @@ end
 
 function AIPlayer:is_late_game()
     -- Consider it "late game" when there's no cards to draw
-    return draw_pile:get_num_cards() == 0
+    return draw_pile:getNumCards() == 0
 end
 
 function AIPlayer:is_behind()
-    return self.hand:get_num_cards() > draw_pile:get_num_cards()
+    return self.hand:getNumCards() > draw_pile:getNumCards()
 end
 
 function AIPlayer:biased_rand(min, max)

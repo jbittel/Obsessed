@@ -109,7 +109,7 @@ function CardPile:initialize(...)
     end
 end
 
-function CardPile:get_num_cards()
+function CardPile:getNumCards()
     return #self.cards
 end
 
@@ -117,21 +117,21 @@ function CardPile:sortByRank()
     table.sort(self.cards, function(a, b) return a.rank < b.rank end)
 end
 
-function CardPile:add_card(card)
+function CardPile:addCard(card)
     table.insert(self.cards, 1, card)
 end
 
-function CardPile:remove_card(num)
+function CardPile:removeCard(num)
     if #self.cards == 0 then return nil end
     local num = num or 1
     return table.remove(self.cards, num)
 end
 
-function CardPile:remove_cards()
+function CardPile:removeCards()
     self.cards = {}
 end
 
-function CardPile:get_card(num)
+function CardPile:getCard(num)
     if #self.cards == 0 then return nil end
     local num = num or 1
     return self.cards[num]
@@ -178,15 +178,15 @@ function CardPile:clearSelected()
     end
 end
 
-function CardPile:split_pile(a, b, idx)
+function CardPile:splitPile(a, b, idx)
     local set = table.set(idx)
-    a:remove_cards()
-    b:remove_cards()
+    a:removeCards()
+    b:removeCards()
     for i, card in ipairs(self.cards) do
         if set[i] then
-            a:add_card(card)
+            a:addCard(card)
         else
-            b:add_card(card)
+            b:addCard(card)
         end
     end
 end
@@ -221,7 +221,7 @@ function CardPile:isValidPlay()
     return true
 end
 
-function CardPile:get_valid_play()
+function CardPile:getValidPlay()
     local valid = {}
     local face = nil
     self:sortByRank()
@@ -234,7 +234,7 @@ function CardPile:get_valid_play()
     return valid
 end
 
-function CardPile:has_card(face)
+function CardPile:hasCard(face)
     for i,card in ipairs(self.cards) do
         if card.face == face then return i end
     end
@@ -258,7 +258,7 @@ function CardPile:playCards()
     for i, card in ipairs(self.cards) do
         if set[i] then
             logger("plays a "..tostring(card))
-            discard_pile:add_card(card)
+            discard_pile:addCard(card)
         else
             table.insert(cards, card)
         end
@@ -333,12 +333,12 @@ function DiscardPile:draw()
 end
 
 function DiscardPile:kill_pile()
-    self:remove_cards()
+    self:removeCards()
     logger('killed the discard pile')
 end
 
 function DiscardPile:get_top_face()
-    local card = self:get_card()
+    local card = self:getCard()
     if not card then return nil end
     return card.face
 end
@@ -371,7 +371,7 @@ PlayerHand.static.SIZE = 3
 
 function PlayerHand:initialize()
     CardPile.initialize(self)
-    for i = 1, PlayerHand.SIZE do self:add_card(draw_pile:remove_card()) end
+    for i = 1, PlayerHand.SIZE do self:addCard(draw_pile:removeCard()) end
 end
 
 function PlayerHand:draw()
@@ -401,7 +401,7 @@ PlayerVisible.static.SIZE = 3
 
 function PlayerVisible:initialize()
     CardPile.initialize(self)
-    for i = 1, PlayerVisible.SIZE do self:add_card(draw_pile:remove_card()) end
+    for i = 1, PlayerVisible.SIZE do self:addCard(draw_pile:removeCard()) end
 end
 
 function PlayerVisible:draw()
@@ -431,7 +431,7 @@ PlayerHidden.static.SIZE = 3
 
 function PlayerHidden:initialize()
     CardPile.initialize(self)
-    for i = 1, PlayerHidden.SIZE do self:add_card(draw_pile:remove_card()) end
+    for i = 1, PlayerHidden.SIZE do self:addCard(draw_pile:removeCard()) end
 end
 
 function PlayerHidden:draw()

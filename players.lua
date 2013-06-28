@@ -31,31 +31,31 @@ function Player:is_ai()
 end
 
 function Player:get_num_cards()
-    return self.hand:get_num_cards() + self.visible:get_num_cards() + self.hidden:get_num_cards()
+    return self.hand:getNumCards() + self.visible:getNumCards() + self.hidden:getNumCards()
 end
 
 function Player:get_num_hand_cards()
-    return self.hand:get_num_cards()
+    return self.hand:getNumCards()
 end
 
 function Player:get_num_visible_cards()
-    return self.visible:get_num_cards()
+    return self.visible:getNumCards()
 end
 
 function Player:get_num_hidden_cards()
-    return self.hidden:get_num_cards()
+    return self.hidden:getNumCards()
 end
 
 function Player:addToHand(cards, num)
-    local card = cards:remove_card(num)
-    if card ~= nil then self.hand:add_card(card) end
+    local card = cards:removeCard(num)
+    if card ~= nil then self.hand:addCard(card) end
 end
 
 function Player:addToHandFromHidden(num)
-    local card = self.hidden:remove_card(num)
+    local card = self.hidden:removeCard(num)
     if card ~= nil then
         card:setSelected()
-        self.hand:add_card(card)
+        self.hand:addCard(card)
     end
 end
 
@@ -63,18 +63,18 @@ function Player:pickUpPile()
     local count = 0
     for _, card in ipairs(discard_pile:getCards()) do
         if card.face ~= '3' then
-            self.hand:add_card(card)
+            self.hand:addCard(card)
             count = count + 1
         end
     end
-    discard_pile:remove_cards()
+    discard_pile:removeCards()
     logger('picked up '..count..' cards')
 end
 
 function Player:selectInitialCard()
     local initial_face = nil
     for _,face in ipairs(Card.START_ORDER) do
-        if self.hand:has_card(face) then
+        if self.hand:hasCard(face) then
             initial_face = face
             break
         end
@@ -138,7 +138,7 @@ function Player:executeTurn()
     -- Keep player's hand at the minimum number of cards,
     -- as long as there's cards to draw
     while player:get_num_hand_cards() < PlayerHand.SIZE and
-          draw_pile:get_num_cards() > 0 do
+          draw_pile:getNumCards() > 0 do
         player:addToHand(draw_pile)
     end
 
@@ -266,7 +266,7 @@ end
 function PlayerList:init_player_num()
     for _,face in ipairs(Card.START_ORDER) do
         for _,player in ipairs(self.players) do
-            if player.hand:has_card(face) then
+            if player.hand:hasCard(face) then
                 return player.num
             end
         end
