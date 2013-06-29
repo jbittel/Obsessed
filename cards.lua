@@ -80,11 +80,11 @@ function Card:clearSelected()
 end
 
 function Card:isActiveFace()
-    return self.face == discard_pile:get_active_face()
+    return self.face == discard_pile:getActiveFace()
 end
 
 function Card:isValidPlay()
-    local active_face = discard_pile:get_active_face()
+    local active_face = discard_pile:getActiveFace()
     if active_face == nil then return true end
     if active_face == self.face then return true end
     if Card.INVALID_MOVES[active_face] ~= nil then
@@ -332,27 +332,27 @@ function DiscardPile:draw()
     love.graphics.print(#self.cards, 150, 300)
 end
 
-function DiscardPile:kill_pile()
+function DiscardPile:killPile()
     self:removeCards()
     logger('killed the discard pile')
 end
 
-function DiscardPile:get_top_face()
+function DiscardPile:getTopFace()
     local card = self:getCard()
     if not card then return nil end
     return card.face
 end
 
-function DiscardPile:get_active_face()
+function DiscardPile:getActiveFace()
     for _,card in ipairs(self.cards) do
         if card.face ~= 'R' then return card.face end
     end
     return nil
 end
 
-function DiscardPile:get_run_length()
+function DiscardPile:getRunLength()
     local run = 0
-    local top_face = self:get_top_face()
+    local top_face = self:getTopFace()
     if not top_face then return 0 end
     for _,card in ipairs(self.cards) do
         if card.face == top_face then

@@ -119,19 +119,19 @@ function Player:executeTurn()
     end
 
     -- Apply card face rules
-    local top_face = discard_pile:get_top_face()
+    local top_face = discard_pile:getTopFace()
     if top_face == '8' then
         next_player = false
     elseif top_face == '10' then
-        discard_pile:kill_pile()
+        discard_pile:killPile()
         next_player = false
     elseif top_face == 'R' then
         player_list:reverseDirection()
     end
 
     -- Kill pile if 4+ top cards match
-    if discard_pile:get_run_length() >= KILL_RUN_LEN then
-        discard_pile:kill_pile()
+    if discard_pile:getRunLength() >= KILL_RUN_LEN then
+        discard_pile:killPile()
         next_player = false
     end
 

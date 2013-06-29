@@ -107,7 +107,7 @@ end
 
 function AIPlayer:modify_card_weights(cardpile, valid)
     local freq = self:get_frequencies(cardpile.cards)
-    local run = discard_pile:get_run_length()
+    local run = discard_pile:getRunLength()
     local next_player = player_list:get_next_player()
 
     self.ai_face_weight = table.copy(AIPlayer.BASE_AI_FACE_WEIGHT)
