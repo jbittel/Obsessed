@@ -32,7 +32,7 @@ function AIPlayer:initialize(num)
     Player.initialize(self, num)
 end
 
-function AIPlayer:swap_cards()
+function AIPlayer:swapCards()
     local t = {}
 
     for _,card in ipairs(self.visible.cards) do
@@ -69,7 +69,7 @@ function AIPlayer:selectHand()
     for _, card in ipairs(self.hand.cards) do
         if face == card.face then
             card:setSelected()
-            if card:isSpecial() and not self:is_late_game() then break end
+            if card:isSpecial() and not self:isLateGame() then break end
         end
     end
 end
@@ -92,21 +92,21 @@ end
 function AIPlayer:selectCardFace(cardpile)
     local valid = cardpile:getValidPlay()
 
-    self:modify_card_weights(cardpile, valid)
+    self:modifyCardWeights(cardpile, valid)
     for _, card in ipairs(valid) do card.weight = self.ai_face_weight[card.face] end
     table.sort(valid, function(a, b) return a.weight < b.weight end)
 
-    return valid[self:biased_rand(1, #valid)].face
+    return valid[biased_random(1, #valid)].face
 end
 
-function AIPlayer:get_frequencies(cards)
+function AIPlayer:getFrequencies(cards)
     local freq = {}
     for _,card in ipairs(cards) do freq[card.face] = (freq[card.face] or 0) + 1 end
     return freq
 end
 
-function AIPlayer:modify_card_weights(cardpile, valid)
-    local freq = self:get_frequencies(cardpile.cards)
+function AIPlayer:modifyCardWeights(cardpile, valid)
+    local freq = self:getFrequencies(cardpile.cards)
     local run = discard_pile:getRunLength()
     local next_player = player_list:get_next_player()
 
@@ -115,7 +115,7 @@ function AIPlayer:modify_card_weights(cardpile, valid)
     for _,card in ipairs(valid) do
         -- Prioritize killing the pile when advisable
         if card:isActiveFace() and not card:isSpecial() and
-           (self:is_late_game() or self:is_behind()) then
+           (self:isLateGame() or self:isBehind()) then
             if freq[card.face] + run >= KILL_RUN_LEN or
                freq[card.face] >= KILL_RUN_LEN then
                 self.ai_face_weight[card.face] = 0
@@ -123,7 +123,7 @@ function AIPlayer:modify_card_weights(cardpile, valid)
         end
     end
 
-    if self:is_late_game() and next_player:get_num_hand_cards() == 0 then
+    if self:isLateGame() and next_player:get_num_hand_cards() == 0 then
         -- Aggressively play if the next player is close to winning
         self.ai_face_weight['3'] = 0
         self.ai_face_weight['R'] = 0
@@ -131,19 +131,11 @@ function AIPlayer:modify_card_weights(cardpile, valid)
     end
 end
 
-function AIPlayer:is_late_game()
+function AIPlayer:isLateGame()
     -- Consider it "late game" when there's no cards to draw
     return draw_pile:getNumCards() == 0
 end
 
-function AIPlayer:is_behind()
+function AIPlayer:isBehind()
     return self.hand:getNumCards() > draw_pile:getNumCards()
-end
-
-function AIPlayer:biased_rand(min, max)
-    if min == max then return min end
-    local r = math.floor(min + (max - min) * math.random() ^ 10)
-    if r > max then r = max end
-    if r < min then r = min end
-    return r
 end
