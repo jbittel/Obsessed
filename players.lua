@@ -15,14 +15,14 @@ function Player:initialize(num)
     self.hand = PlayerHand:new('Hand')
     self.visible = PlayerVisible:new('Visible')
     self.hidden = PlayerHidden:new('Hidden')
---  TODO self:swap_cards()
+--  TODO self:swapCards()
 end
 
 function Player:__tostring()
     return 'P'..tostring(self.num)
 end
 
-function Player:is_ai()
+function Player:isAi()
     if self.class.name == 'AIPlayer' then
         return true
     else
@@ -30,19 +30,19 @@ function Player:is_ai()
     end
 end
 
-function Player:get_num_cards()
+function Player:getNumCards()
     return self.hand:getNumCards() + self.visible:getNumCards() + self.hidden:getNumCards()
 end
 
-function Player:get_num_hand_cards()
+function Player:getNumHandCards()
     return self.hand:getNumCards()
 end
 
-function Player:get_num_visible_cards()
+function Player:getNumVisibleCards()
     return self.visible:getNumCards()
 end
 
-function Player:get_num_hidden_cards()
+function Player:getNumHiddenCards()
     return self.hidden:getNumCards()
 end
 
@@ -89,11 +89,11 @@ end
 function Player:getActivePile()
     local active_pile = nil
 
-    if self:get_num_hand_cards() > 0 then
+    if self:getNumHandCards() > 0 then
         active_pile = self.hand
-    elseif self:get_num_visible_cards() > 0 then
+    elseif self:getNumVisibleCards() > 0 then
         active_pile = self.visible
-    elseif self:get_num_hidden_cards() > 0 then
+    elseif self:getNumHiddenCards() > 0 then
         active_pile = self.hidden
     end
     return active_pile
@@ -137,7 +137,7 @@ function Player:executeTurn()
 
     -- Keep player's hand at the minimum number of cards,
     -- as long as there's cards to draw
-    while player:get_num_hand_cards() < PlayerHand.SIZE and
+    while player:getNumHandCards() < PlayerHand.SIZE and
           draw_pile:getNumCards() > 0 do
         player:addToHand(draw_pile)
     end
@@ -145,7 +145,7 @@ function Player:executeTurn()
     -- TODO do we want to stop when a player wins,
     -- make it a binary win/loss condition?
     -- Test for win condition
-    if player:get_num_cards() == 0 then
+    if player:getNumCards() == 0 then
         logger('wins!')
         player_list:add_winner()
         next_player = true

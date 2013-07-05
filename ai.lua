@@ -51,13 +51,13 @@ function AIPlayer:swapCards()
 end
 
 function AIPlayer:selectCards()
-    if self:get_num_hand_cards() > 0 then
+    if self:getNumHandCards() > 0 then
         -- Select cards from hand
         self:selectHand()
-    elseif self:get_num_visible_cards() > 0 then
+    elseif self:getNumVisibleCards() > 0 then
         -- Select cards from visible set
          self:selectVisible()
-    elseif self:get_num_hidden_cards() > 0 then
+    elseif self:getNumHiddenCards() > 0 then
         -- Select cards from hidden set
         self:selectHidden()
     end
@@ -86,7 +86,7 @@ end
 
 function AIPlayer:selectHidden()
     self:addToHandFromHidden(1)
-    logger('drew from hidden cards, '..self:get_num_hidden_cards()..' left')
+    logger('drew from hidden cards, '..self:getNumHiddenCards()..' left')
 end
 
 function AIPlayer:selectCardFace(cardpile)
@@ -123,7 +123,7 @@ function AIPlayer:modifyCardWeights(cardpile, valid)
         end
     end
 
-    if self:isLateGame() and next_player:get_num_hand_cards() == 0 then
+    if self:isLateGame() and next_player:getNumHandCards() == 0 then
         -- Aggressively play if the next player is close to winning
         self.ai_face_weight['3'] = 0
         self.ai_face_weight['R'] = 0

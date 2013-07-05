@@ -42,7 +42,7 @@ function Game:update()
         return
     end
 
-    if player:is_ai() then
+    if player:isAi() then
         player:selectCards()
         player:executeTurn()
     end
@@ -52,7 +52,7 @@ function Game:draw()
     love.graphics.printf('Obsessed', 0, 50, screen.width, "center")
 
     local player = player_list:getCurrentPlayer()
-    if player:is_ai() == true then
+    if player:isAi() == true then
         love.graphics.print(tostring(player)..' (AI)', 50, 75)
     else
         love.graphics.print(tostring(player)..' (Human)', 50, 75)
@@ -82,7 +82,7 @@ end
 
 function Game:mousepressed(x, y, button)
     local player = player_list:getCurrentPlayer()
-    if player:is_ai() then return end
+    if player:isAi() then return end
     local active_pile = player:getActivePile()
 
     for name, button in pairs(self.buttons) do
@@ -111,7 +111,7 @@ end
 
 function Game:keypressed(key, unicode)
     local player = player_list:getCurrentPlayer()
-    if player:is_ai() then return end
+    if player:isAi() then return end
 
     local active_pile = player:getActivePile()
     if key == 'p' and active_pile:isValidPlay() then
