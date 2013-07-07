@@ -147,12 +147,12 @@ function Player:executeTurn()
     -- Test for win condition
     if player:getNumCards() == 0 then
         logger('wins!')
-        player_list:add_winner()
+        player_list:addWinner()
         next_player = true
         -- Test for game over condition
-        if player_list:get_num_players() == 1 then
+        if player_list:getNumPlayers() == 1 then
             require 'game_over'
-            player_list:add_winner(player_list:next_player_num())
+            player_list:addWinner(player_list:nextPlayerNum())
             scene = GameOver:new(player_list.winners)
         end
     end
@@ -207,15 +207,15 @@ function PlayerList:initialize()
         table.insert(self.players, player)
     end
 
-    self.curr_player = self:init_player_num()
+    self.curr_player = self:initPlayerNum()
 end
 
 function PlayerList:getCurrentPlayer()
     return self.players[self.curr_player]
 end
 
-function PlayerList:get_next_player()
-    return self.players[self:next_player_num()]
+function PlayerList:getNextPlayer()
+    return self.players[self:nextPlayerNum()]
 end
 
 function PlayerList:getHumanPlayer()
@@ -225,14 +225,14 @@ end
 
 function PlayerList:advancePlayer()
     self:advanceTurn()
-    self.curr_player = self:next_player_num()
+    self.curr_player = self:nextPlayerNum()
 end
 
 function PlayerList:advanceTurn()
     self.turn = self.turn + 1
 end
 
-function PlayerList:get_num_players()
+function PlayerList:getNumPlayers()
     return #self.players
 end
 
@@ -245,7 +245,7 @@ function PlayerList:getTurn()
     return self.turn
 end
 
-function PlayerList:next_player_num()
+function PlayerList:nextPlayerNum()
     local num_players = #self.players
     local curr_player = self.curr_player
 
@@ -263,7 +263,7 @@ end
 
 -- Pick starting player by matching the first instance of
 -- a non-special face with a card in a player's hand
-function PlayerList:init_player_num()
+function PlayerList:initPlayerNum()
     for _,face in ipairs(Card.START_ORDER) do
         for _,player in ipairs(self.players) do
             if player.hand:hasCard(face) then
@@ -274,7 +274,7 @@ function PlayerList:init_player_num()
     return 1
 end
 
-function PlayerList:add_winner(num)
+function PlayerList:addWinner(num)
     local player_num = num or self.curr_player
     local player = table.remove(self.players, player_num)
     table.insert(self.winners, player)
