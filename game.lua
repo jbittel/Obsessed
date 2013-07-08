@@ -63,9 +63,13 @@ function Game:draw()
     local active_pile = human:getActivePile()
     for name, button in pairs(self.buttons) do
         if name == 'play' then
-            if active_pile:hasValidPlay() then button:draw() end
+            if active_pile ~= human.hidden and active_pile:hasValidPlay() then
+                button:draw()
+            end
         elseif name == 'pickup' then
-            if not active_pile:hasValidPlay() then button:draw() end
+            if active_pile ~= human.hidden and not active_pile:hasValidPlay() then
+                button:draw()
+            end
         else
             button:draw()
         end
