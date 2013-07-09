@@ -124,7 +124,7 @@ function Game:keypressed(key, unicode)
         player:executeTurn()
     elseif key == 'q' or key == 'escape' then
         love.event.push('quit')
-    elseif key == '1' or key == '2' or key == '3' then
+    elseif key:match('[1-9]') then
         active_pile:toggleSelected(tonumber(key))
     end
 end
