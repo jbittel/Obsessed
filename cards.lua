@@ -294,7 +294,7 @@ end
 function DrawPile:draw()
     local n = #self.cards
     if n > 0 then
-        local img = self.cards[n].front
+        local img = self.cards[n].back
         love.graphics.draw(img, 50, 200)
     end
     love.graphics.print(n, 50, 300)
