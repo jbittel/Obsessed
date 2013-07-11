@@ -34,7 +34,7 @@ function GameOver:draw()
     end
 end
 
-function Game:mousepressed(x, y, button)
+function GameOver:mousepressed(x, y, button)
     for name, button in pairs(self.buttons) do
         if button:mousepressed(x, y, button) then
             if name == 'restart' then
