@@ -11,6 +11,11 @@
 GameOver = class('GameOver')
 
 function GameOver:initialize(winners)
+    self.buttons = {
+        restart = Button:new('Restart', screen.width - 50, 30),
+        quit = Button:new('Quit', screen.width - 50, 10)
+    }
+
     self.winners = winners
 end
 
@@ -22,6 +27,22 @@ function GameOver:draw()
     for i,player in ipairs(self.winners) do
         love.graphics.print(i..'. '..tostring(player), 100, vpos)
         vpos = vpos + 50
+    end
+
+    for name, button in pairs(self.buttons) do
+        button:draw()
+    end
+end
+
+function Game:mousepressed(x, y, button)
+    for name, button in pairs(self.buttons) do
+        if button:mousepressed(x, y, button) then
+            if name == 'restart' then
+                scene = Game:new()
+            elseif name == 'quit' then
+                love.event.push('quit')
+            end
+        end
     end
 end
 
