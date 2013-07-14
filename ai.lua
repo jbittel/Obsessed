@@ -35,11 +35,11 @@ end
 function AIPlayer:swapCards()
     local t = {}
 
-    for _,card in ipairs(self.visible.cards) do
+    for _, card in ipairs(self.visible.cards) do
         card.weight = self.ai_face_weight[card.face]
         table.insert(t, card)
     end
-    for _,card in ipairs(self.hand.cards) do
+    for _, card in ipairs(self.hand.cards) do
         card.weight = self.ai_face_weight[card.face]
         table.insert(t, card)
     end
@@ -93,7 +93,9 @@ function AIPlayer:selectCardFace(cardpile)
     local valid = cardpile:getValidPlay()
 
     self:modifyCardWeights(cardpile, valid)
-    for _, card in ipairs(valid) do card.weight = self.ai_face_weight[card.face] end
+    for _, card in ipairs(valid) do
+        card.weight = self.ai_face_weight[card.face]
+    end
     table.sort(valid, function(a, b) return a.weight < b.weight end)
 
     return valid[biased_random(1, #valid)].face
@@ -101,7 +103,9 @@ end
 
 function AIPlayer:getFrequencies(cards)
     local freq = {}
-    for _,card in ipairs(cards) do freq[card.face] = (freq[card.face] or 0) + 1 end
+    for _, card in ipairs(cards) do
+        freq[card.face] = (freq[card.face] or 0) + 1
+    end
     return freq
 end
 
@@ -112,7 +116,7 @@ function AIPlayer:modifyCardWeights(cardpile, valid)
 
     self.ai_face_weight = table.copy(AIPlayer.BASE_AI_FACE_WEIGHT)
 
-    for _,card in ipairs(valid) do
+    for _, card in ipairs(valid) do
         -- Prioritize killing the pile when advisable
         if card:isActiveFace() and not card:isSpecial() and
            (self:isLateGame() or self:isBehind()) then
@@ -137,5 +141,7 @@ function AIPlayer:isLateGame()
 end
 
 function AIPlayer:isBehind()
+    -- Consider it being "behind" when there are more cards in
+    -- the hand then are in the draw pile
     return self.hand:getNumCards() > draw_pile:getNumCards()
 end
