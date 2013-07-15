@@ -23,6 +23,7 @@ function biased_random(min, max)
 end
 
 function img_filename(text)
+    text = text:gsub(' ', '-')
     return string.lower('images/'..text..'.png')
 end
 
