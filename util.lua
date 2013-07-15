@@ -22,6 +22,10 @@ function biased_random(min, max)
     return r
 end
 
+function img_filename(text)
+    return string.lower('images/'..text..'.png')
+end
+
 -- Table manipulation methods
 
 function table.slice(list, start, len)

@@ -31,8 +31,8 @@ function Card:initialize(face, suit, rank)
     self.face = face
     self.suit = suit
     self.rank = rank
-    self.front = love.graphics.newImage(string.lower('images/'..tostring(self)..'.png'))
-    self.back = love.graphics.newImage('images/b1fv.png')
+    self.front = love.graphics.newImage(img_filename(tostring(self)))
+    self.back = love.graphics.newImage(img_filename('b1fv'))
     self.height = self.front:getHeight()
     self.width = self.front:getWidth()
     self.x = 0
