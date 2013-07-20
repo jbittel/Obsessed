@@ -12,23 +12,15 @@ Button = class('Button')
 
 function Button:initialize(text, x, y)
     self.text = text
-    self.width = font.default:getWidth(text)
-    self.height = font.default:getHeight()
+    self.img = love.graphics.newImage(img_filename(text))
+    self.width = self.img:getWidth()
+    self.height = self.img:getHeight()
     self.x = x
     self.y = y
 end
 
 function Button:draw()
-    local r, g, b, a = love.graphics.getColor()
-    if self:hover() then
-        love.graphics.setColor(255, 0, 255, 190)
-    end
-
-    love.graphics.setFont(font.default)
-    love.graphics.print(self.text, self.x, self.y)
-    love.graphics.rectangle('line', self.x - 1, self.y - 1, self.width + 1, self.height + 1)
-
-    love.graphics.setColor(r, g, b, a)
+    love.graphics.draw(self.img, self.x, self.y)
 end
 
 function Button:hover()

@@ -23,9 +23,9 @@ function Game:initialize()
     require 'ai'
 
     self.buttons = {
-        play = Button:new('Play', screen.width - 50, screen.height - 30),
-        pickup = Button:new('Pick Up Pile', screen.width - 120, screen.height - 30),
-        quit = Button:new('Quit', screen.width - 50, 10)
+        quit = Button:new('Quit', screen.width - 160, 10),
+        play = Button:new('Play', screen.width - 160, screen.height - 60),
+        pickup = Button:new('Pick Up', screen.width - 160, screen.height - 60)
     }
 
     draw_pile = DrawPile:new()
