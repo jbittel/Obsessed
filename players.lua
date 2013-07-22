@@ -114,7 +114,7 @@ function Player:executeTurn()
 
     if active_pile:isValidPlay() then
         active_pile:playCards()
-    else
+    elseif not active_pile:hasValidPlay() then
         player:pickUpPile()
     end
 
@@ -185,6 +185,12 @@ end
 function HumanPlayer:pickUpPile()
     Player.pickUpPile(self)
     self.hand:sortByRank()
+end
+
+function HumanPlayer:executeTurn()
+    local active_pile = self:getActivePile()
+    if active_pile:hasValidPlay() and not active_pile:isValidPlay() then return end
+    Player.executeTurn(self)
 end
 
 
