@@ -25,7 +25,7 @@ function Game:initialize()
     self.buttons = {
         quit = Button:new('Quit', screen.width - 160, 10),
         play = Button:new('Play', screen.width - 160, screen.height - 60),
-        pickup = Button:new('Pick Up', screen.width - 160, screen.height - 60)
+        pickup = Button:new('Pick Up', screen.width - 160, screen.height - 60),
     }
 
     draw_pile = DrawPile:new()

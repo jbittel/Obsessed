@@ -12,7 +12,7 @@ GameOver = class('GameOver')
 
 function GameOver:initialize(winners)
     self.buttons = {
-        quit = Button:new('Quit', screen.width - 160, 10)
+        quit = Button:new('Quit', screen.width - 160, 10),
         restart = Button:new('Restart', screen.width - 160, 70),
     }
 
