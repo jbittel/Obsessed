@@ -409,9 +409,12 @@ function PlayerVisible:draw()
     local r, g, b, a = love.graphics.getColor()
     for _, card in ipairs(self:getCards()) do
         love.graphics.setColor(255, 255, 255, 255)
-        love.graphics.draw(card.front, hpos, 480)
-        card.x = hpos
-        card.y = 480
+        if card.x == 0 then
+            card.x = hpos
+            card.y = 480
+        end
+        hpos = hpos + 100
+        love.graphics.draw(card.front, card.x, card.y)
         if card:isSelected() then
             love.graphics.setColor(255, 0, 255, 190)
             love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
@@ -419,7 +422,6 @@ function PlayerVisible:draw()
             love.graphics.setColor(255, 255, 255, 190)
             love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
         end
-        hpos = hpos + 100
     end
     love.graphics.setColor(r, g, b, a)
 end
@@ -437,9 +439,11 @@ end
 function PlayerHidden:draw()
     local hpos = 50
     for _, card in ipairs(self:getCards()) do
-        love.graphics.draw(card.back, hpos, 480)
-        card.x = hpos
-        card.y = 480
+        if card.x == 0 then
+            card.x = hpos
+            card.y = 480
+        end
         hpos = hpos + 100
+        love.graphics.draw(card.back, card.x, card.y)
     end
 end
