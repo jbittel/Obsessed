@@ -291,13 +291,12 @@ function DrawPile:initialize()
     self:shuffle()
 end
 
-function DrawPile:draw()
-    local n = #self.cards
-    if n > 0 then
-        local img = self.cards[n].back
-        love.graphics.draw(img, 50, 200)
+function DrawPile:draw(x, y)
+    local card = self:getCard()
+    if card then
+        love.graphics.draw(card.back, x, y)
+        love.graphics.print(self:getNumCards(), x, y + card.height)
     end
-    love.graphics.print(n, 50, 300)
 end
 
 -- Implementation of the Fisher-Yates shuffle
@@ -320,16 +319,16 @@ end
 
 DiscardPile = class('DiscardPile', CardPile)
 
-function DiscardPile:draw()
+function DiscardPile:draw(x, y)
     for _, card in ipairs(self.cards) do
         if card.face == 'R' then
-            love.graphics.draw(card.front, 175, 200)
+            love.graphics.draw(card.front, x + 10, y)
         else
-            love.graphics.draw(card.front, 150, 200)
+            love.graphics.draw(card.front, x, y)
+            love.graphics.print(self:getNumCards(), x, y + card.height)
             break
         end
     end
-    love.graphics.print(#self.cards, 150, 300)
 end
 
 function DiscardPile:killPile()
@@ -374,14 +373,14 @@ function PlayerHand:initialize()
     for i = 1, PlayerHand.SIZE do self:addCard(draw_pile:removeCard()) end
 end
 
-function PlayerHand:draw()
-    local hpos = 50
+function PlayerHand:draw(x, y)
     local r, g, b, a = love.graphics.getColor()
     for _, card in ipairs(self:getCards()) do
+        card.x = x
+        card.y = y
+
         love.graphics.setColor(255, 255, 255, 255)
-        love.graphics.draw(card.front, hpos, 350)
-        card.x = hpos
-        card.y = 350
+        love.graphics.draw(card.front, card.x, card.y)
         if card:isSelected() then
             love.graphics.setColor(255, 0, 255, 190)
             love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
@@ -389,7 +388,7 @@ function PlayerHand:draw()
             love.graphics.setColor(255, 255, 255, 190)
             love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
         end
-        hpos = hpos + 75
+        x = x + card.width + 5
     end
     love.graphics.setColor(r, g, b, a)
 end
@@ -404,16 +403,16 @@ function PlayerVisible:initialize()
     for i = 1, PlayerVisible.SIZE do self:addCard(draw_pile:removeCard()) end
 end
 
-function PlayerVisible:draw()
-    local hpos = 60
+function PlayerVisible:draw(x, y)
     local r, g, b, a = love.graphics.getColor()
     for _, card in ipairs(self:getCards()) do
-        love.graphics.setColor(255, 255, 255, 255)
         if card.x == 0 then
-            card.x = hpos
-            card.y = 480
+            card.x = x
+            card.y = y
         end
-        hpos = hpos + 100
+        x = x + card.width + 20
+
+        love.graphics.setColor(255, 255, 255, 255)
         love.graphics.draw(card.front, card.x, card.y)
         if card:isSelected() then
             love.graphics.setColor(255, 0, 255, 190)
@@ -436,14 +435,14 @@ function PlayerHidden:initialize()
     for i = 1, PlayerHidden.SIZE do self:addCard(draw_pile:removeCard()) end
 end
 
-function PlayerHidden:draw()
-    local hpos = 50
+function PlayerHidden:draw(x, y)
     for _, card in ipairs(self:getCards()) do
         if card.x == 0 then
-            card.x = hpos
-            card.y = 480
+            card.x = x
+            card.y = y
         end
-        hpos = hpos + 100
+
+        x = x + card.width + 20
         love.graphics.draw(card.back, card.x, card.y)
     end
 end

@@ -76,12 +76,12 @@ function Game:draw()
     end
 
     -- Display game board
-    draw_pile:draw()
-    discard_pile:draw()
+    draw_pile:draw(50, 200)
+    discard_pile:draw(150, 200)
 
-    human.hand:draw()
-    human.hidden:draw()
-    human.visible:draw()
+    human.hand:draw(50, 350)
+    human.hidden:draw(60, 480)
+    human.visible:draw(50, 470)
 end
 
 function Game:mousepressed(x, y, button)
