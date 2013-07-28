@@ -112,10 +112,12 @@ function Player:executeTurn()
     local active_pile = self:getActivePile()
     local player = player_list:getCurrentPlayer()
 
-    if active_pile:isValidPlay() then
-        active_pile:playCards()
-    elseif not active_pile:hasValidPlay() then
-        player:pickUpPile()
+    if active_pile then
+        if active_pile:isValidPlay() then
+            active_pile:playCards()
+        elseif not active_pile:hasValidPlay() then
+            player:pickUpPile()
+        end
     end
 
     -- Apply card face rules
@@ -189,7 +191,11 @@ end
 
 function HumanPlayer:executeTurn()
     local active_pile = self:getActivePile()
-    if active_pile:hasValidPlay() and not active_pile:isValidPlay() then return end
+    if active_pile then
+        if active_pile:hasValidPlay() and not active_pile:isValidPlay() then
+            return
+        end
+    end
     Player.executeTurn(self)
 end
 
