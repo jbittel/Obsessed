@@ -59,6 +59,11 @@ function Game:draw()
     end
     love.graphics.print('Turn '..player_list:getTurn(), 50, 100)
 
+    draw_pile:draw(50, 200)
+    discard_pile:draw(150, 200)
+
+    if player:isAi() then return end
+
     local human = player_list:getHumanPlayer()
     local active_pile = human:getActivePile()
     for name, button in pairs(self.buttons) do
@@ -74,10 +79,6 @@ function Game:draw()
             button:draw()
         end
     end
-
-    -- Display game board
-    draw_pile:draw(50, 200)
-    discard_pile:draw(150, 200)
 
     human.hand:draw(50, 350)
     human.hidden:draw(60, 480)
