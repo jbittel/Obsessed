@@ -153,8 +153,11 @@ function Player:executeTurn()
         next_player = true
         -- Test for game over condition
         if player_list:getNumPlayers() == 1 then
+            for i, player in ipairs(player_list:getPlayers()) do
+                player_list:addWinner(i)
+            end
+
             require 'game_over'
-            player_list:addWinner(player_list:nextPlayerNum())
             scene = GameOver:new(player_list.winners)
         end
     end
