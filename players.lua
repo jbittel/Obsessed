@@ -222,6 +222,10 @@ function PlayerList:initialize()
     self.curr_player = self:initPlayerNum()
 end
 
+function PlayerList:getPlayers()
+    return self.players
+end
+
 function PlayerList:getCurrentPlayer()
     return self.players[self.curr_player]
 end
