@@ -375,6 +375,7 @@ end
 
 function PlayerHand:draw(x, y)
     local r, g, b, a = love.graphics.getColor()
+    local screen_width = love.graphics.getWidth()
     for _, card in ipairs(self:getCards()) do
         card.x = x
         card.y = y
@@ -388,7 +389,9 @@ function PlayerHand:draw(x, y)
             love.graphics.setColor(255, 255, 255, 190)
             love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
         end
+
         x = x + card.width + 5
+        if x + card.width > screen_width then break end
     end
     love.graphics.setColor(r, g, b, a)
 end
