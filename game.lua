@@ -57,7 +57,6 @@ function Game:draw()
     else
         love.graphics.print(tostring(player)..' (Human)', 50, 75)
     end
-    love.graphics.print('Turn '..player_list:getTurn(), 50, 100)
 
     draw_pile:draw(50, 200)
     discard_pile:draw(150, 200)
