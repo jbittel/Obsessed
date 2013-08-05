@@ -22,6 +22,8 @@ function Game:initialize()
     require 'players'
     require 'ai'
 
+    self.logo = love.graphics.newImage(img_filename('obsessed'))
+
     self.buttons = {
         quit = Button:new('Quit', screen.width - 160, 10),
         play = Button:new('Play', screen.width - 160, screen.height - 60),
@@ -49,7 +51,7 @@ function Game:update()
 end
 
 function Game:draw()
-    love.graphics.printf('Obsessed', 0, 50, screen.width, "center")
+    love.graphics.draw(self.logo, screen.width / 2 - self.logo:getWidth() / 2, 10)
 
     local player = player_list:getCurrentPlayer()
     if player:isAi() == true then
