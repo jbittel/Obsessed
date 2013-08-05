@@ -53,16 +53,10 @@ end
 function Game:draw()
     love.graphics.draw(self.logo, screen.width / 2 - self.logo:getWidth() / 2, 10)
 
-    local player = player_list:getCurrentPlayer()
-    if player:isAi() == true then
-        love.graphics.print(tostring(player)..' (AI)', 50, 75)
-    else
-        love.graphics.print(tostring(player)..' (Human)', 50, 75)
-    end
-
     draw_pile:draw(50, 200)
     discard_pile:draw(150, 200)
 
+    local player = player_list:getCurrentPlayer()
     if player:isAi() then return end
 
     local human = player_list:getHumanPlayer()
