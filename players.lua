@@ -238,8 +238,12 @@ function PlayerList:getNextPlayer()
 end
 
 function PlayerList:getHumanPlayer()
-    -- TODO make this less brittle
-    return self.players[1]
+    for i, player in  ipairs(self.players) do
+        if  player.class.name == 'HumanPlayer' then
+            return self.players[i]
+        end
+    end
+    return nil
 end
 
 function PlayerList:advancePlayer()
