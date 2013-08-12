@@ -75,9 +75,9 @@ function Game:draw()
         end
     end
 
-    human.hand:draw(50, 350)
-    human.hidden:draw(60, 480)
-    human.visible:draw(50, 470)
+    human.hand:draw(50, 350, 10)
+    human.hidden:draw(54, 476, 10)
+    human.visible:draw(50, 470, 10)
 end
 
 function Game:mousepressed(x, y, button)

@@ -373,7 +373,7 @@ function PlayerHand:initialize()
     for i = 1, PlayerHand.SIZE do self:addCard(draw_pile:removeCard()) end
 end
 
-function PlayerHand:draw(x, y)
+function PlayerHand:draw(x, y, spacing)
     local r, g, b, a = love.graphics.getColor()
     local screen_width = love.graphics.getWidth()
     for _, card in ipairs(self:getCards()) do
@@ -390,7 +390,7 @@ function PlayerHand:draw(x, y)
             love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
         end
 
-        x = x + card.width + 5
+        x = x + card.width + spacing
         if x + card.width > screen_width then break end
     end
     love.graphics.setColor(r, g, b, a)
@@ -406,14 +406,14 @@ function PlayerVisible:initialize()
     for i = 1, PlayerVisible.SIZE do self:addCard(draw_pile:removeCard()) end
 end
 
-function PlayerVisible:draw(x, y)
+function PlayerVisible:draw(x, y, spacing)
     local r, g, b, a = love.graphics.getColor()
     for _, card in ipairs(self:getCards()) do
         if card.x == 0 then
             card.x = x
             card.y = y
         end
-        x = x + card.width + 20
+        x = x + card.width + spacing
 
         love.graphics.setColor(255, 255, 255, 255)
         love.graphics.draw(card.front, card.x, card.y)
@@ -438,14 +438,14 @@ function PlayerHidden:initialize()
     for i = 1, PlayerHidden.SIZE do self:addCard(draw_pile:removeCard()) end
 end
 
-function PlayerHidden:draw(x, y)
+function PlayerHidden:draw(x, y, spacing)
     for _, card in ipairs(self:getCards()) do
         if card.x == 0 then
             card.x = x
             card.y = y
         end
 
-        x = x + card.width + 20
+        x = x + card.width + spacing
         love.graphics.draw(card.back, card.x, card.y)
     end
 end
