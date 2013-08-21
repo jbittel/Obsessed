@@ -376,6 +376,8 @@ end
 function PlayerHand:draw(x, y, spacing)
     local r, g, b, a = love.graphics.getColor()
     local screen_width = love.graphics.getWidth()
+    local displayed = 0
+
     for _, card in ipairs(self:getCards()) do
         card.x = x
         card.y = y
@@ -390,9 +392,21 @@ function PlayerHand:draw(x, y, spacing)
             love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
         end
 
+        displayed = displayed + 1
         x = x + card.width + spacing
         if x + card.width > screen_width then break end
     end
+
+    -- If not all cards fit on screen, show remaining count
+    not_displayed = self:getNumCards() - displayed
+    if not_displayed > 0 then
+        card = self:getCard()
+        text = '+'..not_displayed..' cards'
+        text_x = screen.width - (font.default:getWidth(text) + spacing)
+        love.graphics.setColor(255, 255, 255, 255)
+        love.graphics.print(text, text_x, y + card.height)
+    end
+
     love.graphics.setColor(r, g, b, a)
 end
 
