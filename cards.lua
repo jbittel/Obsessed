@@ -404,7 +404,7 @@ function PlayerHand:draw(x, y, spacing)
         local card = self:getCard()
         local count = '+'..not_displayed..' cards'
         love.graphics.setColor(255, 255, 255, 255)
-        love.graphics.print(text, screen.width - (font.default:getWidth(text) + spacing), y + card.height)
+        love.graphics.print(count, screen.width - (font.default:getWidth(count) + spacing), y + card.height)
     end
 
     love.graphics.setColor(r, g, b, a)
