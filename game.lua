@@ -114,9 +114,7 @@ function Game:keypressed(key, unicode)
     if player:isAi() then return end
 
     local active_pile = player:getActivePile()
-    if key == 'p' and active_pile:isValidPlay() then
-        player:executeTurn()
-    elseif key == 'u' and not active_pile:hasValidPlay() then
+    if key == 'p' or key == 'u' then
         player:executeTurn()
     elseif key == 'q' or key == 'escape' then
         love.event.push('quit')
