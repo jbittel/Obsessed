@@ -87,10 +87,8 @@ function Game:mousepressed(x, y, button)
 
     for name, button in pairs(self.buttons) do
         if button:mousepressed(x, y, button) then
-            if name == 'play' then
-                if active_pile:hasValidPlay() then player:executeTurn() end
-            elseif  name == 'pickup' then
-                if not active_pile:hasValidPlay() then player:executeTurn() end
+            if name == 'play' or name == 'pickup' then
+                player:executeTurn()
             elseif name == 'quit' then
                 love.event.push('quit')
             end
