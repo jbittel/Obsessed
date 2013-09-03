@@ -112,12 +112,10 @@ function Player:executeTurn()
     local active_pile = self:getActivePile()
     local player = player_list:getCurrentPlayer()
 
-    if active_pile then
-        if active_pile:isValidPlay() then
-            active_pile:playCards()
-        elseif not active_pile:hasValidPlay() then
-            player:pickUpPile()
-        end
+    if active_pile:isValidPlay() then
+        active_pile:playCards()
+    elseif not active_pile:hasValidPlay() then
+        player:pickUpPile()
     end
 
     -- Apply card face rules
@@ -144,22 +142,11 @@ function Player:executeTurn()
         player:addToHand(draw_pile)
     end
 
-    -- TODO do we want to stop when a player wins,
-    -- make it a binary win/loss condition?
     -- Test for win condition
     if player:getNumCards() == 0 then
         logger('wins!')
         player_list:addWinner()
         next_player = true
-        -- Test for game over condition
-        if player_list:getNumPlayers() == 1 then
-            for i, player in ipairs(player_list:getPlayers()) do
-                player_list:addWinner(i)
-            end
-
-            require 'game_over'
-            scene = GameOver:new(player_list.winners)
-        end
     end
 
     if next_player == true then
@@ -227,6 +214,11 @@ end
 
 function PlayerList:getPlayers()
     return self.players
+end
+
+function PlayerList:getWinners()
+    self:addWinners()
+    return self.winners
 end
 
 function PlayerList:getCurrentPlayer()
@@ -297,8 +289,18 @@ function PlayerList:initPlayerNum()
     return 1
 end
 
+function PlayerList:isGameOver()
+    return #self.players <= 1
+end
+
 function PlayerList:addWinner(num)
     local player_num = num or self.curr_player
     local player = table.remove(self.players, player_num)
     table.insert(self.winners, player)
+end
+
+function PlayerList:addWinners()
+    for i, _ in ipairs(self.players) do
+        self:addWinner(i)
+    end
 end

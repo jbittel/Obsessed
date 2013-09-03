@@ -44,9 +44,14 @@ function Game:update()
         return
     end
 
-    if player:isAi() then
+    if player:isAi() and not player_list:isGameOver() then
         player:selectCards()
         player:executeTurn()
+    end
+
+    if player_list:isGameOver() then
+        require 'game_over'
+        scene = GameOver:new(player_list:getWinners())
     end
 end
 
