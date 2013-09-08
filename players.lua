@@ -260,6 +260,10 @@ function PlayerList:getTurn()
     return self.turn
 end
 
+function PlayerList:isFirstTurn()
+    return self:getTurn() == 1
+end
+
 function PlayerList:nextPlayerNum()
     local num_players = #self.players
     local curr_player = self.curr_player

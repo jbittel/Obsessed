@@ -38,7 +38,7 @@ end
 function Game:update()
     local player = player_list:getCurrentPlayer()
 
-    if player_list:getTurn() == 1 then
+    if player_list:isFirstTurn() then
         player:selectInitialCard()
         player:executeTurn()
         return
