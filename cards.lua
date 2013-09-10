@@ -59,7 +59,7 @@ function Card:mousepressed(x, y, button)
 end
 
 function Card:isSpecial()
-    for _,card in ipairs(Card.SPECIAL_CARDS) do
+    for _, card in ipairs(Card.SPECIAL_CARDS) do
         if card == self.face then return true end
     end
     return false
@@ -101,9 +101,9 @@ CardPile = class('CardPile')
 function CardPile:initialize(...)
     self.cards = {}
     local arg = {n = select('#', ...), ...}
-    for i = 1,arg.n do
+    for i = 1, arg.n do
         local pile = arg[i]
-        for _,card in ipairs(pile.cards) do
+        for _, card in ipairs(pile.cards) do
             table.insert(self.cards, card)
         end
     end
@@ -192,19 +192,18 @@ function CardPile:splitPile(a, b, idx)
 end
 
 function CardPile:hasValidPlay()
-    for _,card in ipairs(self.cards) do
+    for _, card in ipairs(self.cards) do
         if card:isValidPlay() then return true end
     end
     return false
 end
 
 function CardPile:isValidPlay()
-    local face = nil
-
     if not self:hasValidPlay() or not self:hasSelected() then
         return false
     end
 
+    local face = nil
     for _, card in ipairs(self.cards) do
         if card:isSelected() then
             if not card:isValidPlay() then
@@ -225,7 +224,7 @@ function CardPile:getValidPlay()
     local valid = {}
     local face = nil
     self:sortByRank()
-    for _,card in ipairs(self.cards) do
+    for _, card in ipairs(self.cards) do
         if face ~= card.face and card:isValidPlay() then
             face = card.face
             table.insert(valid, card)
@@ -235,7 +234,7 @@ function CardPile:getValidPlay()
 end
 
 function CardPile:hasCard(face)
-    for i,card in ipairs(self.cards) do
+    for i, card in ipairs(self.cards) do
         if card.face == face then return i end
     end
     return nil
@@ -274,17 +273,15 @@ function DrawPile:initialize()
     local num_decks = math.ceil(NUM_PLAYERS / 2)
 
     for deck = 1, num_decks do
-        for _,suit in ipairs(Card.SUITS) do
-            for rank,face in ipairs(Card.FACES) do
-                local card = Card:new(face, suit, rank + 1)
-                table.insert(self.cards, card)
+        for _, suit in ipairs(Card.SUITS) do
+            for rank, face in ipairs(Card.FACES) do
+                table.insert(self.cards, Card:new(face, suit, rank + 1))
             end
         end
 
         -- Add two Jokers to each deck
         for i = 1, 2 do
-            local card = Card:new('R', '', #Card.FACES + 2)
-            table.insert(self.cards, card)
+            table.insert(self.cards, Card:new('R', '', #Card.FACES + 2))
         end
     end
 
@@ -343,17 +340,17 @@ function DiscardPile:getTopFace()
 end
 
 function DiscardPile:getActiveFace()
-    for _,card in ipairs(self.cards) do
+    for _, card in ipairs(self.cards) do
         if card.face ~= 'R' then return card.face end
     end
     return nil
 end
 
 function DiscardPile:getRunLength()
-    local run = 0
     local top_face = self:getTopFace()
     if not top_face then return 0 end
-    for _,card in ipairs(self.cards) do
+    local run = 0
+    for _, card in ipairs(self.cards) do
         if card.face == top_face then
             run = run + 1
         else
