@@ -23,11 +23,7 @@ function Player:__tostring()
 end
 
 function Player:isAi()
-    if self.class.name == 'AIPlayer' then
-        return true
-    else
-        return false
-    end
+    return self.class.name == 'AIPlayer'
 end
 
 function Player:getNumCards()
@@ -73,7 +69,7 @@ end
 
 function Player:selectInitialCard()
     local initial_face = nil
-    for _,face in ipairs(Card.START_ORDER) do
+    for _, face in ipairs(Card.START_ORDER) do
         if self.hand:hasCard(face) then
             initial_face = face
             break
@@ -87,16 +83,14 @@ function Player:selectInitialCard()
 end
 
 function Player:getActivePile()
-    local active_pile = nil
-
     if self:getNumHandCards() > 0 then
-        active_pile = self.hand
+        return self.hand
     elseif self:getNumVisibleCards() > 0 then
-        active_pile = self.visible
+        return self.visible
     elseif self:getNumHiddenCards() > 0 then
-        active_pile = self.hidden
+        return self.hidden
     end
-    return active_pile
+    return nil
 end
 
 function Player:getActiveCards()
@@ -199,14 +193,12 @@ function PlayerList:initialize()
     self.reverse = false
     self.turn = 1
 
-    for i = 1,NUM_PLAYERS do
+    for i = 1, NUM_PLAYERS do
         if i == 1 then
-            player = HumanPlayer:new(i)
+            table.insert(self.players, HumanPlayer:new(i))
         else
-            player = AIPlayer:new(i)
+            table.insert(self.players, AIPlayer:new(i))
         end
-
-        table.insert(self.players, player)
     end
 
     self.curr_player = self:initPlayerNum()
@@ -283,8 +275,8 @@ end
 -- Pick starting player by matching the first instance of
 -- a non-special face with a card in a player's hand
 function PlayerList:initPlayerNum()
-    for _,face in ipairs(Card.START_ORDER) do
-        for _,player in ipairs(self.players) do
+    for _, face in ipairs(Card.START_ORDER) do
+        for _, player in ipairs(self.players) do
             if player.hand:hasCard(face) then
                 return player.num
             end
