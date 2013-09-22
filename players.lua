@@ -15,7 +15,7 @@ function Player:initialize(num)
     self.hand = PlayerHand:new('Hand')
     self.visible = PlayerVisible:new('Visible')
     self.hidden = PlayerHidden:new('Hidden')
---  TODO self:swapCards()
+    self:swapCards()
 end
 
 function Player:__tostring()
