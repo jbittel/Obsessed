@@ -35,21 +35,23 @@ function love.load()
 end
 
 function love.update(dt)
-    scene:update(dt)
+    if scene.update then
+        scene:update(dt)
+    end
 end
 
 function love.draw()
     scene:draw()
 end
 
-function love.keypressed(key, unicode)
-    if scene.keypressed then
-        scene:keypressed(key, unicode)
-    end
-end
-
 function love.mousepressed(x, y, button)
     if scene.mousepressed then
         scene:mousepressed(x, y, button)
+    end
+end
+
+function love.keypressed(key, unicode)
+    if scene.keypressed then
+        scene:keypressed(key, unicode)
     end
 end

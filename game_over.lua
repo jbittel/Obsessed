@@ -19,8 +19,6 @@ function GameOver:initialize(winners)
     self.winners = winners
 end
 
-function GameOver:update(dt) end
-
 function GameOver:draw()
     love.graphics.print('Game Over', 100, 100)
     local vpos = 200
