@@ -173,6 +173,10 @@ function HumanPlayer:pickUpPile()
     self.hand:sortByRank()
 end
 
+function HumanPlayer:swapCards()
+    return
+end
+
 function HumanPlayer:executeTurn()
     local active_pile = self:getActivePile()
     if active_pile then
