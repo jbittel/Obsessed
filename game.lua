@@ -66,28 +66,24 @@ function Game:draw()
     draw_pile:draw(50, 200)
     discard_pile:draw(150, 200)
 
-    local player = player_list:getCurrentPlayer()
-    if player:isAi() then return end
+    self.buttons['quit']:draw()
 
     local human = player_list:getHumanPlayer()
-    local active_pile = human:getActivePile()
-    for name, button in pairs(self.buttons) do
-        if name == 'play' then
-            if active_pile ~= human.hidden and active_pile:hasValidPlay() then
-                button:draw()
-            end
-        elseif name == 'pickup' then
-            if active_pile ~= human.hidden and not active_pile:hasValidPlay() then
-                button:draw()
-            end
-        else
-            button:draw()
-        end
-    end
+    if not human then return end
 
     human.hand:draw(50, 350, 10)
     human.hidden:draw(54, 476, 10)
     human.visible:draw(50, 470, 10)
+
+    if human:isCurrentPlayer() then
+        local active_pile = human:getActivePile()
+        if active_pile ~= human.hidden and active_pile:hasValidPlay() then
+            self.buttons['play']:draw()
+        end
+        if active_pile ~= human.hidden and not active_pile:hasValidPlay() then
+            self.buttons['pickup']:draw()
+        end
+    end
 end
 
 function Game:mousepressed(x, y, button)

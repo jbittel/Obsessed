@@ -26,6 +26,10 @@ function Player:isAi()
     return self.class.name == 'AIPlayer'
 end
 
+function Player:isCurrentPlayer()
+    return self.num == player_list:getCurrentPlayerNum()
+end
+
 function Player:getNumCards()
     return self.hand:getNumCards() + self.visible:getNumCards() + self.hidden:getNumCards()
 end
@@ -219,6 +223,10 @@ end
 
 function PlayerList:getCurrentPlayer()
     return self.players[self.curr_player]
+end
+
+function PlayerList:getCurrentPlayerNum()
+    return self.curr_player
 end
 
 function PlayerList:getNextPlayer()
