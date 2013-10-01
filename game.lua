@@ -77,10 +77,10 @@ function Game:draw()
 
     if human:isCurrentPlayer() then
         local active_pile = human:getActivePile()
-        if active_pile ~= human.hidden and active_pile:hasValidPlay() then
+        if not active_pile:isHidden() and active_pile:hasValidPlay() then
             self.buttons['play']:draw()
         end
-        if active_pile ~= human.hidden and not active_pile:hasValidPlay() then
+        if not active_pile:isHidden() and not active_pile:hasValidPlay() then
             self.buttons['pickup']:draw()
         end
     end

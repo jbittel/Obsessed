@@ -265,6 +265,10 @@ function CardPile:playCards()
     self.cards = cards
 end
 
+function CardPile:isHidden(pile)
+    return self.class.name == 'PlayerHidden'
+end
+
 
 DrawPile = class('DrawPile', CardPile)
 
