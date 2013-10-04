@@ -10,11 +10,11 @@
 
 Button = class('Button')
 
-function Button:initialize(text, x, y)
+function Button:initialize(name, x, y)
     self.x = x
     self.y = y
-    self.text = text
-    self.img = love.graphics.newImage(img_filename(text))
+    self.name = name
+    self.img = love.graphics.newImage(img_filename(name))
     self.width = self.img:getWidth()
     self.height = self.img:getHeight()
 end
