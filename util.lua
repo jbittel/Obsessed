@@ -29,7 +29,7 @@ end
 
 -- Table manipulation methods
 
-function table.slice(list, start, len)
+function table_slice(list, start, len)
     local s = {}
     local len = len or (#list - start + 1)
     local stop = start + len - 1
@@ -37,13 +37,13 @@ function table.slice(list, start, len)
     return s
 end
 
-function table.set(list)
+function table_set(list)
     local s = {}
     for _, v in ipairs(list) do s[v] = true end
     return s
 end
 
-function table.copy(t)
+function table_copy(t)
     local t2 = {}
     for k, v in pairs(t) do t2[k] = v end
     return t2

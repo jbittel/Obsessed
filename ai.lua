@@ -28,7 +28,7 @@ AIPlayer.static.BASE_AI_FACE_WEIGHT = {
 }
 
 function AIPlayer:initialize(num)
-    self.ai_face_weight = table.copy(AIPlayer.BASE_AI_FACE_WEIGHT)
+    self.ai_face_weight = table_copy(AIPlayer.BASE_AI_FACE_WEIGHT)
     Player.initialize(self, num)
 end
 
@@ -46,8 +46,8 @@ function AIPlayer:swapCards()
 
     table.sort(t, function(a, b) return a.weight > b.weight end)
 
-    self.visible.cards = table.slice(t, 1, PlayerVisible.SIZE)
-    self.hand.cards = table.slice(t, PlayerVisible.SIZE + 1, PlayerHand.SIZE)
+    self.visible.cards = table_slice(t, 1, PlayerVisible.SIZE)
+    self.hand.cards = table_slice(t, PlayerVisible.SIZE + 1, PlayerHand.SIZE)
 end
 
 function AIPlayer:selectCards()
@@ -114,7 +114,7 @@ function AIPlayer:modifyCardWeights(cardpile, valid)
     local run = discard_pile:getRunLength()
     local next_player = player_list:getNextPlayer()
 
-    self.ai_face_weight = table.copy(AIPlayer.BASE_AI_FACE_WEIGHT)
+    self.ai_face_weight = table_copy(AIPlayer.BASE_AI_FACE_WEIGHT)
 
     for _, card in ipairs(valid) do
         -- Prioritize killing the pile when advisable

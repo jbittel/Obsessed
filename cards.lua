@@ -169,7 +169,7 @@ function CardPile:getSelectedSet()
             table.insert(idx, i)
         end
     end
-    return table.set(idx)
+    return table_set(idx)
 end
 
 function CardPile:clearSelected()
@@ -179,7 +179,7 @@ function CardPile:clearSelected()
 end
 
 function CardPile:splitPile(a, b, idx)
-    local set = table.set(idx)
+    local set = table_set(idx)
     a:removeCards()
     b:removeCards()
     for i, card in ipairs(self.cards) do
