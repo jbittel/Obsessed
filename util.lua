@@ -22,9 +22,9 @@ function biased_random(min, max)
     return r
 end
 
-function img_filename(text)
-    text = text:gsub(' ', '-')
-    return string.lower('images/'..text..'.png')
+function img_filename(str)
+    str = str:gsub(' ', '-')
+    return string.lower('images/'..str..'.png')
 end
 
 -- Table manipulation methods
