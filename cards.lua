@@ -117,6 +117,10 @@ function CardPile:sortByRank()
     table.sort(self.cards, function(a, b) return a.rank < b.rank end)
 end
 
+function CardPile:sortByWeight()
+    table.sort(self.cards, function(a, b) return a.weight < b.weight end)
+end
+
 function CardPile:addCard(card)
     table.insert(self.cards, 1, card)
 end
