@@ -112,7 +112,6 @@ end
 function AIPlayer:modifyCardWeights(cardpile, valid)
     local freq = self:getFrequencies(cardpile.cards)
     local run = discard_pile:getRunLength()
-    local next_player = player_list:getNextPlayer()
 
     self.ai_face_weight = table_copy(AIPlayer.BASE_AI_FACE_WEIGHT)
 
@@ -127,7 +126,7 @@ function AIPlayer:modifyCardWeights(cardpile, valid)
         end
     end
 
-    if self:isLateGame() and next_player:getNumHandCards() == 0 then
+    if self:isLateGame() and self:nextPlayerWinning() then
         -- Aggressively play if the next player is close to winning
         self.ai_face_weight['3'] = 0
         self.ai_face_weight['R'] = 0
@@ -141,7 +140,12 @@ function AIPlayer:isLateGame()
 end
 
 function AIPlayer:isBehind()
-    -- Consider it being "behind" when there are more cards in
-    -- the hand then are in the draw pile
+    -- Consider it "behind" when there are more cards in hand
+    -- then are in the draw pile
     return self.hand:getNumCards() > draw_pile:getNumCards()
+end
+
+function AIPlayer:nextPlayerWinning()
+    local next_player = player_list:getNextPlayer()
+    return next_player:getNumCards() < 6
 end
