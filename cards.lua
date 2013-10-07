@@ -229,13 +229,13 @@ function CardPile:isValidPlay()
 end
 
 function CardPile:getValidPlay()
-    local valid = {}
+    local valid = CardPile:new()
     local face = nil
     self:sortByRank()
     for _, card in ipairs(self.cards) do
         if face ~= card.face and card:isValidPlay() then
             face = card.face
-            table.insert(valid, card)
+            valid:addCard(card)
         end
     end
     return valid
