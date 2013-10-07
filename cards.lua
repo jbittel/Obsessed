@@ -180,6 +180,14 @@ function CardPile:getSelectedSet()
     return table_set(idx)
 end
 
+function CardPile:getFrequencies()
+    local freq = {}
+    for _, card in ipairs(self.cards) do
+        freq[card.face] = (freq[card.face] or 0) + 1
+    end
+    return freq
+end
+
 function CardPile:clearSelected()
     for _, card in ipairs(self.cards) do
         card:clearSelected()

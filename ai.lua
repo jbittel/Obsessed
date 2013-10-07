@@ -101,14 +101,6 @@ function AIPlayer:selectCardFace(cardpile)
     return valid[biased_random(1, #valid)].face
 end
 
-function AIPlayer:getFrequencies(cards)
-    local freq = {}
-    for _, card in ipairs(cards) do
-        freq[card.face] = (freq[card.face] or 0) + 1
-    end
-    return freq
-end
-
 function AIPlayer:modifyCardWeights(cardpile, valid)
     local freq = self:getFrequencies(cardpile.cards)
     local run = discard_pile:getRunLength()
