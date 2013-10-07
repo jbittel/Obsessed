@@ -91,28 +91,24 @@ end
 
 function AIPlayer:selectCardFace(cardpile)
     local valid = cardpile:getValidPlay()
+    self:modifyCardWeights(valid)
 
-    self:modifyCardWeights(cardpile, valid)
-    for _, card in ipairs(valid) do
+    for _, card in ipairs(valid:getCards()) do
         card.weight = self.ai_face_weight[card.face]
     end
-    table.sort(valid, function(a, b) return a.weight < b.weight end)
+    valid:sortByWeight()
 
-    return valid[biased_random(1, #valid)].face
+    return valid:getCard(biased_random(1, valid:getNumCards())):getFace()
 end
 
-function AIPlayer:modifyCardWeights(cardpile, valid)
-    local freq = self:getFrequencies(cardpile.cards)
-    local run = discard_pile:getRunLength()
-
+function AIPlayer:modifyCardWeights(cards)
     self.ai_face_weight = table_copy(AIPlayer.BASE_AI_FACE_WEIGHT)
 
-    for _, card in ipairs(valid) do
+    for _, card in ipairs(cards:getCards()) do
         -- Prioritize killing the pile when advisable
         if card:isActiveFace() and not card:isSpecial() and
            (self:isLateGame() or self:isBehind()) then
-            if freq[card.face] + run >= KILL_RUN_LEN or
-               freq[card.face] >= KILL_RUN_LEN then
+            if self:canKillPile(cards, card:getFace()) then
                 self.ai_face_weight[card.face] = 0
             end
         end
@@ -138,6 +134,14 @@ function AIPlayer:isBehind()
 end
 
 function AIPlayer:nextPlayerWinning()
+    -- Consider the next player close to winning when they have
+    -- less than 6 cards total
     local next_player = player_list:getNextPlayer()
     return next_player:getNumCards() < 6
+end
+
+function AIPlayer:canKillPile(cards, face)
+    local freq = cards:getFrequencies()
+    local run = discard_pile:getRunLength()
+    return freq[face] + run >= KILL_RUN_LEN
 end
