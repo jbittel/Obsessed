@@ -29,14 +29,6 @@ end
 
 -- Table manipulation methods
 
-function table_slice(list, start, len)
-    local s = {}
-    local len = len or (#list - start + 1)
-    local stop = start + len - 1
-    for i = start, stop do table.insert(s, list[i]) end
-    return s
-end
-
 function table_set(list)
     local s = {}
     for _, v in ipairs(list) do s[v] = true end

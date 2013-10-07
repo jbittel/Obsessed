@@ -149,6 +149,14 @@ function CardPile:getCards()
     return self.cards
 end
 
+function CardPile:slice(start, len)
+    local p = CardPile:new()
+    local len = len or (#self.cards - start + 1)
+    local stop = start + len - 1
+    for i = start, stop do p:addCard(self.cards[i]) end
+    return p
+end
+
 function CardPile:isActivePile()
     local player = player_list:getCurrentPlayer()
     return self == player:getActivePile()
