@@ -33,21 +33,14 @@ function AIPlayer:initialize(num)
 end
 
 function AIPlayer:swapCards()
-    local t = {}
-
-    for _, card in ipairs(self.visible.cards) do
+    local pile = CardPile:new(self.visible, self.hand)
+    for _, card in ipairs(pile:getCards()) do
         card.weight = self.ai_face_weight[card.face]
-        table.insert(t, card)
     end
-    for _, card in ipairs(self.hand.cards) do
-        card.weight = self.ai_face_weight[card.face]
-        table.insert(t, card)
-    end
+    pile:sortByWeight()
 
-    table.sort(t, function(a, b) return a.weight > b.weight end)
-
-    self.visible.cards = table_slice(t, 1, PlayerVisible.SIZE)
-    self.hand.cards = table_slice(t, PlayerVisible.SIZE + 1, PlayerHand.SIZE)
+    self.visible = pile:slice(1, PlayerVisible.SIZE)
+    self.hand = pile:slice(PlayerVisible.SIZE + 1, PlayerHand.SIZE)
 end
 
 function AIPlayer:selectCards()
