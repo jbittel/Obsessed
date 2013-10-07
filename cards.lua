@@ -79,6 +79,10 @@ function Card:clearSelected()
     self.selected = false
 end
 
+function Card:getFace()
+    return self.face
+end
+
 function Card:isActiveFace()
     return self.face == discard_pile:getActiveFace()
 end
