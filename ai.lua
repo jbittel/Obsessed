@@ -35,7 +35,7 @@ end
 function AIPlayer:swapCards()
     local pile = CardPile:new(self.visible, self.hand)
     for _, card in ipairs(pile:getCards()) do
-        card.weight = self.ai_face_weight[card.face]
+        card.weight = self.ai_face_weight[card:getFace()]
     end
     pile:sortByWeight()
 
@@ -60,7 +60,7 @@ function AIPlayer:selectHand()
     if not self.hand:hasValidPlay() then return end
     local face = self:selectCardFace(self.hand)
     for _, card in ipairs(self.hand.cards) do
-        if face == card.face then
+        if face == card:getFace() then
             card:setSelected()
             if card:isSpecial() and not self:isLateGame() then break end
         end
@@ -71,7 +71,7 @@ function AIPlayer:selectVisible()
     if not self.visible:hasValidPlay() then return end
     local face = self:selectCardFace(self.visible)
     for _, card in ipairs(self.visible.cards) do
-        if face == card.face then
+        if face == card:getFace() then
             card:setSelected()
         end
     end
@@ -87,7 +87,7 @@ function AIPlayer:selectCardFace(cardpile)
     self:modifyCardWeights(valid)
 
     for _, card in ipairs(valid:getCards()) do
-        card.weight = self.ai_face_weight[card.face]
+        card.weight = self.ai_face_weight[card:getFace()]
     end
     valid:sortByWeight()
 
@@ -101,8 +101,8 @@ function AIPlayer:modifyCardWeights(cards)
         -- Prioritize killing the pile when advisable
         if card:isActiveFace() and not card:isSpecial() and
            (self:isLateGame() or self:isBehind()) then
-            if self:canKillPile(cards, card:getFace()) then
-                self.ai_face_weight[card.face] = 0
+            if self:canKillPile(pile, card:getFace()) then
+                self.ai_face_weight[card:getFace()] = 0
             end
         end
     end

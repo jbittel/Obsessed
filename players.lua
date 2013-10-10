@@ -62,7 +62,7 @@ end
 function Player:pickUpPile()
     local count = 0
     for _, card in ipairs(discard_pile:getCards()) do
-        if card.face ~= '3' then
+        if card:getFace() ~= '3' then
             self.hand:addCard(card)
             count = count + 1
         end
@@ -80,8 +80,8 @@ function Player:selectInitialCard()
         end
     end
     for _, card in ipairs(self.hand.cards) do
-        if initial_face == card.face then
             card:setSelected()
+        if initial_face == card:getFace() then
         end
     end
 end

@@ -191,7 +191,7 @@ end
 function CardPile:getFrequencies()
     local freq = {}
     for _, card in ipairs(self.cards) do
-        freq[card.face] = (freq[card.face] or 0) + 1
+        freq[card:getFace()] = (freq[card:getFace()] or 0) + 1
     end
     return freq
 end
@@ -234,8 +234,8 @@ function CardPile:isValidPlay()
                 return false
             else
                 if face == nil then
-                    face = card.face
-                elseif face ~= card.face then
+                    face = card:getFace()
+                elseif face ~= card:getFace() then
                     return false
                 end
             end
@@ -249,8 +249,8 @@ function CardPile:getValidPlay()
     local face = nil
     self:sortByRank()
     for _, card in ipairs(self.cards) do
-        if face ~= card.face and card:isValidPlay() then
-            face = card.face
+        if face ~= card:getFace() and card:isValidPlay() then
+            face = card:getFace()
             valid:addCard(card)
         end
     end
@@ -259,7 +259,7 @@ end
 
 function CardPile:hasCard(face)
     for i, card in ipairs(self.cards) do
-        if card.face == face then return i end
+        if card:getFace() == face then return i end
     end
     return nil
 end
@@ -346,7 +346,7 @@ DiscardPile = class('DiscardPile', CardPile)
 
 function DiscardPile:draw(x, y)
     for _, card in ipairs(self.cards) do
-        if card.face == 'R' then
+        if card:getFace() == 'R' then
             love.graphics.draw(card.front, x + 10, y)
         else
             love.graphics.draw(card.front, x, y)
@@ -364,12 +364,12 @@ end
 function DiscardPile:getTopFace()
     local card = self:getCard()
     if not card then return nil end
-    return card.face
+    return card:getFace()
 end
 
 function DiscardPile:getActiveFace()
     for _, card in ipairs(self.cards) do
-        if card.face ~= 'R' then return card.face end
+        if card:getFace() ~= 'R' then return card:getFace() end
     end
     return nil
 end
@@ -379,7 +379,7 @@ function DiscardPile:getRunLength()
     if not top_face then return 0 end
     local run = 0
     for _, card in ipairs(self.cards) do
-        if card.face == top_face then
+        if card:getFace() == top_face then
             run = run + 1
         else
             break
