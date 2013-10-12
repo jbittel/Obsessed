@@ -59,7 +59,8 @@ function AIPlayer:selectFromHand()
     for _, card in ipairs(self.hand:getCards()) do
         if face == card:getFace() then
             card:setSelected()
-            if card:isSpecial() and not self:isLateGame() then break end
+            if card:isSpecial() and not self:isLateGame()
+               and not self:isBehind() then break end
         end
     end
 end
