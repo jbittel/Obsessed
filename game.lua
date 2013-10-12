@@ -102,7 +102,7 @@ function Game:mousepressed(x, y, button)
     end
 
     local active_pile = player:getActivePile()
-    for i, card in ipairs(player:getActiveCards()) do
+    for i, card in ipairs(active_pile:getCards()) do
         if card:mousepressed(x, y, button) then
             if active_pile == player.hidden then
                 player:addToHandFromHidden(i)

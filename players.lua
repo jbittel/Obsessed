@@ -97,14 +97,6 @@ function Player:getActivePile()
     return nil
 end
 
-function Player:getActiveCards()
-    local active_pile = self:getActivePile()
-    if active_pile then
-        return active_pile:getCards()
-    end
-    return {}
-end
-
 function Player:executeTurn()
     local next_player = true
     local active_pile = self:getActivePile()

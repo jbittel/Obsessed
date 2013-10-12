@@ -59,7 +59,7 @@ end
 function AIPlayer:selectHand()
     if not self.hand:hasValidPlay() then return end
     local face = self:selectCardFace(self.hand)
-    for _, card in ipairs(self.hand.cards) do
+    for _, card in ipairs(self.hand:getCards()) do
         if face == card:getFace() then
             card:setSelected()
             if card:isSpecial() and not self:isLateGame() then break end
@@ -70,7 +70,7 @@ end
 function AIPlayer:selectVisible()
     if not self.visible:hasValidPlay() then return end
     local face = self:selectCardFace(self.visible)
-    for _, card in ipairs(self.visible.cards) do
+    for _, card in ipairs(self.visible:getCards()) do
         if face == card:getFace() then
             card:setSelected()
         end
