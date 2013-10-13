@@ -107,7 +107,7 @@ function Game:mousepressed(x, y, button)
             if active_pile == player.hidden then
                 player:addToHandFromHidden(i)
             else
-                active_pile:toggleSelected(i)
+                card:toggleSelected()
             end
             return
         end

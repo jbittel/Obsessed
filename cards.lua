@@ -75,6 +75,14 @@ function Card:setSelected()
     end
 end
 
+function Card:toggleSelected()
+    if self:isSelected() then
+        self:clearSelected()
+    else
+        self:setSelected()
+    end
+end
+
 function Card:clearSelected()
     self.selected = false
 end
@@ -177,12 +185,7 @@ end
 
 function CardPile:toggleSelected(num)
     if #self.cards < num then return end
-    card = self.cards[num]
-    if card:isSelected() then
-        card:clearSelected()
-    else
-        card:setSelected()
-    end
+    self.cards[num]:toggleSelected()
 end
 
 function CardPile:getSelectedSet()
