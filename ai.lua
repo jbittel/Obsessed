@@ -27,18 +27,9 @@ AIPlayer.static.BASE_AI_FACE_WEIGHT = {
     ['R']  = 12
 }
 
-function AIPlayer:initialize(num)
-    self.ai_face_weight = table_copy(AIPlayer.BASE_AI_FACE_WEIGHT)
-    Player.initialize(self, num)
-end
-
 function AIPlayer:swapCards()
     local pile = CardPile:new(self.visible, self.hand)
-    for _, card in ipairs(pile:getCards()) do
-        card.weight = self.ai_face_weight[card:getFace()]
-    end
-    pile:sortByWeight()
-
+    self:modifyCardWeights(pile)
     self.visible = pile:slice(1, PlayerVisible.SIZE)
     self.hand = pile:slice(PlayerVisible.SIZE + 1, PlayerHand.SIZE)
 end
@@ -68,11 +59,7 @@ end
 function AIPlayer:selectFromVisible()
     if not self.visible:hasValidPlay() then return end
     local face = self:selectCardFace(self.visible)
-    for _, card in ipairs(self.visible:getCards()) do
-        if face == card:getFace() then
-            card:setSelected()
-        end
-    end
+    self.visible:setSelectedFace(face)
 end
 
 function AIPlayer:selectFromHidden()
@@ -83,34 +70,33 @@ end
 function AIPlayer:selectCardFace(pile)
     local valid = pile:getValidPlay()
     self:modifyCardWeights(valid)
-
-    for _, card in ipairs(valid:getCards()) do
-        card.weight = self.ai_face_weight[card:getFace()]
-    end
-    valid:sortByWeight()
-
     return valid:getCard(biased_random(1, valid:getNumCards())):getFace()
 end
 
 function AIPlayer:modifyCardWeights(pile)
-    self.ai_face_weight = table_copy(AIPlayer.BASE_AI_FACE_WEIGHT)
+    local face_weight = table_copy(AIPlayer.BASE_AI_FACE_WEIGHT)
 
     -- Prioritize killing the pile when advisable
     for _, card in ipairs(pile:getCards()) do
         if card:isActiveFace() and not card:isSpecial() and
            (self:isLateGame() or self:isBehind()) then
             if self:canKillPile(pile, card:getFace()) then
-                self.ai_face_weight[card:getFace()] = 0
+                face_weight[card:getFace()] = 0
             end
         end
     end
 
     -- Play aggressively if the next player is close to winning
     if self:isLateGame() and self:nextPlayerWinning() then
-        self.ai_face_weight['3'] = 0
-        self.ai_face_weight['R'] = 0
-        self.ai_face_weight['7'] = 0
+        face_weight['3'] = 0
+        face_weight['R'] = 0
+        face_weight['7'] = 0
     end
+
+    for _, card in ipairs(pile:getCards()) do
+        card.weight = face_weight[card:getFace()]
+    end
+    pile:sortByWeight()
 end
 
 function AIPlayer:isLateGame()
