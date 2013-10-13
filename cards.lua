@@ -167,6 +167,14 @@ function CardPile:setSelected(num)
     self.cards[num]:setSelected()
 end
 
+function CardPile:setSelectedFace(face)
+    for _, card in ipairs(self.cards) do
+        if face == card:getFace() then
+            card:setSelected()
+        end
+    end
+end
+
 function CardPile:toggleSelected(num)
     if #self.cards < num then return end
     card = self.cards[num]

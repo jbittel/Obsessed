@@ -79,11 +79,7 @@ function Player:selectInitialCard()
             break
         end
     end
-    for _, card in ipairs(self.hand.cards) do
-            card:setSelected()
-        if initial_face == card:getFace() then
-        end
-    end
+    self.hand:setSelectedFace(initial_face)
 end
 
 function Player:getActivePile()
