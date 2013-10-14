@@ -27,14 +27,6 @@ function img_filename(str)
     return string.lower('images/'..str..'.png')
 end
 
--- Table manipulation methods
-
-function table_set(list)
-    local s = {}
-    for _, v in ipairs(list) do s[v] = true end
-    return s
-end
-
 function table_copy(t)
     local t2 = {}
     for k, v in pairs(t) do t2[k] = v end

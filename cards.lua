@@ -188,15 +188,10 @@ function CardPile:toggleSelected(num)
     self.cards[num]:toggleSelected()
 end
 
-function CardPile:getSelectedSet()
-    local idx = {}
-    for i, card in ipairs(self.cards) do
-        if card:isSelected() then
-            card:clearSelected()
-            table.insert(idx, i)
-        end
+function CardPile:clearSelected()
+    for _, card in ipairs(self.cards) do
+        card:clearSelected()
     end
-    return table_set(idx)
 end
 
 function CardPile:getFrequencies()
@@ -205,25 +200,6 @@ function CardPile:getFrequencies()
         freq[card:getFace()] = (freq[card:getFace()] or 0) + 1
     end
     return freq
-end
-
-function CardPile:clearSelected()
-    for _, card in ipairs(self.cards) do
-        card:clearSelected()
-    end
-end
-
-function CardPile:splitPile(a, b, idx)
-    local set = table_set(idx)
-    a:removeCards()
-    b:removeCards()
-    for i, card in ipairs(self.cards) do
-        if set[i] then
-            a:addCard(card)
-        else
-            b:addCard(card)
-        end
-    end
 end
 
 function CardPile:hasValidPlay()
@@ -286,13 +262,12 @@ end
 
 function CardPile:playCards()
     local cards = {}
-    local set = self:getSelectedSet()
-    local player = player_list:getCurrentPlayer()
     -- Move selected cards to discard pile
-    for i, card in ipairs(self.cards) do
-        if set[i] then
-            logger("plays a "..tostring(card))
+    for _, card in ipairs(self.cards) do
+        if card:isSelected() then
+            card:clearSelected()
             discard_pile:addCard(card)
+            logger("plays a "..tostring(card))
         else
             table.insert(cards, card)
         end
