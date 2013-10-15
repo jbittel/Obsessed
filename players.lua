@@ -12,9 +12,9 @@ Player = class('Player')
 
 function Player:initialize(num)
     self.num = num
-    self.hand = PlayerHand:new('Hand')
-    self.visible = PlayerVisible:new('Visible')
-    self.hidden = PlayerHidden:new('Hidden')
+    self.hand = PlayerHand:new()
+    self.visible = PlayerVisible:new()
+    self.hidden = PlayerHidden:new()
     self:swapCards()
 end
 
@@ -46,8 +46,8 @@ function Player:getNumHiddenCards()
     return self.hidden:getNumCards()
 end
 
-function Player:addToHand(cards, num)
-    local card = cards:removeCard(num)
+function Player:addToHand(pile, num)
+    local card = pile:removeCard(num)
     if card ~= nil then self.hand:addCard(card) end
 end
 
@@ -150,8 +150,8 @@ function HumanPlayer:initialize(num)
     self.hand:sortByRank()
 end
 
-function HumanPlayer:addToHand(cards, num)
-    Player.addToHand(self, cards, num)
+function HumanPlayer:addToHand(pile, num)
+    Player.addToHand(self, pile, num)
     self.hand:sortByRank()
 end
 
@@ -185,7 +185,6 @@ PlayerList = class('PlayerList')
 function PlayerList:initialize()
     self.players = {}
     self.winners = {}
-    self.curr_player = 0
     self.reverse = false
     self.turn = 1
 
@@ -222,7 +221,7 @@ function PlayerList:getNextPlayer()
 end
 
 function PlayerList:getHumanPlayer()
-    for i, player in  ipairs(self.players) do
+    for i, player in ipairs(self.players) do
         if  player.class.name == 'HumanPlayer' then
             return self.players[i]
         end
@@ -258,18 +257,18 @@ end
 
 function PlayerList:nextPlayerNum()
     local num_players = #self.players
-    local curr_player = self.curr_player
+    local next_player = self.curr_player
 
     if not self.reverse then
-        curr_player = curr_player + 1
+        next_player = next_player + 1
     else
-        curr_player = curr_player - 1
+        next_player = next_player - 1
     end
 
-    if curr_player > num_players then curr_player = 1 end
-    if curr_player < 1 then curr_player = num_players end
+    if next_player > num_players then next_player = 1 end
+    if next_player < 1 then next_player = num_players end
 
-    return curr_player
+    return next_player
 end
 
 -- Pick starting player by matching the first instance of

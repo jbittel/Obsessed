@@ -100,7 +100,7 @@ function Card:isValidPlay()
     if active_face == nil then return true end
     if active_face == self.face then return true end
     if Card.INVALID_MOVES[active_face] ~= nil then
-        for _,move in ipairs(Card.INVALID_MOVES[active_face]) do
+        for _, move in ipairs(Card.INVALID_MOVES[active_face]) do
             if move == self.face then return false end
         end
     end
@@ -158,11 +158,11 @@ function CardPile:getCards()
 end
 
 function CardPile:slice(start, len)
-    local p = CardPile:new()
+    local pile = CardPile:new()
     local len = len or (#self.cards - start + 1)
     local stop = start + len - 1
-    for i = start, stop do p:addCard(self.cards[i]) end
-    return p
+    for i = start, stop do pile:addCard(self.cards[i]) end
+    return pile
 end
 
 function CardPile:isActivePile()
@@ -315,11 +315,7 @@ function DrawPile:shuffle()
     local n = #self.cards
     -- TODO switch to lrandom for better random numbers
     -- http://lua-users.org/lists/lua-l/2007-03/msg00564.html 
-    math.randomseed(tonumber(tostring(os.time()):reverse():sub(1,6)))
-    -- math.randomseed(os.time())
-    -- math.random()
-    -- math.random()
-    -- math.random()
+    math.randomseed(tonumber(tostring(os.time()):reverse():sub(1, 6)))
     while n > 1 do
         local k = math.random(n)
         self.cards[n], self.cards[k] = self.cards[k], self.cards[n]
@@ -388,7 +384,6 @@ function PlayerHand:draw(x, y, spacing)
     local r, g, b, a = love.graphics.getColor()
     local screen_width = love.graphics.getWidth()
     local displayed = 0
-    local x = x
 
     for _, card in ipairs(self:getCards()) do
         card.x = x

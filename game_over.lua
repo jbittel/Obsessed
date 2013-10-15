@@ -22,7 +22,7 @@ end
 function GameOver:draw()
     love.graphics.print('Game Over', 100, 100)
     local vpos = 200
-    for i,player in ipairs(self.winners) do
+    for i, player in ipairs(self.winners) do
         love.graphics.print(i..'. '..tostring(player), 100, vpos)
         vpos = vpos + 50
     end
