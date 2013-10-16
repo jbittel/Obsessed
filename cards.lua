@@ -284,7 +284,7 @@ DrawPile = class('DrawPile', CardPile)
 
 function DrawPile:initialize()
     CardPile.initialize(self)
-    local num_decks = math.ceil(NUM_PLAYERS / 2)
+    local num_decks = math.ceil(Game.NUM_PLAYERS / 2)
 
     for deck = 1, num_decks do
         for _, suit in ipairs(Card.SUITS) do

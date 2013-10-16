@@ -120,5 +120,5 @@ end
 function AIPlayer:canKillPile(pile, face)
     local freq = pile:getFrequencies()
     local run = discard_pile:getRunLength()
-    return freq[face] + run >= KILL_RUN_LEN
+    return freq[face] + run >= Game.KILL_RUN_LENGTH
 end

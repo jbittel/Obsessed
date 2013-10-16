@@ -116,7 +116,7 @@ function Player:executeTurn()
     end
 
     -- Kill pile if 4+ top cards match
-    if discard_pile:getRunLength() >= KILL_RUN_LEN then
+    if discard_pile:getRunLength() >= Game.KILL_RUN_LENGTH then
         discard_pile:killPile()
         next_player = false
     end
@@ -188,7 +188,7 @@ function PlayerList:initialize()
     self.reverse = false
     self.turn = 1
 
-    for i = 1, NUM_PLAYERS do
+    for i = 1, Game.NUM_PLAYERS do
         if i == 1 then
             table.insert(self.players, HumanPlayer:new(i))
         else

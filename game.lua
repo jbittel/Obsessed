@@ -10,11 +10,12 @@
 
 Game = class('Game')
 
-NUM_PLAYERS = 4
+Game.static.NUM_PLAYERS = 4
 
-KILL_RUN_LEN = 4
-if NUM_PLAYERS == 2 then
-    KILL_RUN_LEN = 3
+if Game.NUM_PLAYERS == 2 then
+    Game.static.KILL_RUN_LENGTH = 3
+else
+    Game.static.KILL_RUN_LENGTH = 4
 end
 
 function Game:initialize()
