@@ -105,11 +105,7 @@ function Game:mousepressed(x, y, button)
     local active_pile = player:getActivePile()
     for i, card in ipairs(active_pile:getCards()) do
         if card:mousepressed(x, y, button) then
-            if active_pile == player.hidden then
-                player:addToHandFromHidden(i)
-            else
-                card:toggleSelected()
-            end
+            active_pile:toggleSelected(i)
             return
         end
     end

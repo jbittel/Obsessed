@@ -469,3 +469,8 @@ function PlayerHidden:draw(x, y, spacing)
         love.graphics.draw(card.back, card.x, card.y)
     end
 end
+
+function PlayerHidden:toggleSelected(num)
+    CardPile.toggleSelected(self, num)
+    player_list:getCurrentPlayer():addToHand(self, num)
+end

@@ -63,7 +63,7 @@ function AIPlayer:selectFromVisible()
 end
 
 function AIPlayer:selectFromHidden()
-    self:addToHandFromHidden(1)
+    self.hidden:toggleSelected(1)
     logger('drew from hidden cards, '..self:getNumHiddenCards()..' left')
 end
 

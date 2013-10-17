@@ -51,14 +51,6 @@ function Player:addToHand(pile, num)
     if card ~= nil then self.hand:addCard(card) end
 end
 
-function Player:addToHandFromHidden(num)
-    local card = self.hidden:removeCard(num)
-    if card ~= nil then
-        card:setSelected()
-        self.hand:addCard(card)
-    end
-end
-
 function Player:pickUpPile()
     local count = 0
     for _, card in ipairs(discard_pile:getCards()) do
@@ -152,11 +144,6 @@ end
 
 function HumanPlayer:addToHand(pile, num)
     Player.addToHand(self, pile, num)
-    self.hand:sortByRank()
-end
-
-function HumanPlayer:addToHandFromHidden(num)
-    Player.addToHandFromHidden(self, num)
     self.hand:sortByRank()
 end
 
