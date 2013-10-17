@@ -69,6 +69,7 @@ end
 
 function AIPlayer:selectCardFace(pile)
     local valid = pile:getValidPlay()
+    if valid:getNumCards() == 1 then return valid:getCard():getFace() end
     self:modifyCardWeights(valid)
     return valid:getCard(biased_random(1, valid:getNumCards())):getFace()
 end
