@@ -401,7 +401,7 @@ function PlayerHand:draw(x, y, spacing)
 
         displayed = displayed + 1
         x = x + card.width + spacing
-        if x + card.width > screen_width then break end
+        if x + card.width + spacing > screen_width then break end
     end
 
     -- If not all cards fit on screen, show remaining count
