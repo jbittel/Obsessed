@@ -10,13 +10,13 @@
 
 GameOver = class('GameOver')
 
-function GameOver:initialize(winners)
+function GameOver:initialize()
     self.buttons = {
         quit = Button:new('Quit', screen.width - 160, 10),
         restart = Button:new('Restart', screen.width - 160, 70),
     }
 
-    self.winners = winners
+    self.winners = player_list:getWinners()
 end
 
 function GameOver:draw()

@@ -57,7 +57,7 @@ function Game:update(dt)
 
     if player_list:isGameOver() then
         require 'game_over'
-        scene = GameOver:new(player_list:getWinners())
+        scene = GameOver:new()
     end
 end
 
