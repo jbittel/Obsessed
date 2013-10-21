@@ -16,8 +16,8 @@ function love.load()
     screen = {
         width = love.graphics.getWidth(),
         height = love.graphics.getHeight(),
-        halfWidth = love.graphics.getWidth() / 2,
-        halfHeight = love.graphics.getHeight() / 2,
+        halfwidth = love.graphics.getWidth() / 2,
+        halfheight = love.graphics.getHeight() / 2,
     }
 
     font = {

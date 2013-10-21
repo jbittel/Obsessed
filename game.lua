@@ -62,7 +62,7 @@ function Game:update(dt)
 end
 
 function Game:draw()
-    love.graphics.draw(self.logo, screen.width / 2 - self.logo:getWidth() / 2, 5)
+    love.graphics.draw(self.logo, screen.halfwidth - self.logo:getWidth() / 2, 5)
 
     draw_pile:draw(50, 200)
     discard_pile:draw(150, 200)
