@@ -58,6 +58,24 @@ function Card:mousepressed(x, y, button)
     return false
 end
 
+function Card:draw(front, active)
+    local r, g, b, a = love.graphics.getColor()
+    love.graphics.setColor(255, 255, 255, 255)
+    if front then
+        love.graphics.draw(self.front, self.x, self.y)
+    else
+        love.graphics.draw(self.back, self.x, self.y)
+    end
+    if self:isSelected() then
+        love.graphics.setColor(255, 0, 255, 190)
+        love.graphics.rectangle('line', self.x, self.y, self.width, self.height)
+    elseif active and self:hover() and self:isValidPlay() then
+        love.graphics.setColor(255, 255, 255, 190)
+        love.graphics.rectangle('line', self.x, self.y, self.width, self.height)
+    end
+    love.graphics.setColor(r, g, b, a)
+end
+
 function Card:isSpecial()
     for _, card in ipairs(Card.SPECIAL_CARDS) do
         if card == self.face then return true end
@@ -381,30 +399,20 @@ function PlayerHand:initialize()
 end
 
 function PlayerHand:draw(x, y, spacing)
-    local r, g, b, a = love.graphics.getColor()
     local screen_width = love.graphics.getWidth()
     local displayed = 0
 
     for _, card in ipairs(self:getCards()) do
         card.x = x
         card.y = y
-
-        love.graphics.setColor(255, 255, 255, 255)
-        love.graphics.draw(card.front, card.x, card.y)
-        if card:isSelected() then
-            love.graphics.setColor(255, 0, 255, 190)
-            love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
-        elseif card:hover() and card:isValidPlay() then
-            love.graphics.setColor(255, 255, 255, 190)
-            love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
-        end
-
+        card:draw(true, self:isActivePile())
         displayed = displayed + 1
         x = x + card.width + spacing
         if x + card.width + spacing > screen_width then break end
     end
 
     -- If not all cards fit on screen, show remaining count
+    local r, g, b, a = love.graphics.getColor()
     local not_displayed = self:getNumCards() - displayed
     if not_displayed > 0 then
         local card = self:getCard()
@@ -412,7 +420,6 @@ function PlayerHand:draw(x, y, spacing)
         love.graphics.setColor(255, 255, 255, 255)
         love.graphics.print(count, screen.width - (font.default:getWidth(count) + spacing), y + card.height)
     end
-
     love.graphics.setColor(r, g, b, a)
 end
 
@@ -427,25 +434,14 @@ function PlayerVisible:initialize()
 end
 
 function PlayerVisible:draw(x, y, spacing)
-    local r, g, b, a = love.graphics.getColor()
     for _, card in ipairs(self:getCards()) do
         if card.x == 0 then
             card.x = x
             card.y = y
         end
+        card:draw(true, self:isActivePile())
         x = x + card.width + spacing
-
-        love.graphics.setColor(255, 255, 255, 255)
-        love.graphics.draw(card.front, card.x, card.y)
-        if card:isSelected() then
-            love.graphics.setColor(255, 0, 255, 190)
-            love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
-        elseif self:isActivePile() and card:hover() and card:isValidPlay() then
-            love.graphics.setColor(255, 255, 255, 190)
-            love.graphics.rectangle('line', card.x, card.y, card.width, card.height)
-        end
     end
-    love.graphics.setColor(r, g, b, a)
 end
 
 
@@ -464,9 +460,8 @@ function PlayerHidden:draw(x, y, spacing)
             card.x = x
             card.y = y
         end
-
+        card:draw(false, false)
         x = x + card.width + spacing
-        love.graphics.draw(card.back, card.x, card.y)
     end
 end
 
