@@ -34,7 +34,8 @@ function Game:initialize()
     draw_pile = DrawPile:new()
     discard_pile = DiscardPile:new()
     player_list = PlayerList:new()
-    dtotal = 0
+
+    self.dtotal = 0
 end
 
 function Game:update(dt)
@@ -46,9 +47,9 @@ function Game:update(dt)
         return
     end
 
-    dtotal = dtotal + dt
-    if dtotal >= 0.5 then
-        dtotal = dtotal - 0.5
+    self.dtotal = self.dtotal + dt
+    if self.dtotal >= 0.5 then
+        self.dtotal = self.dtotal - 0.5
         if player:isAi() and not player_list:isGameOver() then
             player:selectCards()
             player:executeTurn()
