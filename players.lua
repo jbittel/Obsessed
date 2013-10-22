@@ -15,7 +15,6 @@ function Player:initialize(num)
     self.hand = PlayerHand:new()
     self.visible = PlayerVisible:new()
     self.hidden = PlayerHidden:new()
-    self:swapCards()
 end
 
 function Player:__tostring()
@@ -150,10 +149,6 @@ end
 function HumanPlayer:pickUpPile()
     Player.pickUpPile(self)
     self.hand:sortByRank()
-end
-
-function HumanPlayer:swapCards()
-    return
 end
 
 function HumanPlayer:executeTurn()

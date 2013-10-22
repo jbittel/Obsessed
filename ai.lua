@@ -27,6 +27,11 @@ AIPlayer.static.BASE_AI_FACE_WEIGHT = {
     ['R']  = 12
 }
 
+function AIPlayer:initialize(num)
+    Player.initialize(self, num)
+    self:swapCards()
+end
+
 function AIPlayer:swapCards()
     local pile = CardPile:new(self.visible, self.hand)
     self:modifyCardWeights(pile)
