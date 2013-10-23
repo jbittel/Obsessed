@@ -69,7 +69,7 @@ function Card:draw(front, active)
     if self:isSelected() then
         love.graphics.setColor(255, 0, 255, 190)
         love.graphics.rectangle('line', self.x, self.y, self.width, self.height)
-    elseif active and self:hover() and self:isValidPlay() then
+    elseif active and self:hover() then
         love.graphics.setColor(255, 255, 255, 190)
         love.graphics.rectangle('line', self.x, self.y, self.width, self.height)
     end
@@ -460,7 +460,7 @@ function PlayerHidden:draw(x, y, spacing)
             card.x = x
             card.y = y
         end
-        card:draw(false, false)
+        card:draw(false, self:isActivePile())
         x = x + card.width + spacing
     end
 end
