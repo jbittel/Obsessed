@@ -77,8 +77,8 @@ function Card:draw(front, active)
 end
 
 function Card:isSpecial()
-    for _, card in ipairs(Card.SPECIAL_CARDS) do
-        if card == self.face then return true end
+    for _, face in ipairs(Card.SPECIAL_CARDS) do
+        if face == self.face then return true end
     end
     return false
 end
