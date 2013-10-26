@@ -109,6 +109,15 @@ function Card:getFace()
     return self.face
 end
 
+function Card:getPosition()
+    return x, y
+end
+
+function Card:setPosition(x, y)
+    self.x = x
+    self.y = y
+end
+
 function Card:isActiveFace()
     return self.face == discard_pile:getActiveFace()
 end
@@ -403,8 +412,7 @@ function PlayerHand:draw(x, y, spacing)
     local displayed = 0
 
     for _, card in ipairs(self:getCards()) do
-        card.x = x
-        card.y = y
+        card:setPosition(x, y)
         card:draw(true, self:isActivePile())
         displayed = displayed + 1
         x = x + card.width + spacing
@@ -435,9 +443,8 @@ end
 
 function PlayerVisible:draw(x, y, spacing)
     for _, card in ipairs(self:getCards()) do
-        if card.x == 0 then
-            card.x = x
-            card.y = y
+        if not card:getPosition() then
+            card:setPosition(x, y)
         end
         card:draw(true, self:isActivePile())
         x = x + card.width + spacing
@@ -456,9 +463,8 @@ end
 
 function PlayerHidden:draw(x, y, spacing)
     for _, card in ipairs(self:getCards()) do
-        if card.x == 0 then
-            card.x = x
-            card.y = y
+        if not card:getPosition() then
+            card:setPosition(x, y)
         end
         card:draw(false, self:isActivePile())
         x = x + card.width + spacing
