@@ -332,7 +332,8 @@ end
 function DrawPile:draw(x, y)
     local card = self:getCard()
     if card then
-        love.graphics.draw(card.back, x, y)
+        card:setPosition(x, y)
+        card:draw(false, false)
         love.graphics.print(self:getNumCards(), x, y + card.height)
     end
 end
@@ -356,9 +357,11 @@ DiscardPile = class('DiscardPile', CardPile)
 function DiscardPile:draw(x, y)
     for _, card in ipairs(self.cards) do
         if card:getFace() == 'R' then
-            love.graphics.draw(card.front, x + 10, y)
+            card:setPosition(x + 10, y)
+            card:draw(true, false)
         else
-            love.graphics.draw(card.front, x, y)
+            card:setPosition(x, y)
+            card:draw(true, false)
             love.graphics.print(self:getNumCards(), x, y + card.height)
             break
         end
