@@ -110,7 +110,7 @@ function Card:getFace()
 end
 
 function Card:getPosition()
-    return x, y
+    return self.x, self.y
 end
 
 function Card:setPosition(x, y)
@@ -443,7 +443,7 @@ end
 
 function PlayerVisible:draw(x, y, spacing)
     for _, card in ipairs(self:getCards()) do
-        if not card:getPosition() then
+        if card:getPosition() == 0 then
             card:setPosition(x, y)
         end
         card:draw(true, self:isActivePile())
@@ -463,7 +463,7 @@ end
 
 function PlayerHidden:draw(x, y, spacing)
     for _, card in ipairs(self:getCards()) do
-        if not card:getPosition() then
+        if card:getPosition() == 0 then
             card:setPosition(x, y)
         end
         card:draw(false, self:isActivePile())
