@@ -118,6 +118,14 @@ function Card:setPosition(x, y)
     self.y = y
 end
 
+function Card:getHeight()
+    return self.height
+end
+
+function Card:getWidth()
+    return self.width
+end
+
 function Card:isActiveFace()
     return self.face == discard_pile:getActiveFace()
 end
@@ -334,7 +342,7 @@ function DrawPile:draw(x, y)
     if card then
         card:setPosition(x, y)
         card:draw(false, false)
-        love.graphics.print(self:getNumCards(), x, y + card.height)
+        love.graphics.print(self:getNumCards(), x, y + card:getHeight())
     end
 end
 
@@ -362,7 +370,7 @@ function DiscardPile:draw(x, y)
         else
             card:setPosition(x, y)
             card:draw(true, false)
-            love.graphics.print(self:getNumCards(), x, y + card.height)
+            love.graphics.print(self:getNumCards(), x, y + card:getHeight())
             break
         end
     end
@@ -418,8 +426,8 @@ function PlayerHand:draw(x, y, spacing)
         card:setPosition(x, y)
         card:draw(true, self:isActivePile())
         displayed = displayed + 1
-        x = x + card.width + spacing
-        if x + card.width + spacing > screen_width then break end
+        x = x + card:getWidth() + spacing
+        if x + card:getWidth() + spacing > screen_width then break end
     end
 
     -- If not all cards fit on screen, show remaining count
@@ -429,7 +437,7 @@ function PlayerHand:draw(x, y, spacing)
         local card = self:getCard()
         local count = '+'..not_displayed..' cards'
         love.graphics.setColor(255, 255, 255, 255)
-        love.graphics.print(count, screen.width - (font.default:getWidth(count) + spacing), y + card.height)
+        love.graphics.print(count, screen.width - (font.default:getWidth(count) + spacing), y + card:getHeight())
     end
     love.graphics.setColor(r, g, b, a)
 end
@@ -450,7 +458,7 @@ function PlayerVisible:draw(x, y, spacing)
             card:setPosition(x, y)
         end
         card:draw(true, self:isActivePile())
-        x = x + card.width + spacing
+        x = x + card:getWidth() + spacing
     end
 end
 
@@ -470,7 +478,7 @@ function PlayerHidden:draw(x, y, spacing)
             card:setPosition(x, y)
         end
         card:draw(false, self:isActivePile())
-        x = x + card.width + spacing
+        x = x + card:getWidth() + spacing
     end
 end
 
