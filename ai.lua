@@ -100,7 +100,7 @@ function AIPlayer:modifyCardWeights(pile)
     end
 
     for _, card in ipairs(pile:getCards()) do
-        card.weight = face_weight[card:getFace()]
+        card:setWeight(face_weight[card:getFace()])
     end
     pile:sortByWeight()
 end

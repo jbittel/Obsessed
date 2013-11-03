@@ -38,6 +38,7 @@ function Card:initialize(face, suit, rank)
     self.x = 0
     self.y = 0
     self.selected = false
+    self.weight = 0
 end
 
 function Card:__tostring()
@@ -126,6 +127,14 @@ function Card:getWidth()
     return self.width
 end
 
+function Card:getWeight()
+    return self.weight
+end
+
+function Card:setWeight(weight)
+    self.weight = weight
+end
+
 function Card:isActiveFace()
     return self.face == discard_pile:getActiveFace()
 end
@@ -165,7 +174,7 @@ function CardPile:sortByRank()
 end
 
 function CardPile:sortByWeight()
-    table.sort(self.cards, function(a, b) return a.weight < b.weight end)
+    table.sort(self.cards, function(a, b) return a:getWeight() < b:getWeight() end)
 end
 
 function CardPile:addCard(card)
