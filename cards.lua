@@ -289,10 +289,12 @@ function CardPile:getValidPlay()
 end
 
 function CardPile:hasCard(face)
-    for i, card in ipairs(self.cards) do
-        if card:getFace() == face then return i end
+    for _, card in ipairs(self.cards) do
+        if card:getFace() == face then
+            return true
+        end
     end
-    return nil
+    return false
 end
 
 function CardPile:hasSelected()
