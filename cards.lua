@@ -159,7 +159,7 @@ function CardPile:initialize(...)
     local arg = {n = select('#', ...), ...}
     for i = 1, arg.n do
         local pile = arg[i]
-        for _, card in ipairs(pile.cards) do
+        for _, card in ipairs(pile:getCards()) do
             table.insert(self.cards, card)
         end
     end
