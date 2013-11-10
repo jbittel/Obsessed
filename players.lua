@@ -25,6 +25,14 @@ function Player:isAi()
     return self.class.name == 'AIPlayer'
 end
 
+function Player:getNum()
+    return self.num
+end
+
+function Player:getHand()
+    return self.hand
+end
+
 function Player:isCurrentPlayer()
     return self.num == player_list:getCurrentPlayerNum()
 end
@@ -258,8 +266,8 @@ end
 function PlayerList:initPlayerNum()
     for _, face in ipairs(Card.START_ORDER) do
         for _, player in ipairs(self.players) do
-            if player.hand:hasCard(face) then
-                return player.num
+            if player:getHand():hasCard(face) then
+                return player:getNum()
             end
         end
     end
