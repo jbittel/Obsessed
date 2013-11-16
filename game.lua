@@ -48,7 +48,7 @@ function Game:update(dt)
     end
 
     self.dtotal = self.dtotal + dt
-    if self.dtotal >= 0.5 then
+    if self.dtotal >= 0.5 or not player_list:getHumanPlayer() then
         self.dtotal = self.dtotal - 0.5
         if player:isAi() and not player_list:isGameOver() then
             player:selectCards()
