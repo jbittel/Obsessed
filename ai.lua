@@ -118,9 +118,9 @@ end
 
 function AIPlayer:nextPlayerWinning()
     -- Consider the next player close to winning when they have
-    -- less than 6 cards total
+    -- less than the visible and hidden cards left
     local next_player = player_list:getNextPlayer()
-    return next_player:getNumCards() < 6
+    return next_player:getNumCards() < PlayerVisible.SIZE + PlayerHidden.SIZE
 end
 
 function AIPlayer:canKillPile(pile, face)
