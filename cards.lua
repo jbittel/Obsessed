@@ -429,13 +429,14 @@ function PlayerHand:initialize()
     for i = 1, PlayerHand.SIZE do self:addCard(draw_pile:removeCard()) end
 end
 
-function PlayerHand:draw(x, y, spacing)
+function PlayerHand:draw(x, y, spacing, active)
+    active = active or self:isActivePile()
     local screen_width = love.graphics.getWidth()
     local displayed = 0
 
     for _, card in ipairs(self:getCards()) do
         card:setPosition(x, y)
-        card:draw(true, self:isActivePile())
+        card:draw(true, active)
         displayed = displayed + 1
         x = x + card:getWidth() + spacing
         if x + card:getWidth() + spacing > screen_width then break end
@@ -463,12 +464,13 @@ function PlayerVisible:initialize()
     for i = 1, PlayerVisible.SIZE do self:addCard(draw_pile:removeCard()) end
 end
 
-function PlayerVisible:draw(x, y, spacing)
+function PlayerVisible:draw(x, y, spacing, active)
+    active = active or self:isActivePile()
     for _, card in ipairs(self:getCards()) do
         if card:getPosition() == 0 then
             card:setPosition(x, y)
         end
-        card:draw(true, self:isActivePile())
+        card:draw(true, active)
         x = x + card:getWidth() + spacing
     end
 end
