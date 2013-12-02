@@ -246,17 +246,16 @@ function PlayerList:isFirstTurn()
 end
 
 function PlayerList:nextPlayerNum()
-    local num_players = #self.players
-    local next_player = self.curr_player
+    local num_players = self:getNumPlayers()
+    local next_player = self:getCurrentPlayerNum()
 
     if not self.reverse then
         next_player = next_player + 1
+        if next_player > num_players then next_player = 1 end
     else
         next_player = next_player - 1
+        if next_player < 1 then next_player = num_players end
     end
-
-    if next_player > num_players then next_player = 1 end
-    if next_player < 1 then next_player = num_players end
 
     return next_player
 end
