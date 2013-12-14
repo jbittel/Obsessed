@@ -81,6 +81,7 @@ end
 
 function AIPlayer:modifyCardWeights(pile)
     local face_weight = table_copy(AIPlayer.BASE_AI_FACE_WEIGHT)
+    local sort_descending = false
 
     -- Prioritize killing the pile when advisable
     for _, card in ipairs(pile:getCards()) do
@@ -92,17 +93,17 @@ function AIPlayer:modifyCardWeights(pile)
         end
     end
 
-    -- Play aggressively if the next player is close to winning
     if self:isLateGame() and self:nextPlayerWinning() then
-        face_weight['3'] = 0
-        face_weight['R'] = 0
-        face_weight['7'] = 0
+        -- If the next player is close to winning, invert the pile
+        -- sort order so more aggressive cards are played
+        face_weight['2'] = 0
+        sort_descending = true
     end
 
     for _, card in ipairs(pile:getCards()) do
         card:setWeight(face_weight[card:getFace()])
     end
-    pile:sortByWeight()
+    pile:sortByWeight(sort_descending)
 end
 
 function AIPlayer:isLateGame()

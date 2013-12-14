@@ -173,8 +173,13 @@ function CardPile:sortByRank()
     table.sort(self.cards, function(a, b) return a.rank < b.rank end)
 end
 
-function CardPile:sortByWeight()
-    table.sort(self.cards, function(a, b) return a:getWeight() < b:getWeight() end)
+function CardPile:sortByWeight(descending)
+    local descending = descending or false
+    if descending then
+        table.sort(self.cards, function(a, b) return a:getWeight() > b:getWeight() end)
+    else
+        table.sort(self.cards, function(a, b) return a:getWeight() < b:getWeight() end)
+    end
 end
 
 function CardPile:addCard(card)
