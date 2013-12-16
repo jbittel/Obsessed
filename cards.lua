@@ -165,6 +165,14 @@ function CardPile:initialize(...)
     end
 end
 
+function CardPile:__tostring()
+    card_list = ''
+    for _, card in ipairs(self.cards) do
+        card_list = card_list..tostring(card)..', '
+    end
+    return card_list
+end
+
 function CardPile:getNumCards()
     return #self.cards
 end
