@@ -170,7 +170,7 @@ function CardPile:__tostring()
     for _, card in ipairs(self.cards) do
         card_list = card_list..tostring(card)..', '
     end
-    return card_list
+    return '['..string.sub(card_list, 1, -3)..']'
 end
 
 function CardPile:getNumCards()
