@@ -209,6 +209,19 @@ function CardPile:getCards()
     return self.cards
 end
 
+function CardPile:getUniqueCards()
+    local unique = {}
+    local face = nil
+    self:sortByRank()
+    for _, card in ipairs(self.cards) do
+        if face ~= card:getFace() then
+            face = card:getFace()
+            table.insert(unique, card)
+        end
+    end
+    return unique
+end
+
 function CardPile:slice(start, len)
     local pile = CardPile:new()
     local len = len or (#self.cards - start + 1)
@@ -285,11 +298,8 @@ end
 
 function CardPile:getValidPlay()
     local valid = CardPile:new()
-    local face = nil
-    self:sortByRank()
-    for _, card in ipairs(self.cards) do
-        if face ~= card:getFace() and card:isValidPlay() then
-            face = card:getFace()
+    for _, card in ipairs(self:getUniqueCards()) do
+        if card:isValidPlay() then
             valid:addCard(card)
         end
     end
