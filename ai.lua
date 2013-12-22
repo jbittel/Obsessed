@@ -51,7 +51,7 @@ end
 
 function AIPlayer:swapCards()
     local pile = CardPile:new(self.visible, self.hand)
-    self:modifyCardWeights(pile)
+    self:setCardWeights(pile)
     self.visible = pile:slice(1, PlayerVisible.SIZE)
     self.hand = pile:slice(PlayerVisible.SIZE + 1, PlayerHand.SIZE)
 end
@@ -72,8 +72,8 @@ function AIPlayer:selectFromHand()
     for _, card in ipairs(self.hand:getCards()) do
         if face == card:getFace() then
             card:setSelected()
-            if card:isSpecial() and not self:isLateGame()
-               and not self:isBehind() then break end
+            if card:isSpecial() and not (self:isLateGame()
+               or self:isBehind() or self:hasLargeHand()) then break end
         end
     end
 end
@@ -90,26 +90,24 @@ function AIPlayer:selectFromHidden()
 end
 
 function AIPlayer:selectCardFace(pile)
+    self:setCardWeights(pile)
     local valid = pile:getValidPlay()
-    if valid:getNumCards() == 1 then return valid:getCard():getFace() end
-    self:modifyCardWeights(valid)
+    valid:sortByWeight()
     return valid:getCard(biased_random(1, valid:getNumCards())):getFace()
 end
 
-function AIPlayer:modifyCardWeights(pile)
+function AIPlayer:setCardWeights(pile)
     local face_weight = {}
     if self:isLateGame() and self:nextPlayerWinning() then
-        -- If the next player is winning, play more "aggressively"
         face_weight = table_copy(AIPlayer.AGGRESSIVE_AI_FACE_WEIGHT)
     else
         face_weight = table_copy(AIPlayer.BASE_AI_FACE_WEIGHT)
     end
 
     -- Prioritize killing the pile when advisable
-    for _, card in ipairs(pile:getCards()) do
-        if card:isActiveFace() and not card:isSpecial() and
-           (self:isLateGame() or self:isBehind()) then
-            if self:canKillPile(pile, card:getFace()) then
+    for _, card in ipairs(pile:getUniqueCards()) do
+        if self:canKillPile(pile, card) then
+            if self:hasLargeHand() or self:isLateGame() or self:isBehind() then
                 face_weight[card:getFace()] = 0
             end
         end
@@ -119,6 +117,17 @@ function AIPlayer:modifyCardWeights(pile)
         card:setWeight(face_weight[card:getFace()])
     end
     pile:sortByWeight()
+end
+
+function AIPlayer:canKillPile(pile, card)
+    if not card:isValidPlay() then return false end
+    local freq = pile:getFrequencies()
+    if card:getFace() == discard_pile:getTopFace() then
+        local run = discard_pile:getRunLength()
+        return freq[card:getFace()] + run >= Game.KILL_RUN_LENGTH
+    else
+        return freq[card:getFace()] >= Game.KILL_RUN_LENGTH
+    end
 end
 
 function AIPlayer:isLateGame()
@@ -139,8 +148,6 @@ function AIPlayer:nextPlayerWinning()
     return next_player:getNumCards() < PlayerVisible.SIZE + PlayerHidden.SIZE
 end
 
-function AIPlayer:canKillPile(pile, face)
-    local freq = pile:getFrequencies()
-    local run = discard_pile:getRunLength()
-    return freq[face] + run >= Game.KILL_RUN_LENGTH
+function AIPlayer:hasLargeHand()
+    return self.hand:getNumCards() > PlayerHand.SIZE
 end
