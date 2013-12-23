@@ -425,8 +425,8 @@ end
 
 function DiscardPile:getRunLength()
     local top_face = self:getTopFace()
-    if not top_face then return 0 end
     local run = 0
+    if not top_face then return run end
     for _, card in ipairs(self.cards) do
         if card:getFace() == top_face then
             run = run + 1
