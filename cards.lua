@@ -135,6 +135,10 @@ function Card:setWeight(weight)
     self.weight = weight
 end
 
+function Card:getRank()
+    return self.rank
+end
+
 function Card:isActiveFace()
     return self.face == discard_pile:getActiveFace()
 end
@@ -178,7 +182,7 @@ function CardPile:getNumCards()
 end
 
 function CardPile:sortByRank()
-    table.sort(self.cards, function(a, b) return a.rank < b.rank end)
+    table.sort(self.cards, function(a, b) return a:getRank() < b:getRank() end)
 end
 
 function CardPile:sortByWeight()
