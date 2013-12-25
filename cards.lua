@@ -422,7 +422,8 @@ end
 
 function DiscardPile:getActiveFace()
     for _, card in ipairs(self.cards) do
-        if card:getFace() ~= 'R' then return card:getFace() end
+        local face = card:getFace()
+        if face ~= 'R' then return face end
     end
     return nil
 end
