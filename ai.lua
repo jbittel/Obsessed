@@ -120,6 +120,9 @@ function AIPlayer:setCardWeights(pile)
 end
 
 function AIPlayer:canKillPile(pile, card)
+    -- Determine if the AI player can kill the discard pile,
+    -- either by combining cards in hand with the current
+    -- pile or solely through cards in hand
     if not card:isValidPlay() then return false end
     local freq = pile:getFrequencies()
     if card:getFace() == discard_pile:getTopFace() then
@@ -149,5 +152,6 @@ function AIPlayer:nextPlayerWinning()
 end
 
 function AIPlayer:hasLargeHand()
+    -- Consider a hand "large" if it is larger than the default size
     return self.hand:getNumCards() > PlayerHand.SIZE
 end
