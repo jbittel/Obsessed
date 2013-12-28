@@ -103,6 +103,12 @@ function Player:executeTurn()
         player:pickUpPile()
     end
 
+    -- Kill pile if 4+ top cards match
+    if discard_pile:getRunLength() >= Game.KILL_RUN_LENGTH then
+        discard_pile:killPile()
+        next_player = false
+    end
+
     -- Apply card face rules
     local top_face = discard_pile:getTopFace()
     if top_face == '8' then
@@ -112,12 +118,6 @@ function Player:executeTurn()
         next_player = false
     elseif top_face == 'R' then
         player_list:reverseDirection()
-    end
-
-    -- Kill pile if 4+ top cards match
-    if discard_pile:getRunLength() >= Game.KILL_RUN_LENGTH then
-        discard_pile:killPile()
-        next_player = false
     end
 
     -- Keep player's hand at the minimum number of cards,
