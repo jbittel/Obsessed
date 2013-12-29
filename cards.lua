@@ -194,8 +194,8 @@ function CardPile:addCard(card)
 end
 
 function CardPile:removeCard(num)
-    if #self.cards == 0 then return nil end
     local num = num or 1
+    if #self.cards < num then return nil end
     return table.remove(self.cards, num)
 end
 
@@ -204,8 +204,8 @@ function CardPile:removeCards()
 end
 
 function CardPile:getCard(num)
-    if #self.cards == 0 then return nil end
     local num = num or 1
+    if #self.cards < num then return nil end
     return self.cards[num]
 end
 
