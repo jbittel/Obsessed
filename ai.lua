@@ -85,7 +85,7 @@ function AIPlayer:selectFromVisible()
 end
 
 function AIPlayer:selectFromHidden()
-    self.hidden:toggleSelected(1)
+    self.hidden:toggleSelected(math.random(self.hidden:getNumCards()))
     logger('drew from hidden cards, '..self:getNumHiddenCards()..' left')
 end
 
