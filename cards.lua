@@ -518,7 +518,7 @@ function PlayerHidden:draw(x, y, spacing)
     end
 end
 
-function PlayerHidden:setSelected(num)
-    CardPile.setSelected(self, num)
+function PlayerHidden:toggleSelected(num)
+    CardPile.toggleSelected(self, num)
     player_list:getCurrentPlayer():addToHand(self, num)
 end
