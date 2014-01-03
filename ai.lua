@@ -93,7 +93,7 @@ function AIPlayer:selectCardFace(pile)
     self:setCardWeights(pile)
     local valid = pile:getValidPlay()
     valid:sortByWeight()
-    return valid:getCard(biased_random(1, valid:getNumCards())):getFace()
+    return valid:getBiasedRandomCard():getFace()
 end
 
 function AIPlayer:setCardWeights(pile)

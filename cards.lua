@@ -209,6 +209,13 @@ function CardPile:getCard(num)
     return self.cards[num]
 end
 
+function CardPile:getBiasedRandomCard()
+    local max = #self.cards
+    local r = math.floor(1 + (max - 1) * math.random() ^ 10)
+    if r > max then r = max end
+    return self:getCard(r)
+end
+
 function CardPile:getCards()
     return self.cards
 end

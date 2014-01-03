@@ -14,14 +14,6 @@ function logger(msg)
     print(tostring(turn)..': '..tostring(player)..' '..msg)
 end
 
-function biased_random(min, max)
-    if min == max then return min end
-    local r = math.floor(min + (max - min) * math.random() ^ 10)
-    if r > max then r = max end
-    if r < min then r = min end
-    return r
-end
-
 function img_filename(str)
     str = str:gsub(' ', '-')
     return string.lower('images/'..str..'.png')
