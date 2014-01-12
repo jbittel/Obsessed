@@ -39,6 +39,15 @@ function Card:initialize(face, suit, rank)
     self.y = 0
     self.selected = false
     self.weight = 0
+    self.special = false
+
+    -- Set flag if card is special
+    for _, face in ipairs(Card.SPECIAL_CARDS) do
+        if face == self.face then
+            self.special = true
+            break
+        end
+    end
 end
 
 function Card:__tostring()
@@ -78,10 +87,7 @@ function Card:draw(front, active)
 end
 
 function Card:isSpecial()
-    for _, face in ipairs(Card.SPECIAL_CARDS) do
-        if face == self.face then return true end
-    end
-    return false
+    return self.special
 end
 
 function Card:isSelected()
