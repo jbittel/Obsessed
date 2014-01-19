@@ -4,7 +4,7 @@
   obsessed - a card game of mystery and intrigue
   ----------------------------------------------------
 
-  Copyright (c) 2013 Jason Bittel <jason.bittel@gmail.com>
+  Copyright (c) 2014 Jason Bittel <jason.bittel@gmail.com>
 
 --]]
 
