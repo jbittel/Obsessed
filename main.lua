@@ -24,7 +24,7 @@ function love.load()
         default = love.graphics.newFont(18)
     }
 
-    love.graphics.setCaption('Obsessed')
+    love.window.setTitle('Obsessed')
     love.graphics.setBackgroundColor(0, 79, 0)
     love.graphics.setColor(255, 255, 255)
 

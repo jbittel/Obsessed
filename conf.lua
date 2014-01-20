@@ -12,13 +12,13 @@ function love.conf(t)
     t.title = "Obsessed"
     t.author = "Jason Bittel"
 
-    t.version = "0.8.0"
+    t.version = "0.9.0"
 
-    t.screen.width = 1024
-    t.screen.height = 600
-    t.screen.fullscreen = false
-    t.screen.vsync = true
-    t.screen.fsaa = 0
+    t.window.width = 1024
+    t.window.height = 600
+    t.window.fullwindow = false
+    t.window.vsync = true
+    t.window.fsaa = 0
 
     t.modules.joystick = false
     t.modules.audio = false
