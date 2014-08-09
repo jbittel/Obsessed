@@ -115,12 +115,12 @@ function Game:keypressed(key, unicode)
     local player = player_list:getCurrentPlayer()
     if player:isAi() then return end
 
-    local active_pile = player:getActivePile()
     if key == 'return' then
         player:executeTurn()
     elseif key == 'q' or key == 'escape' then
         love.event.push('quit')
     elseif key:match('[1-9]') then
+        local active_pile = player:getActivePile()
         active_pile:toggleSelected(tonumber(key))
     end
 end
