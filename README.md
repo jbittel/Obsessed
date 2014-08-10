@@ -1,34 +1,11 @@
 Obsessed
 --------
 
-Obsessed is an implementation of the card game Obsession. For an explanation of the game's rules, see below. This is a command line application so enter this at a command prompt to play:
+Obsessed is an implementation of the card game Obsession. For an explanation of the game's rules, see below. It is built using the [LOVE game engine](http://love2d.org/). To play, first change to the game's root directory and enter::
 
-    $ lua game.lua
+    $ love .
 
-During play, the game will look something like this:
-
-    === PLAYER 2
-    ### Draw:       63 cards
-    ### Discard:    4 cards 1:2S 2:R 3:KH 4:KC 
-    ### Hand:       3 cards
-    ### Visible:    3 cards 1:10D 2:8D 3:AC 
-    ### Hidden:     3 cards
-    *** Played a 9H
-    
-    === PLAYER 1
-    ### Draw:       62 cards
-    ### Discard:    5 cards 1:9H 2:2S 3:R 4:KH 5:KC 
-    ### Hand:       8 cards 1:6H 2:6H 3:6S 4:JH 5:JC 6:QS 7:QD 8:KS 
-    ### Visible:    3 cards 1:KS 2:KD 3:R 
-    ### Hidden:     3 cards
-    +++ Select cards from your hand
-    +++ Enter card number(s):
-
-When prompted to enter card numbers, it will tell you what stack to draw cards from (hand, visible or hidden). The selection numbers are printed next to each card in the stack. Multiple cards can be played at a time by separating the numbers with a delimiter, which can be any non-numeric character. For example:
-
-    +++ Enter card number(s): 4,5
-
-Play will continue until one of the players wins.
+Naturally, you will need a copy of LOVE 0.9.1+ installed.
 
 Obsession
 ---------
@@ -42,6 +19,7 @@ Each player is dealt three cards that become their hand. Additionally, each play
 ### PLAYING THE GAME ###
 
 Play begins with the player who has the lowest available non-special card, which they play into a central discard pile. After playing a card, the player draws the top card from the draw stack to ensure they maintain a minimum of three cards. If they have more than three cards, they do not draw any cards on their turn. Play continues clockwise to the next player, who either plays a non-special card equal to or greater in face value to the top card on the discard pile, or a special card which operates according to unique rules listed below. If a player has a valid move they must take it, and if they do not have a valid move, then the current discard pile is picked up and becomes part of their hand. If a player has more than one identical face value card, they can choose to play any number of them as a set on their turn. Any run of four or more cards on the discard pile, including cards played by other players, kills it and the current player gets another turn.
+
 
 If the discard pile is killed, either through a run of four or more cards or by playing a 10 special card, all cards in the discard pile are "killed" and removed entirely from play. The player who killed the pile gets another turn and can play anything on the now empty pile. A player can kill the pile multiple times in a row.
 
