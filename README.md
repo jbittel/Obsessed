@@ -1,7 +1,7 @@
 Obsessed
 --------
 
-Obsessed is an implementation of the card game Obsession. For an explanation of the game's rules, see below. It is built using the [LOVE game engine](http://love2d.org/). To play, first change to the game's root directory and enter::
+Obsessed is an implementation of the card game Obsession. For an explanation of the game's rules, see below. It is built using the [LOVE game engine](http://love2d.org/). To play, first change to the game's root directory and enter:
 
     $ love .
 
